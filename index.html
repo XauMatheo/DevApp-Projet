@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DataInvest Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #07080d;
+    --bg-1: #0d0f18;
+    --bg-2: #12151f;
+    --bg-3: #181c28;
+    --bg-4: #1e2333;
+    --border: rgba(255,255,255,0.07);
+    --border-active: rgba(212,175,55,0.4);
+    --gold: #d4af37;
+    --gold-light: #f0d060;
+    --gold-dim: rgba(212,175,55,0.15);
+    --text-1: #f0ece0;
+    --text-2: #9a9580;
+    --text-3: #5a5648;
+    --green: #3dd68c;
+    --red: #f05252;
+    --blue: #4d9fff;
+    --purple: #a78bfa;
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --radius: 10px;
+    --sidebar-w: 220px;
+    --transition: 0.2s ease;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-0);
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 100;
+    padding: 24px 0;
+  }
+
+  .logo {
+    padding: 0 20px 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .logo-title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--gold);
+    letter-spacing: -0.5px;
+  }
+  .logo-sub {
+    font-size: 0.65rem;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .nav-section {
+    padding: 8px 12px 4px;
+    font-size: 0.6rem;
+    color: var(--text-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    color: var(--text-2);
+    transition: var(--transition);
+    border-left: 2px solid transparent;
+    margin: 1px 0;
+  }
+  .nav-item:hover { color: var(--text-1); background: var(--bg-2); }
+  .nav-item.active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-dim); }
+  .nav-icon { font-size: 1rem; width: 18px; text-align: center; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 0.65rem;
+    color: var(--text-3);
+  }
+  .status-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── MAIN ── */
+  #main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .topbar-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-1);
+  }
+  .topbar-time {
+    font-size: 0.7rem;
+    color: var(--text-3);
+  }
+
+  .content {
+    padding: 28px 32px;
+    flex: 1;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; animation: fadeIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: border-color var(--transition);
+  }
+  .card:hover { border-color: rgba(255,255,255,0.12); }
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::before {
+    content: '';
+    display: inline-block;
+    width: 3px; height: 14px;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .col-span-2 { grid-column: span 2; }
+
+  /* ── STAT CARDS ── */
+  .stat-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-label { font-size: 0.65rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 1.5px; }
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text-1);
+    margin: 4px 0 2px;
+    line-height: 1;
+  }
+  .stat-sub { font-size: 0.65rem; color: var(--text-3); }
+  .stat-accent {
+    position: absolute;
+    right: 16px; top: 16px;
+    font-size: 1.4rem;
+    opacity: 0.15;
+  }
+
+  /* ── INPUTS ── */
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 0.7rem; color: var(--text-2); margin-bottom: 6px; display: block; letter-spacing: 0.5px; }
+  .form-input, .form-select {
+    width: 100%;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color var(--transition);
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--gold); }
+  .form-input[type="range"] {
+    padding: 6px 0;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+  }
+  input[type="range"]::-webkit-slider-track {
+    background: var(--bg-4); height: 4px; border-radius: 2px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    background: var(--gold); border-radius: 50%;
+    margin-top: -6px; cursor: pointer;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all var(--transition);
+  }
+  .btn-gold {
+    background: var(--gold);
+    color: var(--bg-0);
+  }
+  .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-2);
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; max-height: 360px; overflow-y: auto; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+  thead th {
+    background: var(--bg-3);
+    padding: 10px 14px;
+    text-align: left;
+    color: var(--gold);
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background var(--transition); }
+  tbody tr:hover { background: var(--bg-3); }
+  tbody td { padding: 9px 14px; color: var(--text-2); }
+  tbody tr:last-child { border-bottom: none; }
+
+  /* ── UPLOAD ZONE ── */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    background: var(--bg-3);
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--gold);
+    background: var(--gold-dim);
+  }
+  .upload-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .upload-text { font-size: 0.85rem; color: var(--text-2); margin-bottom: 6px; }
+  .upload-sub { font-size: 0.7rem; color: var(--text-3); }
+
+  /* ── CHART WRAPPER ── */
+  .chart-box { position: relative; height: 280px; }
+  .chart-box-sm { position: relative; height: 220px; }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    letter-spacing: 0.5px;
+  }
+  .badge-gold { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--border-active); }
+  .badge-green { background: rgba(61,214,140,0.1); color: var(--green); }
+  .badge-red { background: rgba(240,82,82,0.1); color: var(--red); }
+
+  /* ── ALERTS ── */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .alert-error { background: rgba(240,82,82,0.1); border: 1px solid rgba(240,82,82,0.3); color: var(--red); }
+  .alert-success { background: rgba(61,214,140,0.1); border: 1px solid rgba(61,214,140,0.3); color: var(--green); }
+  .alert { display: none; }
+  .alert.show { display: flex; }
+
+  /* ── RESULT BOXES ── */
+  .result-box {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+  .result-box.highlight { border-color: var(--border-active); background: var(--gold-dim); }
+  .result-num {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--gold);
+  }
+  .result-lbl { font-size: 0.65rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* ── COMPARE ── */
+  .compare-panel {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .compare-panel.sc-a { border-top: 3px solid var(--blue); }
+  .compare-panel.sc-b { border-top: 3px solid var(--purple); }
+
+  /* ── BUDGET ── */
+  .budget-bar-wrap { background: var(--bg-3); border-radius: 4px; height: 8px; overflow: hidden; margin: 8px 0 4px; }
+  .budget-bar { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--bg-3); padding: 4px; border-radius: 8px; }
+  .tab {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: var(--text-3);
+    border-radius: 6px;
+    transition: all var(--transition);
+  }
+  .tab.active { background: var(--bg-2); color: var(--gold); border: 1px solid var(--border-active); }
+
+  /* ── RANGE DISPLAY ── */
+  .range-row { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-3); margin-top: 2px; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-1); }
+  ::-webkit-scrollbar-thumb { background: var(--bg-4); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  .mb-16 { margin-bottom: 16px; }
+  .mb-20 { margin-bottom: 20px; }
+  .mt-16 { margin-top: 16px; }
+  .gap-12 { gap: 12px; }
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+
+  /* ── HOME KPI ROW ── */
+  #home-page .kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    :root { --sidebar-w: 60px; }
+    .logo-title, .logo-sub, .nav-item span, .nav-section, .sidebar-footer span { display: none; }
+    .nav-item { justify-content: center; padding: 12px; }
+    .logo { padding: 0 10px 16px; text-align: center; }
+    #home-page .kpi-row { grid-template-columns: repeat(2,1fr); }
+    .grid-4 { grid-template-columns: repeat(2,1fr); }
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .col-span-2 { grid-column: span 1; }
+    .content { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
+<nav id="sidebar">
+  <div class="logo">
+    <div class="logo-title">DataInvest</div>
+    <div class="logo-sub">Dashboard v1.0</div>
+  </div>
+
+  <div class="nav-section"><span>Général</span></div>
+  <div class="nav-item active" data-page="home">
+    <span class="nav-icon">🏠</span><span>Accueil</span>
+  </div>
+  <div class="nav-item" data-page="csv">
+    <span class="nav-icon">📁</span><span>Import CSV</span>
+  </div>
+  <div class="nav-item" data-page="analyse">
+    <span class="nav-icon">📊</span><span>Analyse</span>
+  </div>
+  <div class="nav-item" data-page="graphiques">
+    <span class="nav-icon">📈</span><span>Graphiques</span>
+  </div>
+
+  <div class="nav-section"><span>Finance</span></div>
+  <div class="nav-item" data-page="invest">
+    <span class="nav-icon">💰</span><span>Investissement</span>
+  </div>
+  <div class="nav-item" data-page="budget">
+    <span class="nav-icon">💸</span><span>Budget</span>
+  </div>
+  <div class="nav-item" data-page="compare">
+    <span class="nav-icon">🔄</span><span>Comparaison</span>
+  </div>
+
+  <div class="sidebar-footer">
+    <span class="status-dot"></span><span>Système actif</span>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════ MAIN ═══════════════════════════════ -->
+<main id="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Vue d'ensemble</div>
+    <div class="topbar-time" id="clock">--:--:--</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════════ HOME ══════════════ -->
+    <div id="home-page" class="page active">
+      <div class="kpi-row">
+        <div class="stat-card">
+          <div class="stat-label">Capital simulé</div>
+          <div class="stat-value" id="home-capital">—</div>
+          <div class="stat-sub">Dernier calcul invest.</div>
+          <div class="stat-accent">💰</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Gains générés</div>
+          <div class="stat-value" id="home-gains">—</div>
+          <div class="stat-sub">Intérêts composés</div>
+          <div class="stat-accent">📈</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Lignes CSV</div>
+          <div class="stat-value" id="home-rows">—</div>
+          <div class="stat-sub">Données importées</div>
+          <div class="stat-accent">📄</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Reste à vivre</div>
+          <div class="stat-value" id="home-ral">—</div>
+          <div class="stat-sub">Dernier budget</div>
+          <div class="stat-accent">💸</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Évolution investissement</div>
+          <div class="chart-box"><canvas id="home-chart"></canvas></div>
+          <p style="font-size:0.7rem;color:var(--text-3);margin-top:8px;">Configurez le simulateur pour voir l'évolution ici.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Raccourcis rapides</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+            <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="goPage('csv')">📁 Importer un CSV</button>
+            <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="goPage('invest')">💰 Simuler un investissement</button>
+            <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="goPage('budget')">💸 Calculer mon budget</button>
+            <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="goPage('compare')">🔄 Comparer des scénarios</button>
+          </div>
+          <hr class="divider">
+          <div style="font-size:0.72rem;color:var(--text-3);line-height:1.8">
+            <div><span style="color:var(--gold)">▸</span> Importez un CSV pour activer l'analyse</div>
+            <div><span style="color:var(--gold)">▸</span> Les données sont sauvegardées localement</div>
+            <div><span style="color:var(--gold)">▸</span> Calculs basés sur intérêts composés</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ CSV ══════════════ -->
+    <div id="csv-page" class="page">
+      <div class="card mb-20">
+        <div class="card-title">Import de données CSV</div>
+        <div class="alert alert-error" id="csv-error">❌ <span id="csv-error-msg"></span></div>
+        <div class="alert alert-success" id="csv-success">✅ <span id="csv-success-msg"></span></div>
+        <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+          <div class="upload-icon">📂</div>
+          <div class="upload-text">Glissez-déposez votre fichier CSV ici</div>
+          <div class="upload-sub">ou cliquez pour sélectionner</div>
+          <input type="file" id="file-input" accept=".csv" style="display:none">
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="loadSampleData()">📊 Charger données exemple</button>
+          <button class="btn btn-outline" onclick="clearCSVData()">🗑️ Effacer</button>
+        </div>
+      </div>
+
+      <div class="card" id="csv-table-card" style="display:none">
+        <div class="card-title" style="justify-content:space-between;align-items:center">
+          <span>Aperçu des données</span>
+          <span id="csv-info" class="badge badge-gold"></span>
+        </div>
+        <div class="table-wrap"><table id="csv-table"><thead></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ══════════════ ANALYSE ══════════════ -->
+    <div id="analyse-page" class="page">
+      <div id="no-data-msg" class="card mb-20" style="text-align:center;padding:40px">
+        <div style="font-size:2rem;margin-bottom:12px">📭</div>
+        <div style="color:var(--text-2);margin-bottom:16px">Aucune donnée importée</div>
+        <button class="btn btn-gold" onclick="goPage('csv')">Importer un CSV</button>
+      </div>
+      <div id="analyse-content" style="display:none">
+        <div class="card mb-20">
+          <div class="card-title">Sélection de colonne</div>
+          <div class="form-group">
+            <label class="form-label">Colonne à analyser</label>
+            <select class="form-select" id="analyse-col" onchange="runAnalyse()"></select>
+          </div>
+        </div>
+        <div class="grid-4 mb-20" id="stats-grid">
+          <div class="stat-card"><div class="stat-label">Moyenne</div><div class="stat-value" id="stat-avg">—</div><div class="stat-accent">~</div></div>
+          <div class="stat-card"><div class="stat-label">Somme</div><div class="stat-value" id="stat-sum">—</div><div class="stat-accent">Σ</div></div>
+          <div class="stat-card"><div class="stat-label">Minimum</div><div class="stat-value" id="stat-min">—</div><div class="stat-accent">↓</div></div>
+          <div class="stat-card"><div class="stat-label">Maximum</div><div class="stat-value" id="stat-max">—</div><div class="stat-accent">↑</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Distribution des valeurs</div>
+          <div class="chart-box"><canvas id="analyse-chart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ GRAPHIQUES ══════════════ -->
+    <div id="graphiques-page" class="page">
+      <div id="no-data-msg2" class="card mb-20" style="text-align:center;padding:40px">
+        <div style="font-size:2rem;margin-bottom:12px">📭</div>
+        <div style="color:var(--text-2);margin-bottom:16px">Aucune donnée importée</div>
+        <button class="btn btn-gold" onclick="goPage('csv')">Importer un CSV</button>
+      </div>
+      <div id="graphiques-content" style="display:none">
+        <div class="card mb-20">
+          <div class="card-title">Configuration</div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Colonne</label>
+              <select class="form-select" id="graph-col" onchange="renderGraphs()"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Colonne Label (optionnel)</label>
+              <select class="form-select" id="graph-label-col" onchange="renderGraphs()"></select>
+            </div>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-title">Histogramme</div>
+            <div class="chart-box-sm"><canvas id="bar-chart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Courbe</div>
+            <div class="chart-box-sm"><canvas id="line-chart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Camembert</div>
+            <div class="chart-box-sm"><canvas id="pie-chart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ INVESTISSEMENT ══════════════ -->
+    <div id="invest-page" class="page">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Paramètres</div>
+
+          <div class="form-group">
+            <label class="form-label">Capital initial (€) — <span id="v-capital">10 000</span></label>
+            <input type="range" class="form-input" id="r-capital" min="100" max="500000" step="100" value="10000" oninput="updateInvest()">
+            <div class="range-row"><span>100 €</span><span>500 000 €</span></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Versement mensuel (€) — <span id="v-monthly">500</span></label>
+            <input type="range" class="form-input" id="r-monthly" min="0" max="10000" step="50" value="500" oninput="updateInvest()">
+            <div class="range-row"><span>0 €</span><span>10 000 €</span></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Taux annuel (%) — <span id="v-rate">7</span>%</label>
+            <input type="range" class="form-input" id="r-rate" min="0.1" max="20" step="0.1" value="7" oninput="updateInvest()">
+            <div class="range-row"><span>0.1%</span><span>20%</span></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Durée (années) — <span id="v-years">20</span> ans</label>
+            <input type="range" class="form-input" id="r-years" min="1" max="50" step="1" value="20" oninput="updateInvest()">
+            <div class="range-row"><span>1 an</span><span>50 ans</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Résultats</div>
+          <div class="grid-2 mb-20">
+            <div class="result-box highlight">
+              <div class="result-num" id="res-final">—</div>
+              <div class="result-lbl">Capital final</div>
+            </div>
+            <div class="result-box">
+              <div class="result-num" id="res-gains">—</div>
+              <div class="result-lbl">Gains générés</div>
+            </div>
+            <div class="result-box">
+              <div class="result-num" id="res-versed">—</div>
+              <div class="result-lbl">Total versé</div>
+            </div>
+            <div class="result-box">
+              <div class="result-num" id="res-ratio">—</div>
+              <div class="result-lbl">Multiplicateur</div>
+            </div>
+          </div>
+          <div style="background:var(--bg-3);border-radius:8px;padding:12px;font-size:0.7rem;color:var(--text-3)">
+            <div style="margin-bottom:4px">Répartition du capital final :</div>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+              <div style="flex:1;height:10px;background:var(--bg-4);border-radius:4px;overflow:hidden">
+                <div id="bar-versed" style="height:100%;background:var(--blue);transition:width 0.4s"></div>
+              </div>
+              <span id="pct-versed" style="color:var(--blue);width:36px;text-align:right">—</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div style="flex:1;height:10px;background:var(--bg-4);border-radius:4px;overflow:hidden">
+                <div id="bar-gains2" style="height:100%;background:var(--gold);transition:width 0.4s"></div>
+              </div>
+              <span id="pct-gains" style="color:var(--gold);width:36px;text-align:right">—</span>
+            </div>
+            <div style="margin-top:6px;display:flex;gap:16px">
+              <span style="color:var(--blue)">▬ Versements</span>
+              <span style="color:var(--gold)">▬ Intérêts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-16">
+        <div class="card-title">Évolution du capital dans le temps</div>
+        <div class="chart-box"><canvas id="invest-chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ══════════════ BUDGET ══════════════ -->
+    <div id="budget-page" class="page">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Revenus</div>
+          <div id="revenus-list"></div>
+          <button class="btn btn-outline mt-16" onclick="addRevenu()" style="width:100%;justify-content:center">+ Ajouter un revenu</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Dépenses</div>
+          <div id="depenses-list"></div>
+          <button class="btn btn-outline mt-16" onclick="addDepense()" style="width:100%;justify-content:center">+ Ajouter une dépense</button>
+        </div>
+      </div>
+
+      <div class="grid-3 mt-16 mb-20">
+        <div class="result-box">
+          <div class="result-num" id="b-revenus" style="color:var(--green)">0 €</div>
+          <div class="result-lbl">Total revenus</div>
+        </div>
+        <div class="result-box">
+          <div class="result-num" id="b-depenses" style="color:var(--red)">0 €</div>
+          <div class="result-lbl">Total dépenses</div>
+        </div>
+        <div class="result-box highlight">
+          <div class="result-num" id="b-ral">0 €</div>
+          <div class="result-lbl">Reste à vivre</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Répartition des dépenses</div>
+        <div class="grid-2">
+          <div class="chart-box-sm"><canvas id="budget-pie"></canvas></div>
+          <div id="budget-bars" style="display:flex;flex-direction:column;gap:10px;justify-content:center"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ COMPARAISON ══════════════ -->
+    <div id="compare-page" class="page">
+      <div class="grid-2 mb-20">
+        <div class="compare-panel sc-a">
+          <div style="font-family:var(--font-display);font-weight:700;color:var(--blue);margin-bottom:16px;font-size:0.85rem">SCÉNARIO A</div>
+
+          <div class="form-group">
+            <label class="form-label">Capital initial (€)</label>
+            <input type="number" class="form-input" id="ca-capital" value="10000" oninput="updateCompare()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Versement mensuel (€)</label>
+            <input type="number" class="form-input" id="ca-monthly" value="500" oninput="updateCompare()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Taux annuel (%)</label>
+            <input type="number" class="form-input" id="ca-rate" value="7" step="0.1" oninput="updateCompare()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Durée (années)</label>
+            <input type="number" class="form-input" id="ca-years" value="20" oninput="updateCompare()">
+          </div>
+          <div class="result-box" style="margin-top:8px">
+            <div class="result-num" id="ca-result" style="color:var(--blue)">—</div>
+            <div class="result-lbl">Capital final</div>
+          </div>
+        </div>
+
+        <div class="compare-panel sc-b">
+          <div style="font-family:var(--font-display);font-weight:700;color:var(--purple);margin-bottom:16px;font-size:0.85rem">SCÉNARIO B</div>
+
+          <div class="form-group">
+            <label class="form-label">Capital initial (€)</label>
+            <input type="number" class="form-input" id="cb-capital" value="5000" oninput="updateCompare()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Versement mensuel (€)</label>
+            <input type="number" class="form-input" id="cb-monthly" value="1000" oninput="updateCompare()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Taux annuel (%)</label>
+            <input type="number" class="form-input" id="cb-rate" value="5" step="0.1" oninput="updateCompare()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Durée (années)</label>
+            <input type="number" class="form-input" id="cb-years" value="20" oninput="updateCompare()">
+          </div>
+          <div class="result-box" style="margin-top:8px">
+            <div class="result-num" id="cb-result" style="color:var(--purple)">—</div>
+            <div class="result-lbl">Capital final</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Comparaison côte à côte</div>
+        <div class="chart-box"><canvas id="compare-chart"></canvas></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- ═══════════════════════════════ SCRIPTS ═══════════════════════════════ -->
+<script>
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+let csvData = [];
+let csvHeaders = [];
+let charts = {};
+let budgetItems = { revenus: [], depenses: [] };
+
+/* ══════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════ */
+const pageTitles = {
+  home: 'Vue d\'ensemble',
+  csv: 'Import de données CSV',
+  analyse: 'Analyse statistique',
+  graphiques: 'Visualisation graphique',
+  invest: 'Simulateur d\'investissement',
+  budget: 'Simulateur de budget',
+  compare: 'Comparaison de scénarios'
+};
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(id + '-page').classList.add('active');
+  document.querySelector(`[data-page="${id}"]`).classList.add('active');
+  document.getElementById('page-title').textContent = pageTitles[id];
+
+  // Trigger page-specific init
+  if (id === 'analyse') initAnalysePage();
+  if (id === 'graphiques') initGraphPage();
+  if (id === 'invest') updateInvest();
+  if (id === 'compare') updateCompare();
+  if (id === 'home') refreshHome();
+}
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => goPage(item.dataset.page));
+});
+
+/* Clock */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('fr-FR');
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ══════════════════════════════════════════════════
+   CHART HELPERS
+══════════════════════════════════════════════════ */
+const CHART_DEFAULTS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { labels: { color: '#9a9580', font: { family: 'JetBrains Mono', size: 11 } } },
+    tooltip: {
+      backgroundColor: '#12151f',
+      borderColor: 'rgba(212,175,55,0.3)',
+      borderWidth: 1,
+      titleColor: '#d4af37',
+      bodyColor: '#9a9580',
+      padding: 10,
+      callbacks: {}
+    }
+  },
+  scales: {
+    x: {
+      ticks: { color: '#5a5648', font: { family: 'JetBrains Mono', size: 10 } },
+      grid: { color: 'rgba(255,255,255,0.04)' }
+    },
+    y: {
+      ticks: { color: '#5a5648', font: { family: 'JetBrains Mono', size: 10 } },
+      grid: { color: 'rgba(255,255,255,0.04)' }
+    }
+  }
+};
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+function fmt(n) {
+  if (Math.abs(n) >= 1000000) return (n/1000000).toFixed(2) + 'M€';
+  if (Math.abs(n) >= 1000) return (n/1000).toFixed(1) + 'k€';
+  return n.toFixed(0) + '€';
+}
+
+function formatNum(n) {
+  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' €';
+}
+
+function generateColors(n) {
+  const palette = ['#d4af37','#4d9fff','#a78bfa','#3dd68c','#f05252','#f59e0b','#06b6d4','#ec4899','#84cc16','#f97316'];
+  return Array.from({length:n}, (_,i) => palette[i % palette.length]);
+}
+
+/* ══════════════════════════════════════════════════
+   CSV PARSING
+══════════════════════════════════════════════════ */
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) throw new Error('Le fichier doit contenir au moins 2 lignes (entête + données).');
+  const sep = lines[0].includes(';') ? ';' : ',';
+  const headers = lines[0].split(sep).map(h => h.trim().replace(/^"|"$/g,''));
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    const vals = lines[i].split(sep).map(v => v.trim().replace(/^"|"$/g,''));
+    const obj = {};
+    headers.forEach((h, j) => obj[h] = vals[j] !== undefined ? vals[j] : '');
+    rows.push(obj);
+  }
+  return { headers, rows };
+}
+
+function loadCSV(text) {
+  try {
+    const { headers, rows } = parseCSV(text);
+    csvHeaders = headers;
+    csvData = rows;
+    showAlert('csv-success', `✅ ${rows.length} lignes importées, ${headers.length} colonnes.`);
+    hideAlert('csv-error');
+    renderCSVTable();
+    saveLocal('csvData', { headers, rows });
+    document.getElementById('home-rows').textContent = rows.length;
+  } catch(e) {
+    showAlert('csv-error', e.message);
+    hideAlert('csv-success');
+  }
+}
+
+function renderCSVTable() {
+  const card = document.getElementById('csv-table-card');
+  const thead = document.querySelector('#csv-table thead');
+  const tbody = document.querySelector('#csv-table tbody');
+  const info = document.getElementById('csv-info');
+
+  card.style.display = 'block';
+  info.textContent = `${csvData.length} lignes · ${csvHeaders.length} colonnes`;
+
+  thead.innerHTML = '<tr>' + csvHeaders.map(h => `<th>${h}</th>`).join('') + '</tr>';
+  tbody.innerHTML = csvData.slice(0,100).map(row =>
+    '<tr>' + csvHeaders.map(h => `<td>${row[h]}</td>`).join('') + '</tr>'
+  ).join('');
+}
+
+/* File input */
+document.getElementById('file-input').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.name.endsWith('.csv')) { showAlert('csv-error', 'Fichier invalide. Sélectionnez un fichier .csv'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => loadCSV(ev.target.result);
+  reader.readAsText(file, 'UTF-8');
+});
+
+/* Drag & Drop */
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (!file || !file.name.endsWith('.csv')) { showAlert('csv-error', 'Veuillez déposer un fichier .csv'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => loadCSV(ev.target.result);
+  reader.readAsText(file, 'UTF-8');
+});
+
+function clearCSVData() {
+  csvData = []; csvHeaders = [];
+  document.getElementById('csv-table-card').style.display = 'none';
+  hideAlert('csv-error'); hideAlert('csv-success');
+  localStorage.removeItem('csvData');
+  document.getElementById('home-rows').textContent = '—';
+}
+
+function loadSampleData() {
+  const sample = `Mois,Ventes,Dépenses,Bénéfice,Clients
+Janvier,12500,8200,4300,142
+Février,14200,9100,5100,158
+Mars,11800,7800,4000,131
+Avril,16500,10200,6300,187
+Mai,18200,11500,6700,204
+Juin,15600,9800,5800,175
+Juillet,13400,8900,4500,152
+Août,12100,8100,4000,138
+Septembre,17800,11000,6800,196
+Octobre,19500,12200,7300,218
+Novembre,21200,13100,8100,241
+Décembre,23800,14500,9300,267`;
+  loadCSV(sample);
+}
+
+/* ══════════════════════════════════════════════════
+   ANALYSE
+══════════════════════════════════════════════════ */
+function initAnalysePage() {
+  const hasData = csvData.length > 0;
+  document.getElementById('no-data-msg').style.display = hasData ? 'none' : 'block';
+  document.getElementById('analyse-content').style.display = hasData ? 'block' : 'none';
+  if (!hasData) return;
+
+  const numCols = csvHeaders.filter(h => {
+    const vals = csvData.map(r => parseFloat(r[h])).filter(v => !isNaN(v));
+    return vals.length > 0;
+  });
+
+  const sel = document.getElementById('analyse-col');
+  sel.innerHTML = numCols.map(h => `<option value="${h}">${h}</option>`).join('');
+  runAnalyse();
+}
+
+function runAnalyse() {
+  const col = document.getElementById('analyse-col').value;
+  if (!col) return;
+  const vals = csvData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+  if (!vals.length) return;
+
+  const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+  const sum = vals.reduce((a,b) => a+b, 0);
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+
+  document.getElementById('stat-avg').textContent = avg % 1 ? avg.toFixed(2) : avg.toFixed(0);
+  document.getElementById('stat-sum').textContent = sum % 1 ? sum.toFixed(2) : sum.toFixed(0);
+  document.getElementById('stat-min').textContent = min;
+  document.getElementById('stat-max').textContent = max;
+
+  // Chart
+  destroyChart('analyse');
+  const labels = csvData.map((_, i) => `#${i+1}`);
+  const ctx = document.getElementById('analyse-chart').getContext('2d');
+  charts.analyse = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: col,
+        data: csvData.map(r => parseFloat(r[col]) || 0),
+        backgroundColor: 'rgba(212,175,55,0.3)',
+        borderColor: '#d4af37',
+        borderWidth: 1.5,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      ...CHART_DEFAULTS,
+      plugins: {
+        ...CHART_DEFAULTS.plugins,
+        legend: { display: false }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   GRAPHIQUES
+══════════════════════════════════════════════════ */
+function initGraphPage() {
+  const hasData = csvData.length > 0;
+  document.getElementById('no-data-msg2').style.display = hasData ? 'none' : 'block';
+  document.getElementById('graphiques-content').style.display = hasData ? 'block' : 'none';
+  if (!hasData) return;
+
+  const numCols = csvHeaders.filter(h => {
+    const vals = csvData.map(r => parseFloat(r[h])).filter(v => !isNaN(v));
+    return vals.length > 0;
+  });
+  const allCols = ['(aucun)', ...csvHeaders];
+
+  const colSel = document.getElementById('graph-col');
+  const lblSel = document.getElementById('graph-label-col');
+  colSel.innerHTML = numCols.map(h => `<option value="${h}">${h}</option>`).join('');
+  lblSel.innerHTML = allCols.map(h => `<option value="${h}">${h}</option>`).join('');
+  renderGraphs();
+}
+
+function renderGraphs() {
+  const col = document.getElementById('graph-col').value;
+  if (!col) return;
+  const lblCol = document.getElementById('graph-label-col').value;
+  const vals = csvData.map(r => parseFloat(r[col]) || 0);
+  const maxPie = 12;
+  const pieData = csvData.slice(0, maxPie);
+  const pieVals = pieData.map(r => parseFloat(r[col]) || 0);
+
+  const labels = lblCol === '(aucun)'
+    ? csvData.map((_, i) => `#${i+1}`)
+    : csvData.map(r => r[lblCol] || '?');
+  const pieLabels = lblCol === '(aucun)'
+    ? pieData.map((_, i) => `#${i+1}`)
+    : pieData.map(r => r[lblCol] || '?');
+
+  const colors = generateColors(pieData.length);
+
+  ['bar-chart','line-chart','pie-chart'].forEach(id => destroyChart(id));
+
+  // Bar
+  const barCtx = document.getElementById('bar-chart').getContext('2d');
+  charts['bar-chart'] = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ label: col, data: vals, backgroundColor: 'rgba(212,175,55,0.4)', borderColor: '#d4af37', borderWidth: 1.5, borderRadius: 4 }]
+    },
+    options: { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } } }
+  });
+
+  // Line
+  const lineCtx = document.getElementById('line-chart').getContext('2d');
+  charts['line-chart'] = new Chart(lineCtx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{ label: col, data: vals, borderColor: '#4d9fff', backgroundColor: 'rgba(77,159,255,0.1)', borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: '#4d9fff', pointRadius: 3 }]
+    },
+    options: { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } } }
+  });
+
+  // Pie
+  const pieCtx = document.getElementById('pie-chart').getContext('2d');
+  charts['pie-chart'] = new Chart(pieCtx, {
+    type: 'doughnut',
+    data: {
+      labels: pieLabels,
+      datasets: [{ data: pieVals, backgroundColor: colors.map(c => c + 'cc'), borderColor: colors, borderWidth: 1.5 }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '55%',
+      plugins: {
+        legend: { labels: { color: '#9a9580', font: { family: 'JetBrains Mono', size: 10 }, boxWidth: 10 } },
+        tooltip: CHART_DEFAULTS.plugins.tooltip
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   SIMULATEUR INVESTISSEMENT
+══════════════════════════════════════════════════ */
+function calcInvest(capital, monthly, rate, years) {
+  const r = rate / 100 / 12;
+  const n = years * 12;
+  let data = [];
+  let current = capital;
+  for (let m = 0; m <= n; m++) {
+    if (m > 0) current = current * (1 + r) + monthly;
+    if (m % 12 === 0) data.push({ year: m/12, value: current });
+  }
+  const final = current;
+  const versed = capital + monthly * n;
+  const gains = final - versed;
+  return { final, versed, gains, data };
+}
+
+function updateInvest() {
+  const capital = parseFloat(document.getElementById('r-capital').value);
+  const monthly = parseFloat(document.getElementById('r-monthly').value);
+  const rate = parseFloat(document.getElementById('r-rate').value);
+  const years = parseInt(document.getElementById('r-years').value);
+
+  document.getElementById('v-capital').textContent = formatNum(capital);
+  document.getElementById('v-monthly').textContent = formatNum(monthly);
+  document.getElementById('v-rate').textContent = rate.toFixed(1);
+  document.getElementById('v-years').textContent = years;
+
+  const { final, versed, gains, data } = calcInvest(capital, monthly, rate, years);
+
+  document.getElementById('res-final').textContent = formatNum(final);
+  document.getElementById('res-gains').textContent = formatNum(gains);
+  document.getElementById('res-versed').textContent = formatNum(versed);
+  document.getElementById('res-ratio').textContent = (final / versed).toFixed(2) + '×';
+
+  const pctV = Math.round(versed / final * 100);
+  const pctG = 100 - pctV;
+  document.getElementById('bar-versed').style.width = pctV + '%';
+  document.getElementById('bar-gains2').style.width = pctG + '%';
+  document.getElementById('pct-versed').textContent = pctV + '%';
+  document.getElementById('pct-gains').textContent = pctG + '%';
+
+  // Chart
+  destroyChart('invest');
+  const ctx = document.getElementById('invest-chart').getContext('2d');
+  const versedLine = data.map((d, i) => capital + monthly * 12 * i);
+  charts.invest = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.map(d => `An ${d.year}`),
+      datasets: [
+        {
+          label: 'Capital total',
+          data: data.map(d => d.value),
+          borderColor: '#d4af37',
+          backgroundColor: 'rgba(212,175,55,0.08)',
+          borderWidth: 2.5,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 2
+        },
+        {
+          label: 'Capital versé',
+          data: versedLine,
+          borderColor: '#4d9fff',
+          borderDash: [5,5],
+          borderWidth: 1.5,
+          fill: false,
+          tension: 0,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      ...CHART_DEFAULTS,
+      plugins: {
+        ...CHART_DEFAULTS.plugins,
+        tooltip: {
+          ...CHART_DEFAULTS.plugins.tooltip,
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${formatNum(ctx.raw)}`
+          }
+        }
+      }
+    }
+  });
+
+  // Save & update home
+  saveLocal('investResult', { final, gains });
+  document.getElementById('home-capital').textContent = fmt(final);
+  document.getElementById('home-gains').textContent = fmt(gains);
+  updateHomeChart(data, versedLine.map((v,i) => ({year:data[i]?.year||i, value:v})));
+}
+
+function updateHomeChart(investData, versedData) {
+  destroyChart('home');
+  const ctx = document.getElementById('home-chart').getContext('2d');
+  charts.home = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: investData.map(d => `An ${d.year}`),
+      datasets: [
+        { label: 'Capital', data: investData.map(d => d.value), borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,0.08)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0 },
+        { label: 'Versé', data: versedData.map(d => d.value), borderColor: '#4d9fff', borderDash: [4,4], fill: false, tension: 0, borderWidth: 1.5, pointRadius: 0 }
+      ]
+    },
+    options: {
+      ...CHART_DEFAULTS,
+      plugins: { ...CHART_DEFAULTS.plugins, tooltip: { ...CHART_DEFAULTS.plugins.tooltip, callbacks: { label: ctx => `${ctx.dataset.label}: ${formatNum(ctx.raw)}` } } }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   BUDGET
+══════════════════════════════════════════════════ */
+function addRevenu(label = 'Salaire', montant = 2000) {
+  budgetItems.revenus.push({ label, montant });
+  renderBudget();
+}
+function addDepense(label = 'Loyer', montant = 800) {
+  budgetItems.depenses.push({ label, montant });
+  renderBudget();
+}
+
+function renderBudget() {
+  const rv = document.getElementById('revenus-list');
+  const dp = document.getElementById('depenses-list');
+
+  rv.innerHTML = budgetItems.revenus.map((item, i) => budgetRow(item, i, 'revenus')).join('');
+  dp.innerHTML = budgetItems.depenses.map((item, i) => budgetRow(item, i, 'depenses')).join('');
+
+  const totalR = budgetItems.revenus.reduce((s, x) => s + parseFloat(x.montant)||0, 0);
+  const totalD = budgetItems.depenses.reduce((s, x) => s + parseFloat(x.montant)||0, 0);
+  const ral = totalR - totalD;
+
+  document.getElementById('b-revenus').textContent = formatNum(totalR);
+  document.getElementById('b-depenses').textContent = formatNum(totalD);
+  const ralEl = document.getElementById('b-ral');
+  ralEl.textContent = formatNum(ral);
+  ralEl.style.color = ral >= 0 ? 'var(--green)' : 'var(--red)';
+
+  document.getElementById('home-ral').textContent = fmt(ral);
+
+  // Budget pie + bars
+  const colors = generateColors(budgetItems.depenses.length);
+  destroyChart('budget-pie');
+  if (budgetItems.depenses.length) {
+    const ctx = document.getElementById('budget-pie').getContext('2d');
+    charts['budget-pie'] = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: budgetItems.depenses.map(x => x.label),
+        datasets: [{ data: budgetItems.depenses.map(x => parseFloat(x.montant)||0), backgroundColor: colors.map(c=>c+'cc'), borderColor: colors, borderWidth: 1.5 }]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false, cutout:'55%',
+        plugins: { legend: { labels: { color:'#9a9580', font:{family:'JetBrains Mono',size:10}, boxWidth:10 } }, tooltip: CHART_DEFAULTS.plugins.tooltip }
+      }
+    });
+  }
+
+  const barsEl = document.getElementById('budget-bars');
+  barsEl.innerHTML = budgetItems.depenses.map((item, i) => {
+    const pct = totalR > 0 ? Math.min(100, (parseFloat(item.montant)||0) / totalR * 100) : 0;
+    return `<div>
+      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text-2);margin-bottom:4px">
+        <span>${item.label}</span><span style="color:${colors[i]}">${formatNum(parseFloat(item.montant)||0)}</span>
+      </div>
+      <div class="budget-bar-wrap"><div class="budget-bar" style="width:${pct}%;background:${colors[i]}"></div></div>
+    </div>`;
+  }).join('');
+
+  saveLocal('budget', budgetItems);
+}
+
+function budgetRow(item, i, type) {
+  return `<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+    <input class="form-input" style="flex:2" value="${item.label}" oninput="budgetItems['${type}'][${i}].label=this.value;renderBudget()">
+    <input class="form-input" type="number" style="flex:1" value="${item.montant}" oninput="budgetItems['${type}'][${i}].montant=parseFloat(this.value)||0;renderBudget()">
+    <button class="btn btn-outline" style="padding:8px 10px;flex-shrink:0" onclick="budgetItems['${type}'].splice(${i},1);renderBudget()">✕</button>
+  </div>`;
+}
+
+// Seed budget with example data on first load
+function initBudget() {
+  const saved = loadLocal('budget');
+  if (saved) {
+    budgetItems = saved;
+  } else {
+    budgetItems.revenus = [{ label: 'Salaire', montant: 2500 }];
+    budgetItems.depenses = [
+      { label: 'Loyer', montant: 800 },
+      { label: 'Courses', montant: 300 },
+      { label: 'Transport', montant: 150 },
+      { label: 'Abonnements', montant: 50 }
+    ];
+  }
+  renderBudget();
+}
+
+/* ══════════════════════════════════════════════════
+   COMPARAISON
+══════════════════════════════════════════════════ */
+function updateCompare() {
+  const getNum = id => parseFloat(document.getElementById(id).value) || 0;
+
+  const A = calcInvest(getNum('ca-capital'), getNum('ca-monthly'), getNum('ca-rate'), getNum('ca-years'));
+  const B = calcInvest(getNum('cb-capital'), getNum('cb-monthly'), getNum('cb-rate'), getNum('cb-years'));
+
+  document.getElementById('ca-result').textContent = formatNum(A.final);
+  document.getElementById('cb-result').textContent = formatNum(B.final);
+
+  const maxYears = Math.max(getNum('ca-years'), getNum('cb-years'));
+  const yearsArr = Array.from({length: Math.floor(maxYears)+1}, (_, i) => i);
+
+  const calcYear = (capital, monthly, rate, year) => {
+    const r = rate / 100 / 12;
+    let v = capital;
+    for (let m = 0; m < year * 12; m++) v = v * (1+r) + monthly;
+    return v;
+  };
+
+  destroyChart('compare');
+  const ctx = document.getElementById('compare-chart').getContext('2d');
+  charts.compare = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: yearsArr.map(y => `An ${y}`),
+      datasets: [
+        {
+          label: 'Scénario A',
+          data: yearsArr.map(y => calcYear(getNum('ca-capital'), getNum('ca-monthly'), getNum('ca-rate'), y)),
+          borderColor: '#4d9fff',
+          backgroundColor: 'rgba(77,159,255,0.06)',
+          fill: true, tension: 0.4, borderWidth: 2.5, pointRadius: 0
+        },
+        {
+          label: 'Scénario B',
+          data: yearsArr.map(y => calcYear(getNum('cb-capital'), getNum('cb-monthly'), getNum('cb-rate'), y)),
+          borderColor: '#a78bfa',
+          backgroundColor: 'rgba(167,139,250,0.06)',
+          fill: true, tension: 0.4, borderWidth: 2.5, pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      ...CHART_DEFAULTS,
+      plugins: {
+        ...CHART_DEFAULTS.plugins,
+        tooltip: { ...CHART_DEFAULTS.plugins.tooltip, callbacks: { label: ctx => `${ctx.dataset.label}: ${formatNum(ctx.raw)}` } }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   LOCAL STORAGE
+══════════════════════════════════════════════════ */
+function saveLocal(key, val) {
+  try { localStorage.setItem('datainvest_' + key, JSON.stringify(val)); } catch(e) {}
+}
+function loadLocal(key) {
+  try { const v = localStorage.getItem('datainvest_' + key); return v ? JSON.parse(v) : null; } catch(e) { return null; }
+}
+
+/* ══════════════════════════════════════════════════
+   HOME REFRESH
+══════════════════════════════════════════════════ */
+function refreshHome() {
+  const inv = loadLocal('investResult');
+  if (inv) {
+    document.getElementById('home-capital').textContent = fmt(inv.final);
+    document.getElementById('home-gains').textContent = fmt(inv.gains);
+  }
+  const csvSaved = loadLocal('csvData');
+  if (csvSaved) document.getElementById('home-rows').textContent = csvSaved.rows.length;
+}
+
+/* ══════════════════════════════════════════════════
+   ALERTS
+══════════════════════════════════════════════════ */
+function showAlert(id, msg) {
+  const el = document.getElementById(id);
+  const msgId = id + '-msg';
+  if (document.getElementById(msgId)) document.getElementById(msgId).textContent = msg;
+  el.classList.add('show');
+}
+function hideAlert(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+/* ══════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════ */
+function init() {
+  // Restore CSV from localStorage
+  const csvSaved = loadLocal('csvData');
+  if (csvSaved) {
+    csvHeaders = csvSaved.headers;
+    csvData = csvSaved.rows;
+    renderCSVTable();
+    showAlert('csv-success', `${csvData.length} lignes restaurées depuis la dernière session.`);
+    document.getElementById('home-rows').textContent = csvData.length;
+  }
+
+  initBudget();
+  updateInvest();
+  refreshHome();
+}
+
+init();
+</script>
+</body>
+</html>
