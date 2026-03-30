@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DataInvest Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-0: #07080d;
@@ -26,7 +26,8 @@
     --blue: #4d9fff;
     --purple: #a78bfa;
     --font-display: 'Syne', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    --font-mono: 'Barlow', sans-serif;
+    --font-num: 'Barlow Condensed', sans-serif;
     --radius: 10px;
     --sidebar-w: 220px;
     --transition: 0.2s ease;
@@ -58,31 +59,33 @@
   }
 
   .logo {
-    padding: 0 20px 28px;
+    padding: 0 20px 24px;
     border-bottom: 1px solid var(--border);
     margin-bottom: 16px;
   }
+  .logo-icon { font-size: 1.6rem; margin-bottom: 6px; display: block; }
   .logo-title {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     color: var(--gold);
     letter-spacing: -0.5px;
   }
   .logo-sub {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     color: var(--text-3);
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
-    margin-top: 2px;
+    margin-top: 3px;
   }
 
   .nav-section {
-    padding: 8px 12px 4px;
-    font-size: 0.6rem;
+    padding: 10px 16px 4px;
+    font-size: 0.58rem;
     color: var(--text-3);
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
+    font-weight: 600;
   }
 
   .nav-item {
@@ -91,15 +94,21 @@
     gap: 10px;
     padding: 10px 20px;
     cursor: pointer;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     color: var(--text-2);
     transition: var(--transition);
     border-left: 2px solid transparent;
-    margin: 1px 0;
+    margin: 1px 8px;
+    border-radius: 0 6px 6px 0;
   }
   .nav-item:hover { color: var(--text-1); background: var(--bg-2); }
-  .nav-item.active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-dim); }
-  .nav-icon { font-size: 1rem; width: 18px; text-align: center; }
+  .nav-item.active {
+    color: var(--gold);
+    border-left-color: var(--gold);
+    background: var(--gold-dim);
+    box-shadow: inset 0 0 20px rgba(212,175,55,0.04);
+  }
+  .nav-icon { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
 
   .sidebar-footer {
     margin-top: auto;
@@ -128,9 +137,9 @@
   }
 
   .topbar {
-    background: var(--bg-1);
+    background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
     border-bottom: 1px solid var(--border);
-    padding: 14px 32px;
+    padding: 16px 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -140,18 +149,24 @@
   }
   .topbar-title {
     font-family: var(--font-display);
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--text-1);
   }
+  .topbar-right { display: flex; align-items: center; gap: 20px; }
   .topbar-time {
-    font-size: 0.7rem;
-    color: var(--text-3);
+    font-family: var(--font-num);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 1px;
   }
 
   .content {
     padding: 28px 32px;
     flex: 1;
+    background: radial-gradient(ellipse at 80% 0%, rgba(212,175,55,0.03) 0%, transparent 60%),
+                var(--bg-0);
   }
 
   /* ── PAGES ── */
@@ -164,21 +179,21 @@
     background: var(--bg-2);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 20px;
-    transition: border-color var(--transition);
+    padding: 22px;
+    transition: border-color var(--transition), box-shadow var(--transition);
   }
-  .card:hover { border-color: rgba(255,255,255,0.12); }
+  .card:hover { border-color: rgba(255,255,255,0.14); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
   .card-title {
     font-family: var(--font-display);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    color: var(--text-2);
+    color: var(--text-1);
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
   .card-title::before {
     content: '';
@@ -186,6 +201,7 @@
     width: 3px; height: 14px;
     background: var(--gold);
     border-radius: 2px;
+    flex-shrink: 0;
   }
 
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -197,19 +213,23 @@
   .stat-card {
     background: var(--bg-2);
     border: 1px solid var(--border);
+    border-top: 2px solid rgba(212,175,55,0.4);
     border-radius: var(--radius);
-    padding: 18px 20px;
+    padding: 20px 20px 16px;
     position: relative;
     overflow: hidden;
+    transition: border-color var(--transition), box-shadow var(--transition);
   }
-  .stat-label { font-size: 0.65rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 1.5px; }
+  .stat-card:hover { border-color: rgba(212,175,55,0.5); box-shadow: 0 0 20px rgba(212,175,55,0.06); }
+  .stat-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; }
   .stat-value {
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    font-weight: 800;
+    font-family: var(--font-num);
+    font-size: 1.9rem;
+    font-weight: 700;
     color: var(--text-1);
-    margin: 4px 0 2px;
+    margin: 6px 0 4px;
     line-height: 1;
+    letter-spacing: -0.5px;
   }
   .stat-sub { font-size: 0.65rem; color: var(--text-3); }
   .stat-accent {
@@ -296,11 +316,10 @@
   tbody td { padding: 9px 14px; color: var(--text-2); }
   tbody tr:last-child { border-bottom: none; }
 
-  /* ── UPLOAD ZONE ── */
   .upload-zone {
-    border: 2px dashed var(--border);
+    border: 2px dashed rgba(212,175,55,0.25);
     border-radius: var(--radius);
-    padding: 40px;
+    padding: 48px 40px;
     text-align: center;
     cursor: pointer;
     transition: all var(--transition);
@@ -310,9 +329,9 @@
     border-color: var(--gold);
     background: var(--gold-dim);
   }
-  .upload-icon { font-size: 2.5rem; margin-bottom: 12px; }
-  .upload-text { font-size: 0.85rem; color: var(--text-2); margin-bottom: 6px; }
-  .upload-sub { font-size: 0.7rem; color: var(--text-3); }
+  .upload-icon { font-size: 2.8rem; margin-bottom: 14px; }
+  .upload-text { font-size: 0.9rem; color: var(--text-1); margin-bottom: 6px; font-family: var(--font-display); font-weight: 600; }
+  .upload-sub { font-size: 0.72rem; color: var(--text-3); }
 
   /* ── CHART WRAPPER ── */
   .chart-box { position: relative; height: 280px; }
@@ -355,10 +374,11 @@
   }
   .result-box.highlight { border-color: var(--border-active); background: var(--gold-dim); }
   .result-num {
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    font-weight: 800;
+    font-family: var(--font-num);
+    font-size: 1.55rem;
+    font-weight: 700;
     color: var(--gold);
+    letter-spacing: -0.5px;
   }
   .result-lbl { font-size: 0.65rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
 
@@ -433,8 +453,9 @@
 <!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
 <nav id="sidebar">
   <div class="logo">
+    <span class="logo-icon">📊</span>
     <div class="logo-title">DataInvest</div>
-    <div class="logo-sub">Dashboard v1.0</div>
+    <div class="logo-sub">Dashboard v2.0</div>
   </div>
 
   <div class="nav-section"><span>Général</span></div>
@@ -461,6 +482,9 @@
   <div class="nav-item" data-page="compare">
     <span class="nav-icon">🔄</span><span>Comparaison</span>
   </div>
+  <div class="nav-item" data-page="marche">
+    <span class="nav-icon">📡</span><span>Marchés live</span>
+  </div>
 
   <div class="sidebar-footer">
     <span class="status-dot"></span><span>Système actif</span>
@@ -471,7 +495,9 @@
 <main id="main">
   <div class="topbar">
     <div class="topbar-title" id="page-title">Vue d'ensemble</div>
-    <div class="topbar-time" id="clock">--:--:--</div>
+    <div class="topbar-right">
+      <div class="topbar-time" id="clock">--:--:--</div>
+    </div>
   </div>
 
   <div class="content">
@@ -543,6 +569,7 @@
         </div>
         <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn-outline" onclick="loadSampleData()">📊 Charger données exemple</button>
+          <button class="btn btn-gold" id="btn-see-graphs" style="display:none" onclick="goPage('graphiques')">📈 Voir les graphiques →</button>
           <button class="btn btn-outline" onclick="clearCSVData()">🗑️ Effacer</button>
         </div>
       </div>
@@ -551,6 +578,9 @@
         <div class="card-title" style="justify-content:space-between;align-items:center">
           <span>Aperçu des données</span>
           <span id="csv-info" class="badge badge-gold"></span>
+        </div>
+        <div style="background:var(--gold-dim);border:1px solid var(--border-active);border-radius:6px;padding:10px 14px;font-size:0.75rem;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+          💡 <span>Données chargées ! Utilisez <strong>Analyse</strong> pour les statistiques ou <strong>Graphiques</strong> pour les visualiser.</span>
         </div>
         <div class="table-wrap"><table id="csv-table"><thead></thead><tbody></tbody></table></div>
       </div>
@@ -797,6 +827,110 @@
       </div>
     </div>
 
+    <!-- ══════════════ MARCHÉS ══════════════ -->
+    <div id="marche-page" class="page">
+      <!-- Ticker tape -->
+      <div class="card mb-20" style="padding:0;overflow:hidden">
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+          {
+            "symbols"; [
+              {"proName":"FOREXCOM:SPXUSD","title":"S&P 500"},
+              {"proName":"FOREXCOM:NSXUSD","title":"Nasdaq 100"},
+              {"description":"CAC 40","proName":"EURONEXT:PX1"},
+              {"description":"BTC","proName":"BITSTAMP:BTCUSD"},
+              {"description":"ETH","proName":"BITSTAMP:ETHUSD"},
+              {"description":"Or","proName":"TVC:GOLD"},
+              {"description":"EUR/USD","proName":"FX:EURUSD"}
+            ],
+            "showSymbolLogo"; true,
+            "isTransparent"; true,
+            "displayMode"; "adaptive",
+            "colorTheme"; "dark",
+            "locale"; "fr"
+          }
+          </script>
+        </div>
+      </div>
+
+      <!-- Symbol selector + main chart -->
+      <div class="card mb-20">
+        <div class="card-title" style="justify-content:space-between">
+          <span>Graphique en temps réel</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-outline" style="padding:6px 12px;font-size:0.72rem" onclick="setSymbol('FOREXCOM:SPXUSD','S&P 500')">S&P 500</button>
+            <button class="btn btn-outline" style="padding:6px 12px;font-size:0.72rem" onclick="setSymbol('NASDAQ:AAPL','Apple')">AAPL</button>
+            <button class="btn btn-outline" style="padding:6px 12px;font-size:0.72rem" onclick="setSymbol('EURONEXT:PX1','CAC 40')">CAC 40</button>
+            <button class="btn btn-outline" style="padding:6px 12px;font-size:0.72rem" onclick="setSymbol('BITSTAMP:BTCUSD','Bitcoin')">BTC</button>
+            <button class="btn btn-outline" style="padding:6px 12px;font-size:0.72rem" onclick="setSymbol('TVC:GOLD','Or')">Or</button>
+            <button class="btn btn-outline" style="padding:6px 12px;font-size:0.72rem" onclick="setSymbol('FX:EURUSD','EUR/USD')">EUR/USD</button>
+          </div>
+        </div>
+        <div id="tv-chart-container" style="height:460px;border-radius:8px;overflow:hidden"></div>
+      </div>
+
+      <!-- Mini quotes grid -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Indices majeurs</div>
+          <div class="tradingview-widget-container" style="height:300px">
+            <div class="tradingview-widget-container__widget" style="height:100%"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
+            {
+              "width"; "100%",
+              "height"; 300,
+              "symbolsGroups"; [
+                {
+                  "name": "Indices",
+                  "symbols": [
+                    {"name":"FOREXCOM:SPXUSD","displayName":"S&P 500"},
+                    {"name":"FOREXCOM:NSXUSD","displayName":"Nasdaq 100"},
+                    {"name":"EURONEXT:PX1","displayName":"CAC 40"},
+                    {"name":"INDEX:DEU40","displayName":"DAX 40"},
+                    {"name":"TVC:DJI","displayName":"Dow Jones"}
+                  ]
+                }
+              ],
+              "showSymbolLogo"; true,
+              "isTransparent"; true,
+              "colorTheme"; "dark",
+              "locale"; "fr"
+            }
+            </script>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Cryptos & Matières premières</div>
+          <div class="tradingview-widget-container" style="height:300px">
+            <div class="tradingview-widget-container__widget" style="height:100%"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
+            {
+              "width"; "100%",
+              "height"; 300,
+              "symbolsGroups"; [
+                {
+                  "name": "Crypto & Matières premières",
+                  "symbols": [
+                    {"name":"BITSTAMP:BTCUSD","displayName":"Bitcoin"},
+                    {"name":"BITSTAMP:ETHUSD","displayName":"Ethereum"},
+                    {"name":"TVC:GOLD","displayName":"Or"},
+                    {"name":"TVC:SILVER","displayName":"Argent"},
+                    {"name":"FX:EURUSD","displayName":"EUR/USD"}
+                  ]
+                }
+              ],
+              "showSymbolLogo"; true,
+              "isTransparent"; true,
+              "colorTheme"; "dark",
+              "locale"; "fr"
+            }
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /content -->
 </main>
 
@@ -820,7 +954,8 @@ const pageTitles = {
   graphiques: 'Visualisation graphique',
   invest: 'Simulateur d\'investissement',
   budget: 'Simulateur de budget',
-  compare: 'Comparaison de scénarios'
+  compare: 'Comparaison de scénarios',
+  marche: 'Marchés financiers — Temps réel'
 };
 
 function goPage(id) {
@@ -836,6 +971,7 @@ function goPage(id) {
   if (id === 'invest') updateInvest();
   if (id === 'compare') updateCompare();
   if (id === 'home') refreshHome();
+  if (id === 'marche') initMarcheChart();
 }
 
 document.querySelectorAll('.nav-item').forEach(item => {
@@ -941,6 +1077,7 @@ function renderCSVTable() {
   const info = document.getElementById('csv-info');
 
   card.style.display = 'block';
+  document.getElementById('btn-see-graphs').style.display = 'inline-flex';
   info.textContent = `${csvData.length} lignes · ${csvHeaders.length} colonnes`;
 
   thead.innerHTML = '<tr>' + csvHeaders.map(h => `<th>${h}</th>`).join('') + '</tr>';
@@ -975,6 +1112,7 @@ dz.addEventListener('drop', e => {
 function clearCSVData() {
   csvData = []; csvHeaders = [];
   document.getElementById('csv-table-card').style.display = 'none';
+  document.getElementById('btn-see-graphs').style.display = 'none';
   hideAlert('csv-error'); hideAlert('csv-success');
   localStorage.removeItem('csvData');
   document.getElementById('home-rows').textContent = '—';
@@ -1072,12 +1210,19 @@ function initGraphPage() {
     const vals = csvData.map(r => parseFloat(r[h])).filter(v => !isNaN(v));
     return vals.length > 0;
   });
+  // Detect text/label columns (non-numeric majority)
+  const textCols = csvHeaders.filter(h => !numCols.includes(h));
   const allCols = ['(aucun)', ...csvHeaders];
 
   const colSel = document.getElementById('graph-col');
   const lblSel = document.getElementById('graph-label-col');
   colSel.innerHTML = numCols.map(h => `<option value="${h}">${h}</option>`).join('');
   lblSel.innerHTML = allCols.map(h => `<option value="${h}">${h}</option>`).join('');
+
+  // Auto-select first text column as label (shows "Mois" etc. instead of #1,#2)
+  if (textCols.length > 0) {
+    lblSel.value = textCols[0];
+  }
   renderGraphs();
 }
 
@@ -1437,8 +1582,54 @@ function hideAlert(id) {
 }
 
 /* ══════════════════════════════════════════════════
-   INIT
+   MARCHÉS — TRADINGVIEW
 ══════════════════════════════════════════════════ */
+let tvCurrentSymbol = 'FOREXCOM:SPXUSD';
+let tvReady = false;
+
+function initMarcheChart() {
+  if (tvReady) return;
+  tvReady = true;
+  if (window.TradingView) {
+    renderTVChart(tvCurrentSymbol);
+  } else {
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/tv.js';
+    script.onload = () => renderTVChart(tvCurrentSymbol);
+    document.head.appendChild(script);
+  }
+}
+
+function renderTVChart(symbol) {
+  const container = document.getElementById('tv-chart-container');
+  container.innerHTML = '<div id="tv_inner" style="height:100%"></div>';
+  new TradingView.widget({
+    autosize: true,
+    symbol: symbol,
+    interval: 'D',
+    timezone: 'Europe/Paris',
+    theme: 'dark',
+    style: '1',
+    locale: 'fr',
+    toolbar_bg: '#12151f',
+    enable_publishing: false,
+    withdateranges: true,
+    hide_side_toolbar: false,
+    allow_symbol_change: true,
+    save_image: false,
+    container_id: 'tv_inner',
+  });
+}
+
+function setSymbol(symbol) {
+  tvCurrentSymbol = symbol;
+  tvReady = true;
+  if (window.TradingView) {
+    renderTVChart(symbol);
+  }
+}
+
+
 function init() {
   // Restore CSV from localStorage
   const csvSaved = loadLocal('csvData');
