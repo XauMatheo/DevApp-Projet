@@ -63,25 +63,78 @@ function generateColors(n) {
   return Array.from({length:n},(_,i) => p[i%p.length]);
 }
 
+/* ══ CHART DEFAULTS ══
+   Improved tooltips: larger text, cleaner background, no x/y axis label issues */
 function chartDefaults() {
   return {
-    responsive: true, maintainAspectRatio: false,
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: 'index',       // show all datasets at that x position
+      intersect: false,    // trigger on hover anywhere in column
+    },
     plugins: {
-      legend: { labels: { color: '#7f86a8', font: { family: 'DM Mono, monospace', size: 10 }, boxWidth: 10, padding: 14 } },
+      legend: {
+        labels: {
+          color: '#a8b0d0',
+          font: { family: 'DM Mono, monospace', size: 11 },
+          boxWidth: 10,
+          padding: 16,
+          usePointStyle: true,
+          pointStyleWidth: 8,
+        }
+      },
       tooltip: {
-        backgroundColor: '#10131f', borderColor: 'rgba(91,111,255,0.3)', borderWidth: 1,
-        titleColor: '#8a9bff', bodyColor: '#7f86a8', padding: 10
+        enabled: true,
+        backgroundColor: '#0b0d17',
+        borderColor: 'rgba(91,111,255,0.4)',
+        borderWidth: 1,
+        titleColor: '#8a9bff',
+        bodyColor: '#a8b0d0',
+        padding: { top: 10, bottom: 10, left: 14, right: 14 },
+        titleFont: { family: 'DM Mono, monospace', size: 11, weight: '600' },
+        bodyFont: { family: 'DM Mono, monospace', size: 12 },
+        caretSize: 6,
+        cornerRadius: 8,
+        boxPadding: 6,
+        callbacks: {
+          label: function(context) {
+            let val = context.raw;
+            if (typeof val === 'number') {
+              return '  ' + context.dataset.label + ' : ' + fmtN(val);
+            }
+            return '  ' + context.dataset.label + ' : ' + val;
+          }
+        }
       }
     },
     scales: {
-      x: { ticks: { color: '#3d4260', font: { family: 'DM Mono, monospace', size: 9 } }, grid: { color: 'rgba(91,111,255,0.05)' } },
-      y: { ticks: { color: '#3d4260', font: { family: 'DM Mono, monospace', size: 9 } }, grid: { color: 'rgba(91,111,255,0.05)' } }
+      x: {
+        ticks: {
+          color: '#5e6685',
+          font: { family: 'DM Mono, monospace', size: 10 },
+          maxRotation: 0,
+          maxTicksLimit: 12,
+        },
+        grid: { color: 'rgba(91,111,255,0.05)' }
+      },
+      y: {
+        ticks: {
+          color: '#5e6685',
+          font: { family: 'DM Mono, monospace', size: 10 },
+          callback: function(value) {
+            if (Math.abs(value) >= 1e6) return (value/1e6).toFixed(1) + 'M€';
+            if (Math.abs(value) >= 1e3) return (value/1e3).toFixed(0) + 'k€';
+            return value + '€';
+          }
+        },
+        grid: { color: 'rgba(91,111,255,0.05)' }
+      }
     }
   };
 }
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
-
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
 /* ══ LOCAL STORAGE ══ */
@@ -89,7 +142,125 @@ function saveLocal(key, val) { try { localStorage.setItem('wos_'+key, JSON.strin
 function loadLocal(key)       { try { const v=localStorage.getItem('wos_'+key); return v?JSON.parse(v):null; } catch(e){return null;} }
 
 /* ══════════════════════════════════════════
-   INVESTISSEMENT (fusionné Rendement)
+   ENVELOPPES FISCALES
+   Chaque enveloppe a des règles fiscales spécifiques
+   ══════════════════════════════════════════ */
+const ENVELOPES = {
+  pea: {
+    name: 'PEA',
+    label: 'PEA — Plan d\'Épargne en Actions',
+    color: 'teal',
+    icon: '◉',
+    description: 'Exonération totale d\'impôt après 5 ans (hors prélèvements sociaux 17,2 %). Plafond : 150 000 €.',
+    // Fiscalité sur les gains uniquement
+    tauxImpot: 0,        // 0% IR après 5 ans
+    tauxPS: 0.172,       // 17,2% prélèvements sociaux toujours dus
+    plafond: 150000,     // plafond de versements
+    avantageDeduction: false,
+    note: 'Idéal pour les actions européennes long terme.'
+  },
+  av: {
+    name: 'AV',
+    label: 'Assurance-vie',
+    color: 'gold',
+    icon: '◎',
+    description: 'Abattement annuel de 4 600 € (9 200 € couple) sur les gains après 8 ans. Fiscalité 7,5% + PS 17,2% après 8 ans (< 150k€).',
+    tauxImpot: 0.075,    // 7,5% après 8 ans (< 150k€ de versements)
+    tauxPS: 0.172,
+    plafond: Infinity,
+    avantageDeduction: false,
+    abattementAnnuel: 4600,
+    note: 'Enveloppe très souple, transmission hors succession.'
+  },
+  cto: {
+    name: 'CTO',
+    label: 'Compte-Titres Ordinaire',
+    color: 'red',
+    icon: '◌',
+    description: 'PFU (Flat Tax) de 30% = 12,8% IR + 17,2% PS. Pas de plafond, pas d\'avantage fiscal.',
+    tauxImpot: 0.128,    // 12,8% IR
+    tauxPS: 0.172,       // 17,2% PS
+    plafond: Infinity,
+    avantageDeduction: false,
+    note: 'Flexible mais fiscalement le moins avantageux.'
+  },
+  per: {
+    name: 'PER',
+    label: 'Plan d\'Épargne Retraite',
+    color: 'purple',
+    icon: '◈',
+    description: 'Versements déductibles du revenu imposable (jusqu\'à 10% revenus, max ~35 000€/an). Fiscalité à la sortie : IR sur capital + gains.',
+    tauxImpot: 0.30,     // imposé à la sortie (TMI estimé)
+    tauxPS: 0.172,
+    plafond: Infinity,
+    avantageDeduction: true,   // déduction à l'entrée
+    note: 'Optimal si TMI élevé aujourd\'hui et plus faible à la retraite.'
+  }
+};
+
+/**
+ * Calcule le capital net après fiscalité selon l'enveloppe
+ * @param {number} capitalBrut - capital total accumulé
+ * @param {number} totalVerse  - total des versements (base)
+ * @param {string} envelopeId  - 'pea' | 'av' | 'cto' | 'per'
+ * @param {number} tmi         - TMI du PER si applicable (fraction, ex 0.30)
+ * @param {number} years       - durée (pour savoir si avantages activés)
+ * @returns {number} capital net disponible
+ */
+function applyEnvelopeFiscality(capitalBrut, totalVerse, envelopeId, tmi, years) {
+  const env = ENVELOPES[envelopeId] || ENVELOPES.cto;
+  const gainsBruts = Math.max(0, capitalBrut - totalVerse);
+
+  if (envelopeId === 'pea') {
+    // Après 5 ans : 0% IR, 17,2% PS sur gains
+    const taxePS = gainsBruts * env.tauxPS;
+    return capitalBrut - taxePS;
+  }
+
+  if (envelopeId === 'av') {
+    // 7,5% + 17,2% PS sur gains, avec abattement annuel 4600€
+    // On simplifie : abattement global sur toute la durée = 4600 * years (1 fois/an)
+    const abattementTotal = (env.abattementAnnuel || 4600) * years;
+    const gainsImposables = Math.max(0, gainsBruts - abattementTotal);
+    const impot = gainsImposables * (env.tauxImpot + env.tauxPS);
+    // Même si gains < abattement : PS reste dus
+    const psMinimaux = Math.min(gainsBruts, abattementTotal) * env.tauxPS;
+    return capitalBrut - impot - psMinimaux;
+  }
+
+  if (envelopeId === 'cto') {
+    // PFU 30% = 12,8% + 17,2% sur gains
+    const impot = gainsBruts * (env.tauxImpot + env.tauxPS);
+    return capitalBrut - impot;
+  }
+
+  if (envelopeId === 'per') {
+    // Avantage déduction à l'entrée (économie d'impôt sur versements)
+    // + fiscalité IR+PS à la sortie sur TOUT le capital (versements + gains)
+    const avantageEntree = totalVerse * (tmi || 0.30);
+    const impotSortie = capitalBrut * ((tmi || 0.30) + env.tauxPS);
+    return capitalBrut - impotSortie + avantageEntree;
+  }
+
+  return capitalBrut * (1 - 0.30);
+}
+
+/**
+ * Affiche l'info de l'enveloppe sélectionnée
+ */
+function updateEnvelopeInfo(envelopeId, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const env = ENVELOPES[envelopeId] || ENVELOPES.cto;
+  el.innerHTML = `
+    <span class="envelope-badge ${env.color}">${env.icon} ${env.name}</span>
+    <div>${env.description}</div>
+    <div style="margin-top:5px;color:var(--t3);font-size:0.68rem">${env.note}</div>
+  `;
+}
+
+/* ══════════════════════════════════════════
+   INVESTISSEMENT
    ══════════════════════════════════════════ */
 
 function switchInvestTab(tab, btn) {
@@ -102,7 +273,6 @@ function switchInvestTab(tab, btn) {
 }
 
 function calcCapital(capital, monthly, rateNet, years, revalor) {
-  // revalor = % annuel d'augmentation des versements
   const data = [];
   let current = capital;
   let currentMonthly = monthly;
@@ -135,11 +305,6 @@ function calcCapAt(capital, monthly, rateNet, years) {
   return v;
 }
 
-function applyFiscality(gains, tmi) {
-  if (tmi <= 0) return gains;
-  return gains * (1 - tmi);
-}
-
 function updateInvest() {
   const capital   = fv('r-capital');
   const monthly   = fv('r-monthly');
@@ -147,21 +312,24 @@ function updateInvest() {
   const years     = iv('r-years') || 0;
   const inflation = fv('r-inflation');
   const frais     = fv('r-frais');
-  const tmi       = fv('r-tmi');
+  const tmi       = fv('r-tmi');  // fraction e.g. 0.128
   const revalor   = fv('r-revalor');
+  const envelopeId= sv('r-envelope') || 'pea';
 
   const rateNet = Math.max(0, rate - frais);
   const data = calcCapital(capital, monthly, rateNet, years, revalor);
   const versData = calcVersementsCumul(capital, monthly, years, revalor);
-  const finalBrut = data[data.length-1]?.value || 0;
+  const finalBrut  = data[data.length-1]?.value || 0;
   const totalVerse = versData[versData.length-1]?.value || 0;
   const gainsBruts = Math.max(0, finalBrut - totalVerse);
-  const gainsNets  = gainsBruts - applyFiscality(gainsBruts, tmi) * (-1) - gainsBruts + applyFiscality(gainsBruts, tmi) * (-1);
-  // Simple: net = total versé + gains après impôt
-  const gainsApresImpot = gainsBruts * (1 - tmi);
-  const capitalNet = totalVerse + gainsApresImpot;
+
+  // Apply real envelope fiscality
+  const capitalNet  = applyEnvelopeFiscality(finalBrut, totalVerse, envelopeId, tmi, years);
   const capitalReel = finalBrut / Math.pow(1 + inflation/100, years);
-  const rente4 = finalBrut * 0.04 / 12;
+  const rente4      = finalBrut * 0.04 / 12;
+
+  // Gains nets = capital net - versements
+  const gainsNets = Math.max(0, capitalNet - totalVerse);
 
   const setText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
   setText('res-final',  fmtN(finalBrut));
@@ -171,6 +339,9 @@ function updateInvest() {
   setText('res-gains',  fmtN(gainsBruts));
   setText('res-ratio',  finalBrut > 0 && totalVerse > 0 ? (finalBrut/totalVerse).toFixed(2)+'×' : '—');
   setText('res-rente',  fmtN(rente4)+'/m');
+
+  // Update envelope info panel
+  updateEnvelopeInfo(envelopeId, 'envelope-info-box');
 
   // Home sync
   document.getElementById('home-capital').textContent = fmt(finalBrut);
@@ -197,73 +368,82 @@ function renderInvestCharts() {
   const versData = calcVersementsCumul(capital, monthly, years, revalor);
   const labels   = data.map(d => `An ${d.year}`);
   const opts     = chartDefaults();
-  opts.plugins.tooltip.callbacks = { label: c => ` ${c.dataset.label} : ${fmtN(c.raw)}` };
 
   // Évolution
-  if (_investTabActive === 'evolution' || true) {
-    destroyChart('invest');
-    charts.invest = new Chart(document.getElementById('invest-chart').getContext('2d'), {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [
-          { label:'Capital total', data:data.map(d=>d.value), borderColor:'#5b6fff', backgroundColor:'rgba(91,111,255,0.07)', borderWidth:2.5, fill:true, tension:0.4, pointRadius:2 },
-          { label:'Versements cumulés', data:versData.map(d=>d.value), borderColor:'#4aa3e8', borderDash:[5,5], borderWidth:1.5, fill:false, tension:0, pointRadius:0 },
-          { label:'Capital réel', data:data.map((d,i)=>d.value/Math.pow(1+inflation/100,i)), borderColor:'#00c9a7', borderDash:[3,3], borderWidth:1.5, fill:false, tension:0.4, pointRadius:0 }
-        ]
-      },
-      options: opts
-    });
+  destroyChart('invest');
+  charts.invest = new Chart(document.getElementById('invest-chart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label:'Capital total', data:data.map(d=>d.value), borderColor:'#5b6fff', backgroundColor:'rgba(91,111,255,0.07)', borderWidth:2.5, fill:true, tension:0.4, pointRadius:0, pointHoverRadius:5 },
+        { label:'Versements cumulés', data:versData.map(d=>d.value), borderColor:'#4aa3e8', borderDash:[5,5], borderWidth:1.5, fill:false, tension:0, pointRadius:0, pointHoverRadius:4 },
+        { label:'Capital réel (inflation)', data:data.map((d,i)=>d.value/Math.pow(1+inflation/100,i)), borderColor:'#00c9a7', borderDash:[3,3], borderWidth:1.5, fill:false, tension:0.4, pointRadius:0, pointHoverRadius:4 }
+      ]
+    },
+    options: opts
+  });
 
-    // Multi-taux
-    destroyChart('rend-multi');
-    const taux_list  = [3,5,7,10,12];
-    const col_list   = ['#4aa3e8','#00c9a7','#5b6fff','#d4af37','#f24463'];
-    charts['rend-multi'] = new Chart(document.getElementById('rend-multi-chart').getContext('2d'), {
-      type: 'line',
-      data: {
-        labels,
-        datasets: taux_list.map((t,i) => {
-          const d = calcCapital(capital, monthly, Math.max(0,t-frais), years, revalor);
-          return { label:`${t}%`, data:d.map(x=>x.value), borderColor:col_list[i], backgroundColor:col_list[i]+'10', borderWidth:2, fill:true, tension:0.4, pointRadius:0 };
-        })
-      },
-      options: opts
-    });
+  // Multi-taux
+  destroyChart('rend-multi');
+  const taux_list  = [3,5,7,10,12];
+  const col_list   = ['#4aa3e8','#00c9a7','#5b6fff','#d4af37','#f24463'];
+  const multiOpts  = chartDefaults();
+  charts['rend-multi'] = new Chart(document.getElementById('rend-multi-chart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: taux_list.map((t,i) => {
+        const d = calcCapital(capital, monthly, Math.max(0,t-frais), years, revalor);
+        return { label:`${t}%`, data:d.map(x=>x.value), borderColor:col_list[i], backgroundColor:col_list[i]+'10', borderWidth:2, fill:true, tension:0.4, pointRadius:0, pointHoverRadius:4 };
+      })
+    },
+    options: multiOpts
+  });
 
-    // Composition
-    destroyChart('rend-compo');
-    const vers = versData[versData.length-1]?.value || 0;
-    const coOpts = { ...chartDefaults(), plugins: { ...chartDefaults().plugins, legend: chartDefaults().plugins.legend } };
-    coOpts.plugins.tooltip = { ...chartDefaults().plugins.tooltip, callbacks: { label: c => ` ${c.dataset.label} : ${fmtN(c.raw)}` } };
-    charts['rend-compo'] = new Chart(document.getElementById('rend-compo-chart').getContext('2d'), {
-      type:'bar',
-      data:{
-        labels:['3%','5%','7%','10%'],
-        datasets:[
-          { label:'Versements', data:[3,5,7,10].map(()=>vers), backgroundColor:'rgba(74,163,232,0.55)', borderColor:'#4aa3e8', borderWidth:1.5, borderRadius:4 },
-          { label:'Intérêts', data:[3,5,7,10].map(t=>Math.max(0,calcCapAt(capital,monthly,Math.max(0,t-frais),years)-vers)), backgroundColor:'rgba(91,111,255,0.55)', borderColor:'#5b6fff', borderWidth:1.5, borderRadius:4 }
-        ]
-      },
-      options:{responsive:true, maintainAspectRatio:false, plugins:{legend:coOpts.plugins.legend,tooltip:coOpts.plugins.tooltip}, scales:{x:{stacked:true,ticks:coOpts.scales.x.ticks,grid:coOpts.scales.x.grid},y:{stacked:true,ticks:coOpts.scales.y.ticks,grid:coOpts.scales.y.grid}}}
-    });
+  // Composition (bar stacked)
+  destroyChart('rend-compo');
+  const vers = versData[versData.length-1]?.value || 0;
+  const coOpts = chartDefaults();
+  coOpts.interaction = { mode:'index', intersect:false };
+  coOpts.plugins.tooltip.callbacks = {
+    label: c => '  ' + c.dataset.label + ' : ' + fmtN(c.raw)
+  };
+  charts['rend-compo'] = new Chart(document.getElementById('rend-compo-chart').getContext('2d'), {
+    type:'bar',
+    data:{
+      labels:['3%','5%','7%','10%'],
+      datasets:[
+        { label:'Versements', data:[3,5,7,10].map(()=>vers), backgroundColor:'rgba(74,163,232,0.55)', borderColor:'#4aa3e8', borderWidth:1.5, borderRadius:4 },
+        { label:'Intérêts', data:[3,5,7,10].map(t=>Math.max(0,calcCapAt(capital,monthly,Math.max(0,t-frais),years)-vers)), backgroundColor:'rgba(91,111,255,0.55)', borderColor:'#5b6fff', borderWidth:1.5, borderRadius:4 }
+      ]
+    },
+    options:{
+      ...coOpts,
+      scales:{
+        x:{stacked:true, ticks:{color:'#5e6685',font:{family:'DM Mono, monospace',size:10}}, grid:{color:'rgba(91,111,255,0.05)'}},
+        y:{stacked:true,
+          ticks:{color:'#5e6685',font:{family:'DM Mono, monospace',size:10},callback:v => Math.abs(v)>=1e6?(v/1e6).toFixed(1)+'M€':Math.abs(v)>=1e3?(v/1e3).toFixed(0)+'k€':v+'€'},
+          grid:{color:'rgba(91,111,255,0.05)'}}
+      }
+    }
+  });
 
-    // Inflation
-    destroyChart('rend-inflation');
-    charts['rend-inflation'] = new Chart(document.getElementById('rend-inflation-chart').getContext('2d'), {
-      type:'line',
-      data:{
-        labels,
-        datasets:[
-          {label:'Valeur nominale', data:data.map(d=>d.value), borderColor:'#5b6fff', backgroundColor:'rgba(91,111,255,0.07)', borderWidth:2, fill:true, tension:0.4, pointRadius:0},
-          {label:'Valeur réelle', data:data.map((d,i)=>d.value/Math.pow(1+inflation/100,i)), borderColor:'#d4af37', backgroundColor:'rgba(212,175,55,0.06)', borderWidth:2, fill:true, tension:0.4, pointRadius:0, borderDash:[4,3]}
-        ]
-      },
-      options:opts
-    });
-  }
+  // Inflation
+  destroyChart('rend-inflation');
+  const infOpts = chartDefaults();
+  charts['rend-inflation'] = new Chart(document.getElementById('rend-inflation-chart').getContext('2d'), {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'Valeur nominale', data:data.map(d=>d.value), borderColor:'#5b6fff', backgroundColor:'rgba(91,111,255,0.07)', borderWidth:2, fill:true, tension:0.4, pointRadius:0, pointHoverRadius:5},
+        {label:'Valeur réelle', data:data.map((d,i)=>d.value/Math.pow(1+inflation/100,i)), borderColor:'#d4af37', backgroundColor:'rgba(212,175,55,0.06)', borderWidth:2, fill:true, tension:0.4, pointRadius:0, pointHoverRadius:5, borderDash:[4,3]}
+      ]
+    },
+    options:infOpts
+  });
 
-  // Détail annuel
   renderRendDetail();
 }
 
@@ -285,7 +465,6 @@ function renderRendDetail() {
   const versD   = calcVersementsCumul(capital, monthly, years, revalor);
   const labels  = data.map(d=>`An ${d.year}`);
   const dOpts   = chartDefaults();
-  dOpts.plugins.tooltip.callbacks = { label: c => ` ${c.dataset.label} : ${fmtN(c.raw)}` };
 
   destroyChart('rend-detail');
   charts['rend-detail'] = new Chart(document.getElementById('rend-detail-chart').getContext('2d'), {
@@ -297,7 +476,15 @@ function renderRendDetail() {
         { label:'Intérêts générés', data:data.map((d,i)=>Math.max(0,d.value-versD[i].value)), backgroundColor:'rgba(91,111,255,0.55)', borderColor:'#5b6fff', borderWidth:0, borderRadius:2 }
       ]
     },
-    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:dOpts.plugins.legend,tooltip:dOpts.plugins.tooltip}, scales:{x:{stacked:true,ticks:dOpts.scales.x.ticks,grid:dOpts.scales.x.grid},y:{stacked:true,ticks:dOpts.scales.y.ticks,grid:dOpts.scales.y.grid}}}
+    options:{
+      ...dOpts,
+      scales:{
+        x:{stacked:true, ticks:{color:'#5e6685',font:{family:'DM Mono, monospace',size:10},maxTicksLimit:12}, grid:{color:'rgba(91,111,255,0.05)'}},
+        y:{stacked:true,
+          ticks:{color:'#5e6685',font:{family:'DM Mono, monospace',size:10},callback:v => Math.abs(v)>=1e6?(v/1e6).toFixed(1)+'M€':Math.abs(v)>=1e3?(v/1e3).toFixed(0)+'k€':v+'€'},
+          grid:{color:'rgba(91,111,255,0.05)'}}
+      }
+    }
   });
 
   const final  = data[data.length-1].value;
@@ -319,17 +506,39 @@ function renderRendDetail() {
 /* ══ HOME CHART ══ */
 function updateHomeChart(data, versData) {
   destroyChart('home');
-  const opts = chartDefaults();
-  opts.scales = {};
-  opts.plugins.legend = { display: false };
-  opts.plugins.tooltip.callbacks = { label: c => ` ${fmtN(c.raw)}` };
+  const opts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0b0d17',
+        borderColor: 'rgba(91,111,255,0.4)',
+        borderWidth: 1,
+        titleColor: '#8a9bff',
+        bodyColor: '#a8b0d0',
+        padding: { top:10, bottom:10, left:14, right:14 },
+        titleFont: { family:'DM Mono, monospace', size:11 },
+        bodyFont: { family:'DM Mono, monospace', size:12 },
+        cornerRadius: 8,
+        callbacks: {
+          label: c => '  ' + fmtN(c.raw)
+        }
+      }
+    },
+    scales: {
+      x: { display: false },
+      y: { display: false }
+    }
+  };
   charts.home = new Chart(document.getElementById('home-chart').getContext('2d'), {
     type:'line',
     data:{
       labels: data.map(d=>`An ${d.year}`),
       datasets:[
-        { data:data.map(d=>d.value), borderColor:'#5b6fff', backgroundColor:'rgba(91,111,255,0.12)', fill:true, tension:0.4, borderWidth:2.5, pointRadius:0 },
-        { data:versData.map(d=>d.value), borderColor:'#4aa3e8', borderDash:[4,4], fill:false, tension:0, borderWidth:1.5, pointRadius:0 }
+        { data:data.map(d=>d.value), borderColor:'#5b6fff', backgroundColor:'rgba(91,111,255,0.12)', fill:true, tension:0.4, borderWidth:2.5, pointRadius:0, pointHoverRadius:5 },
+        { data:versData.map(d=>d.value), borderColor:'#4aa3e8', borderDash:[4,4], fill:false, tension:0, borderWidth:1.5, pointRadius:0, pointHoverRadius:4 }
       ]
     },
     options: opts
@@ -350,7 +559,7 @@ function calcRetraite(capitalActuel, epargne, tauxAnnuel, annees, revalor) {
     }
     data.push({ year: y, value: current });
   }
-  const totalVersed = capitalActuel + epargne * annees * 12; // approximate
+  const totalVersed = capitalActuel + epargne * annees * 12;
   return { data, final: current, versements: totalVersed };
 }
 
@@ -372,7 +581,6 @@ function updateRetraite() {
   const revalor     = fv('ret-revalor') || 0;
   const objectif    = fv('ret-objectif') || 2000;
 
-  // Labels
   const setText = (id, txt) => { const el = document.getElementById(id); if(el) el.textContent = txt; };
   setText('v-age-actuel',        ageActuel + ' ans');
   setText('v-age-retraite',      ageRetraite + ' ans');
@@ -402,7 +610,6 @@ function updateRetraite() {
   setText('ret-res-rente-nominale',fmtN(renteNominale));
   setText('ret-res-rente-reelle',  fmtN(renteReelle));
 
-  // Progress
   const pct = objectif > 0 ? Math.min(100, Math.round(renteNominale/objectif*100)) : 0;
   document.getElementById('ret-progress-bar').style.width = pct + '%';
   setText('ret-progress-pct', pct + '%');
@@ -423,9 +630,9 @@ function updateRetraite() {
     const r = calcRetraite(capital, epargne, sc.taux, anneesEpargne, revalor);
     const rente = calcRente(r.final, tauxRetrait, anneesRetraite);
     return `<div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:var(--bg3);border-radius:var(--r-sm);padding:9px 12px;margin-bottom:6px">
-      <span style="color:${sc.color};font-weight:600;font-size:0.78rem">${sc.label} <span style="color:var(--t3);font-weight:400">(${sc.taux.toFixed(1)}%)</span></span>
-      <span style="color:var(--t1);font-weight:700;font-family:var(--font-mono);font-size:0.78rem;text-align:right">${fmt(r.final)}</span>
-      <span style="color:var(--t2);font-family:var(--font-mono);font-size:0.78rem;text-align:right">${fmt(rente)}/m</span>
+      <span style="color:${sc.color};font-weight:600;font-size:0.82rem">${sc.label} <span style="color:var(--t2);font-weight:400">(${sc.taux.toFixed(1)}%)</span></span>
+      <span style="color:var(--t1);font-weight:700;font-family:var(--font-mono);font-size:0.82rem;text-align:right">${fmt(r.final)}</span>
+      <span style="color:var(--t2);font-family:var(--font-mono);font-size:0.82rem;text-align:right">${fmt(rente)}/m</span>
     </div>`;
   }).join('');
 
@@ -433,15 +640,14 @@ function updateRetraite() {
   destroyChart('retraite');
   const versLine = data.map(d => capital + epargne * d.year * 12);
   const opts = chartDefaults();
-  opts.plugins.tooltip.callbacks = { label: c => ` ${c.dataset.label} : ${fmtN(c.raw)}` };
   charts.retraite = new Chart(document.getElementById('retraite-chart').getContext('2d'), {
     type:'line',
     data:{
       labels: data.map(d => `${ageActuel+d.year} ans`),
       datasets:[
-        { label:'Capital accumulé', data:data.map(d=>d.value), borderColor:'#5b6fff', backgroundColor:'rgba(91,111,255,0.08)', borderWidth:2.5, fill:true, tension:0.4, pointRadius:2 },
-        { label:'Versements cumulés', data:versLine, borderColor:'#4aa3e8', borderDash:[5,5], borderWidth:1.5, fill:false, tension:0, pointRadius:0 },
-        { label:'Capital réel', data:data.map((d,i)=>d.value/Math.pow(1+inflation/100,i)), borderColor:'#00c9a7', borderDash:[3,3], borderWidth:1.5, fill:false, tension:0.4, pointRadius:0 }
+        { label:'Capital accumulé', data:data.map(d=>d.value), borderColor:'#5b6fff', backgroundColor:'rgba(91,111,255,0.08)', borderWidth:2.5, fill:true, tension:0.4, pointRadius:0, pointHoverRadius:5 },
+        { label:'Versements cumulés', data:versLine, borderColor:'#4aa3e8', borderDash:[5,5], borderWidth:1.5, fill:false, tension:0, pointRadius:0, pointHoverRadius:4 },
+        { label:'Capital réel', data:data.map((d,i)=>d.value/Math.pow(1+inflation/100,i)), borderColor:'#00c9a7', borderDash:[3,3], borderWidth:1.5, fill:false, tension:0.4, pointRadius:0, pointHoverRadius:4 }
       ]
     },
     options: opts
@@ -513,7 +719,10 @@ function updatePatrimoine() {
   const colors = generateColors(Math.max(actifs.length, passifs.length, 2));
   const pieOpts = () => ({
     responsive:true, maintainAspectRatio:false, cutout:'52%',
-    plugins:{ legend:{ labels:{color:'#7f86a8',font:{family:'DM Mono',size:9},boxWidth:8,padding:8} }, tooltip:{backgroundColor:'#10131f',borderColor:'rgba(91,111,255,0.3)',borderWidth:1,titleColor:'#8a9bff',bodyColor:'#7f86a8',padding:10,callbacks:{label:c=>` ${c.label}: ${fmtN(c.raw)}`}} }
+    plugins:{
+      legend:{ labels:{color:'#a8b0d0',font:{family:'DM Mono',size:10},boxWidth:8,padding:8,usePointStyle:true} },
+      tooltip:{backgroundColor:'#0b0d17',borderColor:'rgba(91,111,255,0.4)',borderWidth:1,titleColor:'#8a9bff',bodyColor:'#a8b0d0',padding:12,cornerRadius:8,bodyFont:{family:'DM Mono, monospace',size:12},callbacks:{label:c=>'  '+c.label+' : '+fmtN(c.raw)}}
+    }
   });
 
   destroyChart('patri-actifs');
@@ -525,7 +734,6 @@ function updatePatrimoine() {
 
   destroyChart('patri-compare');
   const bOpts = chartDefaults();
-  bOpts.plugins.tooltip.callbacks = { label: c => ` ${fmtN(c.raw)}` };
   bOpts.plugins.legend = { display: false };
   charts['patri-compare'] = new Chart(document.getElementById('patri-compare-chart').getContext('2d'),{type:'bar',data:{labels:['Actifs','Passifs','Net'],datasets:[{data:[totalA,totalP,Math.max(0,net)],backgroundColor:['rgba(0,201,167,0.4)','rgba(242,68,99,0.4)','rgba(91,111,255,0.4)'],borderColor:['#00c9a7','#f24463','#5b6fff'],borderWidth:1.5,borderRadius:6}]},options:bOpts});
 }
@@ -568,7 +776,14 @@ function updateBudgetSummary() {
   const colors = generateColors(budgetItems.depenses.length);
   destroyChart('budget-pie');
   if (budgetItems.depenses.length) {
-    charts['budget-pie'] = new Chart(document.getElementById('budget-pie').getContext('2d'),{type:'doughnut',data:{labels:budgetItems.depenses.map(x=>x.label),datasets:[{data:budgetItems.depenses.map(x=>parseFloat(x.montant)||0),backgroundColor:colors.map(c=>c+'cc'),borderColor:colors,borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{labels:{color:'#7f86a8',font:{family:'DM Mono',size:9},boxWidth:8}},tooltip:{backgroundColor:'#10131f',borderColor:'rgba(91,111,255,0.3)',borderWidth:1,titleColor:'#8a9bff',bodyColor:'#7f86a8',padding:10}}}});
+    const pieOpts = {
+      responsive:true, maintainAspectRatio:false, cutout:'55%',
+      plugins:{
+        legend:{labels:{color:'#a8b0d0',font:{family:'DM Mono',size:10},boxWidth:8,usePointStyle:true}},
+        tooltip:{backgroundColor:'#0b0d17',borderColor:'rgba(91,111,255,0.4)',borderWidth:1,titleColor:'#8a9bff',bodyColor:'#a8b0d0',padding:12,cornerRadius:8,bodyFont:{family:'DM Mono, monospace',size:12},callbacks:{label:c=>'  '+c.label+' : '+fmtN(c.raw)}}
+      }
+    };
+    charts['budget-pie'] = new Chart(document.getElementById('budget-pie').getContext('2d'),{type:'doughnut',data:{labels:budgetItems.depenses.map(x=>x.label),datasets:[{data:budgetItems.depenses.map(x=>parseFloat(x.montant)||0),backgroundColor:colors.map(c=>c+'cc'),borderColor:colors,borderWidth:1.5}]},options:pieOpts});
   }
 
   document.getElementById('budget-bars').innerHTML = budgetItems.depenses.map((item,i)=>{
@@ -585,18 +800,16 @@ function updateBudgetSummary() {
 function initBudget() {
   const saved = loadLocal('budget');
   if (saved) budgetItems = saved;
-  // Start empty — user fills in
   renderBudget();
 }
 
 /* ══════════════════════════════════════════
-   COMPARAISON AMÉLIORÉE
+   COMPARAISON
    ══════════════════════════════════════════ */
-function calcScenario(capital, monthly, rate, years, inflation, frais, tmiPct, revalor) {
+function calcScenario(capital, monthly, rate, years, inflation, frais, tmiPct, revalor, envelopeId) {
   const rateNet = Math.max(0, rate - frais);
   const tmi = tmiPct / 100;
 
-  // Capital avec revalorisation
   let current = capital, m = monthly;
   const data = [{ year:0, value:capital }];
   for (let y = 1; y <= years; y++) {
@@ -607,14 +820,13 @@ function calcScenario(capital, monthly, rate, years, inflation, frais, tmiPct, r
   }
   const final = current;
 
-  // Total versé (approx)
   let totalVerse = capital;
   let mv = monthly;
   for (let y=0; y<years; y++) { totalVerse += mv*12; mv *= (1+revalor/100); }
 
   const gainsBruts = Math.max(0, final - totalVerse);
-  const gainsNets  = gainsBruts * (1 - tmi);
-  const capitalNet = totalVerse + gainsNets;
+  const capitalNet = applyEnvelopeFiscality(final, totalVerse, envelopeId || 'cto', tmi, years);
+  const gainsNets  = Math.max(0, capitalNet - totalVerse);
   const capitalReel = final / Math.pow(1+inflation/100, years);
   const rente = final * 0.04 / 12;
 
@@ -625,8 +837,11 @@ function updateCompare() {
   const g = (id) => parseFloat(document.getElementById(id)?.value) || 0;
   const gi = (id) => parseInt(document.getElementById(id)?.value) || 0;
 
-  const A = calcScenario(g('ca-capital'), g('ca-monthly'), g('ca-rate'), gi('ca-years')||0, g('ca-inflation'), g('ca-frais'), g('ca-tmi'), g('ca-revalor'));
-  const B = calcScenario(g('cb-capital'), g('cb-monthly'), g('cb-rate'), gi('cb-years')||0, g('cb-inflation'), g('cb-frais'), g('cb-tmi'), g('cb-revalor'));
+  const envA = document.getElementById('ca-env')?.value || 'pea';
+  const envB = document.getElementById('cb-env')?.value || 'pea';
+
+  const A = calcScenario(g('ca-capital'), g('ca-monthly'), g('ca-rate'), gi('ca-years')||0, g('ca-inflation'), g('ca-frais'), g('ca-tmi'), g('ca-revalor'), envA);
+  const B = calcScenario(g('cb-capital'), g('cb-monthly'), g('cb-rate'), gi('cb-years')||0, g('cb-inflation'), g('cb-frais'), g('cb-tmi'), g('cb-revalor'), envB);
 
   const setT = (id,val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
   setT('ca-result', fmtN(A.final));
@@ -653,46 +868,38 @@ function updateCompare() {
   const years = Array.from({length: maxYears+1}, (_,i)=>i);
   const labels = years.map(y=>`An ${y}`);
   const opts = chartDefaults();
-  opts.plugins.tooltip.callbacks = { label: c => ` ${c.dataset.label} : ${fmtN(c.raw)}` };
 
-  // 1 — Évolution brute
   destroyChart('compare');
   charts.compare = new Chart(document.getElementById('compare-chart').getContext('2d'),{type:'line',data:{labels,datasets:[
-    {label:labA, data:A.data.slice(0,maxYears+1).map(d=>d.value), borderColor:'#4aa3e8', backgroundColor:'rgba(74,163,232,0.06)', fill:true, tension:0.4, borderWidth:2.5, pointRadius:0},
-    {label:labB, data:B.data.slice(0,maxYears+1).map(d=>d.value), borderColor:'#b06cf8', backgroundColor:'rgba(176,108,248,0.06)', fill:true, tension:0.4, borderWidth:2.5, pointRadius:0}
+    {label:labA, data:A.data.slice(0,maxYears+1).map(d=>d.value), borderColor:'#4aa3e8', backgroundColor:'rgba(74,163,232,0.06)', fill:true, tension:0.4, borderWidth:2.5, pointRadius:0, pointHoverRadius:5},
+    {label:labB, data:B.data.slice(0,maxYears+1).map(d=>d.value), borderColor:'#b06cf8', backgroundColor:'rgba(176,108,248,0.06)', fill:true, tension:0.4, borderWidth:2.5, pointRadius:0, pointHoverRadius:5}
   ]},options:opts});
 
-  // 2 — Réel (inflation)
   const infA = g('ca-inflation'), infB = g('cb-inflation');
   destroyChart('compare-reel');
   charts['compare-reel'] = new Chart(document.getElementById('compare-reel-chart').getContext('2d'),{type:'line',data:{labels,datasets:[
-    {label:labA+' réel', data:A.data.slice(0,maxYears+1).map((d,i)=>d.value/Math.pow(1+infA/100,i)), borderColor:'#4aa3e8', borderDash:[4,3], backgroundColor:'rgba(74,163,232,0.04)', fill:true, tension:0.4, borderWidth:2, pointRadius:0},
-    {label:labB+' réel', data:B.data.slice(0,maxYears+1).map((d,i)=>d.value/Math.pow(1+infB/100,i)), borderColor:'#b06cf8', borderDash:[4,3], backgroundColor:'rgba(176,108,248,0.04)', fill:true, tension:0.4, borderWidth:2, pointRadius:0}
-  ]},options:opts});
+    {label:labA+' réel', data:A.data.slice(0,maxYears+1).map((d,i)=>d.value/Math.pow(1+infA/100,i)), borderColor:'#4aa3e8', borderDash:[4,3], backgroundColor:'rgba(74,163,232,0.04)', fill:true, tension:0.4, borderWidth:2, pointRadius:0, pointHoverRadius:5},
+    {label:labB+' réel', data:B.data.slice(0,maxYears+1).map((d,i)=>d.value/Math.pow(1+infB/100,i)), borderColor:'#b06cf8', borderDash:[4,3], backgroundColor:'rgba(176,108,248,0.04)', fill:true, tension:0.4, borderWidth:2, pointRadius:0, pointHoverRadius:5}
+  ]},options:chartDefaults()});
 
-  // 3 — Composition finale
   destroyChart('compare-compo');
   const coOpts = chartDefaults();
-  coOpts.plugins.tooltip.callbacks = { label: c => ` ${c.dataset.label} : ${fmtN(c.raw)}` };
   coOpts.scales.x.stacked = true; coOpts.scales.y.stacked = true;
   charts['compare-compo'] = new Chart(document.getElementById('compare-compo-chart').getContext('2d'),{type:'bar',data:{labels:[labA,labB],datasets:[
     {label:'Versements', data:[A.totalVerse, B.totalVerse], backgroundColor:'rgba(74,163,232,0.55)', borderColor:'#4aa3e8', borderWidth:1.5, borderRadius:4},
     {label:'Gains nets', data:[A.gainsNets, B.gainsNets], backgroundColor:'rgba(91,111,255,0.55)', borderColor:'#5b6fff', borderWidth:1.5, borderRadius:4}
   ]},options:{...coOpts,scales:{x:{stacked:true,...coOpts.scales.x},y:{stacked:true,...coOpts.scales.y}}}});
 
-  // 4 — Rentes projetées (barre)
   destroyChart('compare-rente');
   const reOpts = chartDefaults();
-  reOpts.plugins.tooltip.callbacks = { label: c => ` ${c.dataset.label} : ${fmtN(c.raw)}/m` };
   reOpts.plugins.legend = { display: false };
   charts['compare-rente'] = new Chart(document.getElementById('compare-rente-chart').getContext('2d'),{type:'bar',data:{labels:[labA,labB],datasets:[
     {data:[A.rente, B.rente], backgroundColor:['rgba(74,163,232,0.5)','rgba(176,108,248,0.5)'], borderColor:['#4aa3e8','#b06cf8'], borderWidth:2, borderRadius:8}
   ]},options:reOpts});
 
-  // Delta
-  const winner = (va, vb, higher=true) => {
+  const winner = (va, vb) => {
     if (va===vb) return '—';
-    const w = higher ? (va>vb?labA:labB) : (va<vb?labA:labB);
+    const w = va>vb?labA:labB;
     return `<span style="color:${w===labA?'#4aa3e8':'#b06cf8'}">▲ ${w}</span>`;
   };
   const diffs = [
@@ -750,7 +957,8 @@ function setSymbol(symbol, btn) {
 function init() {
   initBudget();
   refreshHome();
-  // Init slider displays
   updateRetraite();
+  // Show envelope info on load
+  updateEnvelopeInfo('pea', 'envelope-info-box');
 }
 init();

@@ -59,12 +59,7 @@
         <span class="path-current" id="page-title">Tableau de bord</span>
       </div>
     </div>
-    <div class="topbar-right">
-      <div class="market-badge" id="market-status">
-        <span class="market-dot"></span>
-        Marchés ouverts
-      </div>
-    </div>
+    <!-- Badge "Marchés ouverts" supprimé -->
   </header>
 
   <div class="content">
@@ -216,7 +211,7 @@
       </div>
     </div>
 
-    <!-- ══ INVESTISSEMENT (fusionné avec Rendement) ══ -->
+    <!-- ══ INVESTISSEMENT ══ -->
     <div id="invest-page" class="page">
 
       <div class="page-intro">
@@ -233,7 +228,7 @@
             <div class="field-group">
               <label class="field-label">Capital initial</label>
               <div class="field-input-wrap">
-                <input type="number" class="field-input" id="r-capital" placeholder="0" value="" oninput="updateInvest()">
+                <input type="number" class="field-input" id="r-capital" placeholder="10 000" value="" oninput="updateInvest()">
                 <span class="field-unit">€</span>
               </div>
             </div>
@@ -241,7 +236,7 @@
             <div class="field-group">
               <label class="field-label">Versement mensuel</label>
               <div class="field-input-wrap">
-                <input type="number" class="field-input" id="r-monthly" placeholder="0" value="" oninput="updateInvest()">
+                <input type="number" class="field-input" id="r-monthly" placeholder="200" value="" oninput="updateInvest()">
                 <span class="field-unit">€/m</span>
               </div>
             </div>
@@ -250,14 +245,14 @@
               <div class="field-group">
                 <label class="field-label">Taux annuel brut</label>
                 <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="r-rate" placeholder="0" value="" step="0.1" oninput="updateInvest()">
+                  <input type="number" class="field-input" id="r-rate" placeholder="7" value="" step="0.1" oninput="updateInvest()">
                   <span class="field-unit">%</span>
                 </div>
               </div>
               <div class="field-group">
                 <label class="field-label">Durée</label>
                 <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="r-years" placeholder="0" value="" oninput="updateInvest()">
+                  <input type="number" class="field-input" id="r-years" placeholder="20" value="" oninput="updateInvest()">
                   <span class="field-unit">ans</span>
                 </div>
               </div>
@@ -271,14 +266,14 @@
               <div class="field-group">
                 <label class="field-label">Inflation estimée</label>
                 <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="r-inflation" placeholder="0" value="" step="0.1" oninput="updateInvest()">
+                  <input type="number" class="field-input" id="r-inflation" placeholder="2" value="" step="0.1" oninput="updateInvest()">
                   <span class="field-unit">%</span>
                 </div>
               </div>
               <div class="field-group">
                 <label class="field-label">Frais de gestion</label>
                 <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="r-frais" placeholder="0" value="" step="0.1" oninput="updateInvest()">
+                  <input type="number" class="field-input" id="r-frais" placeholder="0.5" value="" step="0.1" oninput="updateInvest()">
                   <span class="field-unit">%/an</span>
                 </div>
               </div>
@@ -287,9 +282,10 @@
             <div class="field-row">
               <div class="field-group">
                 <label class="field-label">TMI fiscal</label>
+                <!-- Values as fractions for JS calculation -->
                 <select class="field-select" id="r-tmi" onchange="updateInvest()">
-                  <option value="0">0 % (PEA/AV)</option>
-                  <option value="0.128">12,8 % (PFU)</option>
+                  <option value="0">0 % (PEA/AV exo)</option>
+                  <option value="0.128" selected>12,8 % (PFU flat tax)</option>
                   <option value="0.30">30 % TMI</option>
                   <option value="0.41">41 % TMI</option>
                   <option value="0.45">45 % TMI</option>
@@ -305,44 +301,47 @@
             </div>
 
             <div class="field-group">
-              <label class="field-label">Type d'enveloppe</label>
+              <label class="field-label">Type d'enveloppe fiscale</label>
               <select class="field-select" id="r-envelope" onchange="updateInvest()">
-                <option value="pea">PEA — exonération après 5 ans</option>
-                <option value="av">Assurance-vie — abattement 4 600 €</option>
-                <option value="cto">CTO — PFU 30 %</option>
-                <option value="per">PER — déductible + IR sortie</option>
+                <option value="pea">PEA — Plan d'Épargne en Actions</option>
+                <option value="av">Assurance-vie</option>
+                <option value="cto">CTO — Compte-Titres Ordinaire</option>
+                <option value="per">PER — Plan d'Épargne Retraite</option>
               </select>
             </div>
+
+            <!-- Info dynamique sur l'enveloppe -->
+            <div id="envelope-info-box" class="envelope-info"></div>
           </div>
 
           <!-- Résultats synthèse -->
           <div class="results-summary">
             <div class="rs-row">
-              <span class="rs-label">Capital final brut</span>
+              <span>Capital final brut</span>
               <span class="rs-val accent" id="res-final">—</span>
             </div>
             <div class="rs-row">
-              <span class="rs-label">Capital net (après fiscalité)</span>
+              <span>Capital net (après fiscalité enveloppe)</span>
               <span class="rs-val" id="res-net">—</span>
             </div>
             <div class="rs-row">
-              <span class="rs-label">Capital réel (inflation)</span>
+              <span>Capital réel (inflation)</span>
               <span class="rs-val" id="res-reel">—</span>
             </div>
             <div class="rs-row">
-              <span class="rs-label">Total versé</span>
+              <span>Total versé</span>
               <span class="rs-val blue" id="res-versed">—</span>
             </div>
             <div class="rs-row">
-              <span class="rs-label">Gains bruts</span>
+              <span>Gains bruts</span>
               <span class="rs-val teal" id="res-gains">—</span>
             </div>
             <div class="rs-row">
-              <span class="rs-label">Multiplicateur</span>
+              <span>Multiplicateur</span>
               <span class="rs-val gold" id="res-ratio">—</span>
             </div>
             <div class="rs-row">
-              <span class="rs-label">Rente mensuelle (4 %)</span>
+              <span>Rente mensuelle (règle des 4 %)</span>
               <span class="rs-val purple" id="res-rente">—</span>
             </div>
           </div>
@@ -361,26 +360,26 @@
             <div class="chart-area"><canvas id="invest-chart"></canvas></div>
           </div>
           <div class="chart-pane" id="pane-multitaux">
-            <p class="chart-note">Comparaison 3% · 5% · 7% · 10% · 12% avec vos paramètres</p>
+            <p class="chart-note">Comparaison 3% · 5% · 7% · 10% · 12% — avec vos paramètres de frais et durée</p>
             <div class="chart-area"><canvas id="rend-multi-chart"></canvas></div>
           </div>
           <div class="chart-pane" id="pane-compo">
-            <p class="chart-note">Répartition versements / intérêts par taux</p>
+            <p class="chart-note">Répartition versements / intérêts selon différents taux</p>
             <div class="chart-area"><canvas id="rend-compo-chart"></canvas></div>
           </div>
           <div class="chart-pane" id="pane-inflation">
-            <p class="chart-note">Valeur nominale vs valeur réelle (pouvoir d'achat)</p>
+            <p class="chart-note">Valeur nominale vs valeur réelle — érosion du pouvoir d'achat</p>
             <div class="chart-area"><canvas id="rend-inflation-chart"></canvas></div>
           </div>
 
           <!-- Détail annuel bar -->
           <div class="card-block mt-16">
-            <div class="block-header">
-              <span>Détail annuel — versements cumulés & intérêts</span>
+            <div class="block-header" style="justify-content:space-between">
+              <span>Détail annuel — versements & intérêts</span>
               <div class="taux-btns">
-                <button class="tb active" id="tb-5" onclick="setRendTaux(5,this)">5%</button>
-                <button class="tb" id="tb-7" onclick="setRendTaux(7,this)">7%</button>
-                <button class="tb" id="tb-10" onclick="setRendTaux(10,this)">10%</button>
+                <button class="tb" onclick="setRendTaux(5,this)">5%</button>
+                <button class="tb active" onclick="setRendTaux(7,this)">7%</button>
+                <button class="tb" onclick="setRendTaux(10,this)">10%</button>
               </div>
             </div>
             <div class="chart-area"><canvas id="rend-detail-chart"></canvas></div>
@@ -411,17 +410,17 @@
             <div class="slider-group">
               <div class="sg-head"><label>Âge actuel</label><strong id="v-age-actuel">—</strong></div>
               <input type="range" class="slider" id="ret-age-actuel" min="18" max="64" value="35" oninput="updateRetraite()">
-              <div class="sg-range"><span>18</span><span>64</span></div>
+              <div class="sg-range"><span>18 ans</span><span>64 ans</span></div>
             </div>
             <div class="slider-group">
               <div class="sg-head"><label>Départ à la retraite</label><strong id="v-age-retraite">—</strong></div>
               <input type="range" class="slider" id="ret-age-retraite" min="50" max="75" value="65" oninput="updateRetraite()">
-              <div class="sg-range"><span>50</span><span>75</span></div>
+              <div class="sg-range"><span>50 ans</span><span>75 ans</span></div>
             </div>
             <div class="slider-group">
               <div class="sg-head"><label>Espérance de vie</label><strong id="v-esperance">—</strong></div>
               <input type="range" class="slider" id="ret-esperance" min="65" max="100" value="85" oninput="updateRetraite()">
-              <div class="sg-range"><span>65</span><span>100</span></div>
+              <div class="sg-range"><span>65 ans</span><span>100 ans</span></div>
             </div>
           </div>
 
@@ -430,7 +429,7 @@
             <div class="slider-group">
               <div class="sg-head"><label>Capital déjà épargné</label><strong id="v-capital-actuel">—</strong></div>
               <input type="range" class="slider" id="ret-capital-actuel" min="0" max="500000" step="500" value="0" oninput="updateRetraite()">
-              <div class="sg-range"><span>0 €</span><span>500 k€</span></div>
+              <div class="sg-range"><span>0 €</span><span>500 000 €</span></div>
             </div>
             <div class="slider-group">
               <div class="sg-head"><label>Épargne mensuelle</label><strong id="v-epargne-mensuelle">—</strong></div>
@@ -440,24 +439,24 @@
             <div class="slider-group">
               <div class="sg-head"><label>Taux de rendement annuel</label><strong id="v-taux-ret">—</strong></div>
               <input type="range" class="slider" id="ret-taux" min="0.5" max="15" step="0.5" value="5" oninput="updateRetraite()">
-              <div class="sg-range"><span>0.5%</span><span>15%</span></div>
+              <div class="sg-range"><span>0,5 %</span><span>15 %</span></div>
             </div>
             <div class="slider-group">
               <div class="sg-head"><label>Inflation estimée</label><strong id="v-inflation">—</strong></div>
               <input type="range" class="slider" id="ret-inflation" min="0" max="8" step="0.5" value="2" oninput="updateRetraite()">
-              <div class="sg-range"><span>0%</span><span>8%</span></div>
+              <div class="sg-range"><span>0 %</span><span>8 %</span></div>
             </div>
             <div class="slider-group">
               <div class="sg-head"><label>Revalorisation annuelle épargne</label><strong id="v-revalor-ret">—</strong></div>
               <input type="range" class="slider" id="ret-revalor" min="0" max="10" step="0.5" value="0" oninput="updateRetraite()">
-              <div class="sg-range"><span>0%</span><span>10%</span></div>
+              <div class="sg-range"><span>0 %</span><span>10 %</span></div>
             </div>
           </div>
 
           <div class="panel-section">
             <div class="panel-section-title">◈ Objectif mensuel à la retraite</div>
             <div class="slider-group">
-              <div class="sg-head"><label>Revenu souhaité</label><strong id="v-objectif">—</strong></div>
+              <div class="sg-head"><label>Revenu mensuel souhaité</label><strong id="v-objectif">—</strong></div>
               <input type="range" class="slider" id="ret-objectif" min="500" max="10000" step="100" value="2000" oninput="updateRetraite()">
               <div class="sg-range"><span>500 €</span><span>10 000 €</span></div>
             </div>
@@ -465,7 +464,7 @@
               <div class="pt-bar-bg">
                 <div id="ret-progress-bar" class="pt-bar-fill"></div>
               </div>
-              <span id="ret-progress-pct" class="pt-pct">0%</span>
+              <span id="ret-progress-pct" class="pt-pct">0 %</span>
             </div>
             <div id="ret-objectif-msg" class="obj-msg"></div>
           </div>
@@ -645,7 +644,7 @@
             <div class="field-row">
               <div class="field-group">
                 <label class="field-label">Inflation (%)</label>
-                <input type="number" class="field-input" id="ca-inflation" placeholder="0" step="0.1" oninput="updateCompare()">
+                <input type="number" class="field-input" id="ca-inflation" placeholder="2" step="0.1" oninput="updateCompare()">
               </div>
               <div class="field-group">
                 <label class="field-label">Frais gestion (%/an)</label>
@@ -654,8 +653,8 @@
             </div>
             <div class="field-row">
               <div class="field-group">
-                <label class="field-label">TMI / fiscalité (%)</label>
-                <input type="number" class="field-input" id="ca-tmi" placeholder="0" step="0.1" oninput="updateCompare()">
+                <label class="field-label">TMI fiscal (%)</label>
+                <input type="number" class="field-input" id="ca-tmi" placeholder="12.8" step="0.1" oninput="updateCompare()">
               </div>
               <div class="field-group">
                 <label class="field-label">Revalorisation vers. (%/an)</label>
@@ -665,8 +664,10 @@
             <div class="field-group">
               <label class="field-label">Enveloppe fiscale</label>
               <select class="field-select" id="ca-env" onchange="updateCompare()">
-                <option value="pea">PEA</option><option value="av">Assurance-vie</option>
-                <option value="cto">CTO</option><option value="per">PER</option>
+                <option value="pea">PEA — exonération IR après 5 ans</option>
+                <option value="av">Assurance-vie — abattement 4 600 €/an</option>
+                <option value="cto">CTO — PFU 30 %</option>
+                <option value="per">PER — déductible à l'entrée</option>
               </select>
             </div>
           </div>
@@ -714,7 +715,7 @@
             <div class="field-row">
               <div class="field-group">
                 <label class="field-label">Inflation (%)</label>
-                <input type="number" class="field-input" id="cb-inflation" placeholder="0" step="0.1" oninput="updateCompare()">
+                <input type="number" class="field-input" id="cb-inflation" placeholder="2" step="0.1" oninput="updateCompare()">
               </div>
               <div class="field-group">
                 <label class="field-label">Frais gestion (%/an)</label>
@@ -723,8 +724,8 @@
             </div>
             <div class="field-row">
               <div class="field-group">
-                <label class="field-label">TMI / fiscalité (%)</label>
-                <input type="number" class="field-input" id="cb-tmi" placeholder="0" step="0.1" oninput="updateCompare()">
+                <label class="field-label">TMI fiscal (%)</label>
+                <input type="number" class="field-input" id="cb-tmi" placeholder="30" step="0.1" oninput="updateCompare()">
               </div>
               <div class="field-group">
                 <label class="field-label">Revalorisation vers. (%/an)</label>
@@ -734,8 +735,10 @@
             <div class="field-group">
               <label class="field-label">Enveloppe fiscale</label>
               <select class="field-select" id="cb-env" onchange="updateCompare()">
-                <option value="pea">PEA</option><option value="av">Assurance-vie</option>
-                <option value="cto">CTO</option><option value="per">PER</option>
+                <option value="pea">PEA — exonération IR après 5 ans</option>
+                <option value="av">Assurance-vie — abattement 4 600 €/an</option>
+                <option value="cto" selected>CTO — PFU 30 %</option>
+                <option value="per">PER — déductible à l'entrée</option>
               </select>
             </div>
           </div>
@@ -772,7 +775,7 @@
       </div>
 
       <!-- Delta summary -->
-      <div class="card-block mt-16" id="compare-delta-block">
+      <div class="card-block mt-16">
         <div class="block-header"><span>Analyse différentielle A vs B</span></div>
         <div id="compare-delta" class="delta-grid"></div>
       </div>

@@ -15,3 +15,6 @@ A Corigier a nouveau :
 
 - Police d'ecriture pas tres lisible ( écrasée ) et rendre plus visible les sous ecritures ( les ecritures qui sont en gris car on ne voit pas bien )
 - Enlever le "le marchée actif" en haut a droite 
+- les parametres ajoutés ne marche pas ? (Peut etre normal)
+- Le curseur les informations ne s'ffichent pas bien quand on passe le curseur sur les graphiques
+- Les types d'enveloppes changent t'il queqlues chose ? ( On ne remarque rien sur les grahpiques. )
