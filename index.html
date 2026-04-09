@@ -18,7 +18,7 @@
       <span class="logo-w">W</span><span class="logo-rest">ealth</span>
       <span class="logo-os">OS</span>
     </div>
-    <div class="logo-tagline">Votre intelligence financière</div>
+    <div class="logo-tagline">Dashboard</div>
   </div>
 
   <div class="nav-group">
@@ -37,7 +37,7 @@
     <div class="nav-group-label">Analyse</div>
     <div class="nav-item" data-page="analyse"><span class="nav-icon">▣</span><span class="nav-label">Patrimoine</span></div>
     <div class="nav-item" data-page="compare"><span class="nav-icon">⊞</span><span class="nav-label">Comparaison</span></div>
-    <div class="nav-item" data-page="marche"><span class="nav-icon">▲</span><span class="nav-label">Marchés live</span></div>
+    <div class="nav-item" data-page="allocation"><span class="nav-icon">▲</span><span class="nav-label">Allocation</span></div>
   </div>
 
   <div class="sidebar-bottom">
@@ -59,7 +59,6 @@
         <span class="path-current" id="page-title">Tableau de bord</span>
       </div>
     </div>
-    <!-- Badge "Marchés ouverts" supprimé -->
   </header>
 
   <div class="content">
@@ -161,11 +160,11 @@
               </div>
               <span class="ql-chevron">→</span>
             </div>
-            <div class="ql-item" onclick="goPage('marche')">
+            <div class="ql-item" onclick="goPage('allocation')">
               <div class="ql-icon" style="color:var(--red)">▲</div>
               <div class="ql-text">
-                <div class="ql-name">Marchés live</div>
-                <div class="ql-desc">Cours en temps réel</div>
+                <div class="ql-name">Allocation de portefeuille</div>
+                <div class="ql-desc">Optimisation risque/rendement</div>
               </div>
               <span class="ql-chevron">→</span>
             </div>
@@ -282,7 +281,6 @@
             <div class="field-row">
               <div class="field-group">
                 <label class="field-label">TMI fiscal</label>
-                <!-- Values as fractions for JS calculation -->
                 <select class="field-select" id="r-tmi" onchange="updateInvest()">
                   <option value="0">0 % (PEA/AV exo)</option>
                   <option value="0.128" selected>12,8 % (PFU flat tax)</option>
@@ -310,7 +308,6 @@
               </select>
             </div>
 
-            <!-- Info dynamique sur l'enveloppe -->
             <div id="envelope-info-box" class="envelope-info"></div>
           </div>
 
@@ -354,6 +351,7 @@
             <button class="ct-tab" onclick="switchInvestTab('multitaux',this)">Multi-taux</button>
             <button class="ct-tab" onclick="switchInvestTab('compo',this)">Composition</button>
             <button class="ct-tab" onclick="switchInvestTab('inflation',this)">Inflation</button>
+            <button class="ct-tab" onclick="switchInvestTab('amortissement',this)">Amortissement</button>
           </div>
 
           <div class="chart-pane active" id="pane-evolution">
@@ -370,6 +368,10 @@
           <div class="chart-pane" id="pane-inflation">
             <p class="chart-note">Valeur nominale vs valeur réelle — érosion du pouvoir d'achat</p>
             <div class="chart-area"><canvas id="rend-inflation-chart"></canvas></div>
+          </div>
+          <div class="chart-pane" id="pane-amortissement">
+            <p class="chart-note">Progression annuelle du capital — versements, intérêts et solde par tranche</p>
+            <div id="amort-table-container" style="max-height:360px;overflow-y:auto;margin-top:8px"></div>
           </div>
 
           <!-- Détail annuel bar -->
@@ -604,6 +606,21 @@
           <div id="budget-bars" class="budget-bar-list"></div>
         </div>
       </div>
+
+      <!-- Règle 50/30/20 -->
+      <div class="card-block mt-16">
+        <div class="block-header gold-dot"><span>Règle 50 / 30 / 20 — analyse budgétaire</span></div>
+        <p class="chart-note">Idéalement : 50% en besoins essentiels, 30% en loisirs/envies, 20% en épargne.</p>
+        <div id="budget-503020" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px"></div>
+        <div class="chart-area" style="height:220px"><canvas id="budget-503020-chart"></canvas></div>
+      </div>
+
+      <!-- Projection épargne mensuelle -->
+      <div class="card-block mt-16">
+        <div class="block-header purple-dot"><span>Projection de l'épargne sur 10 ans</span></div>
+        <p class="chart-note">Simulation de votre reste à vivre investi chaque mois à différents taux de rendement.</p>
+        <div class="chart-area"><canvas id="budget-projection-chart"></canvas></div>
+      </div>
     </div>
 
     <!-- ══ COMPARAISON ══ -->
@@ -682,7 +699,6 @@
           </div>
         </div>
 
-        <!-- VS badge -->
         <div class="vs-badge">VS</div>
 
         <!-- Scénario B -->
@@ -754,7 +770,6 @@
         </div>
       </div>
 
-      <!-- Graphiques comparaison -->
       <div class="compare-charts-grid mt-20">
         <div class="card-block">
           <div class="block-header"><span>Évolution capitaux</span></div>
@@ -774,42 +789,143 @@
         </div>
       </div>
 
-      <!-- Delta summary -->
       <div class="card-block mt-16">
         <div class="block-header"><span>Analyse différentielle A vs B</span></div>
         <div id="compare-delta" class="delta-grid"></div>
       </div>
     </div>
 
-    <!-- ══ MARCHÉS ══ -->
-    <div id="marche-page" class="page">
+    <!-- ══ ALLOCATION DE PORTEFEUILLE ══ -->
+    <div id="allocation-page" class="page">
       <div class="page-intro">
-        <h2 class="page-h2">Marchés financiers</h2>
-        <p class="page-desc">Cours en temps réel — indices, actions, cryptomonnaies, matières premières.</p>
+        <h2 class="page-h2">Allocation de portefeuille</h2>
+        <p class="page-desc">Construisez votre allocation stratégique, visualisez le profil risque/rendement de votre portefeuille et simulez son évolution selon votre horizon.</p>
       </div>
 
-      <div class="card-block mb-20" style="padding:0;overflow:hidden;border-radius:var(--r)">
-        <div class="tradingview-widget-container">
-          <div class="tradingview-widget-container__widget"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-          {"symbols";[{"proName":"FOREXCOM:SPXUSD","title":"S&P 500"},{"proName":"FOREXCOM:NSXUSD","title":"Nasdaq 100"},{"description":"CAC 40","proName":"EURONEXT:PX1"},{"description":"BTC","proName":"BITSTAMP:BTCUSD"},{"description":"ETH","proName":"BITSTAMP:ETHUSD"},{"description":"Or","proName":"TVC:GOLD"},{"description":"EUR/USD","proName":"FX:EURUSD"}],"showSymbolLogo";true,"isTransparent";true,"displayMode";"adaptive","colorTheme";"dark","locale";"fr"}
-          </script>
-        </div>
+      <!-- KPIs portefeuille -->
+      <div class="kpi-row-4" id="alloc-kpis">
+        <div class="kpi-slim"><div class="ks-val" id="alloc-rendement">—</div><div class="ks-lbl">Rendement annuel estimé</div></div>
+        <div class="kpi-slim red"><div class="ks-val" id="alloc-risque">—</div><div class="ks-lbl">Volatilité estimée</div></div>
+        <div class="kpi-slim teal"><div class="ks-val" id="alloc-sharpe">—</div><div class="ks-lbl">Ratio de Sharpe</div></div>
+        <div class="kpi-slim"><div class="ks-val" id="alloc-max-dd">—</div><div class="ks-lbl">Drawdown max estimé</div></div>
       </div>
 
-      <div class="card-block">
-        <div class="block-header" style="justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <span>Graphique temps réel</span>
-          <div class="market-btns">
-            <button class="mb active" onclick="setSymbol('FOREXCOM:SPXUSD',this)">S&P 500</button>
-            <button class="mb" onclick="setSymbol('NASDAQ:AAPL',this)">AAPL</button>
-            <button class="mb" onclick="setSymbol('EURONEXT:PX1',this)">CAC 40</button>
-            <button class="mb" onclick="setSymbol('BITSTAMP:BTCUSD',this)">BTC</button>
-            <button class="mb" onclick="setSymbol('TVC:GOLD',this)">Or</button>
-            <button class="mb" onclick="setSymbol('FX:EURUSD',this)">EUR/USD</button>
+      <div class="two-col-layout">
+        <!-- Paramètres allocation -->
+        <div class="params-panel">
+          <div class="panel-section">
+            <div class="panel-section-title">▲ Allocation cible (%)</div>
+            <p style="font-size:0.73rem;color:var(--t2);margin-bottom:14px">Ajustez les curseurs — le total doit faire 100 %.</p>
+
+            <div class="slider-group">
+              <div class="sg-head"><label>Actions (ETF monde / actions)</label><strong id="v-alloc-actions">40 %</strong></div>
+              <input type="range" class="slider" id="alloc-actions" min="0" max="100" step="5" value="40" oninput="updateAllocation()">
+            </div>
+            <div class="slider-group">
+              <div class="sg-head"><label>Obligations / fonds €</label><strong id="v-alloc-oblig">20 %</strong></div>
+              <input type="range" class="slider" id="alloc-oblig" min="0" max="100" step="5" value="20" oninput="updateAllocation()">
+            </div>
+            <div class="slider-group">
+              <div class="sg-head"><label>Immobilier (SCPI / REIT)</label><strong id="v-alloc-immo">20 %</strong></div>
+              <input type="range" class="slider" id="alloc-immo" min="0" max="100" step="5" value="20" oninput="updateAllocation()">
+            </div>
+            <div class="slider-group">
+              <div class="sg-head"><label>Cryptomonnaies</label><strong id="v-alloc-crypto">5 %</strong></div>
+              <input type="range" class="slider" id="alloc-crypto" min="0" max="100" step="5" value="5" oninput="updateAllocation()">
+            </div>
+            <div class="slider-group">
+              <div class="sg-head"><label>Liquidités / Livrets</label><strong id="v-alloc-cash">15 %</strong></div>
+              <input type="range" class="slider" id="alloc-cash" min="0" max="100" step="5" value="15" oninput="updateAllocation()">
+            </div>
+
+            <div id="alloc-total-check" style="margin-top:10px;padding:8px 12px;border-radius:var(--r-sm);font-size:0.78rem;background:var(--bg3)">
+              Total : <strong id="alloc-total">100 %</strong>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <div class="panel-section-title">⚙ Simulation</div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label">Capital initial</label>
+                <div class="field-input-wrap">
+                  <input type="number" class="field-input" id="alloc-capital" placeholder="10000" value="10000" oninput="updateAllocation()">
+                  <span class="field-unit">€</span>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Apport mensuel</label>
+                <div class="field-input-wrap">
+                  <input type="number" class="field-input" id="alloc-monthly" placeholder="300" value="300" oninput="updateAllocation()">
+                  <span class="field-unit">€/m</span>
+                </div>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label">Horizon</label>
+                <div class="field-input-wrap">
+                  <input type="number" class="field-input" id="alloc-years" placeholder="20" value="20" oninput="updateAllocation()">
+                  <span class="field-unit">ans</span>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Taux sans risque</label>
+                <div class="field-input-wrap">
+                  <input type="number" class="field-input" id="alloc-rfree" placeholder="3" value="3" step="0.1" oninput="updateAllocation()">
+                  <span class="field-unit">%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profils prédéfinis -->
+          <div class="panel-section">
+            <div class="panel-section-title">◉ Profils prédéfinis</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="alloc-profile-btn" onclick="applyProfile('prudent')">
+                <span style="color:var(--teal)">◎ Prudent</span>
+                <span style="color:var(--t2);font-size:0.7rem">Actions 20% · Oblig 50% · Immo 15% · Cash 15%</span>
+              </button>
+              <button class="alloc-profile-btn" onclick="applyProfile('equilibre')">
+                <span style="color:var(--blue)">◎ Équilibré</span>
+                <span style="color:var(--t2);font-size:0.7rem">Actions 40% · Oblig 20% · Immo 20% · Cash 15%</span>
+              </button>
+              <button class="alloc-profile-btn" onclick="applyProfile('dynamique')">
+                <span style="color:var(--gold)">◎ Dynamique</span>
+                <span style="color:var(--t2);font-size:0.7rem">Actions 65% · Oblig 10% · Immo 15% · Crypto 10%</span>
+              </button>
+              <button class="alloc-profile-btn" onclick="applyProfile('agressif')">
+                <span style="color:var(--red)">◎ Agressif</span>
+                <span style="color:var(--t2);font-size:0.7rem">Actions 75% · Crypto 15% · Immo 10%</span>
+              </button>
+            </div>
           </div>
         </div>
-        <div id="tv-chart-container" style="height:480px;border-radius:var(--r-sm);overflow:hidden;margin-top:14px"></div>
+
+        <!-- Graphiques allocation -->
+        <div class="charts-panel">
+          <div class="card-block">
+            <div class="block-header"><span>Répartition du portefeuille</span></div>
+            <div class="chart-area-sm"><canvas id="alloc-pie-chart"></canvas></div>
+          </div>
+
+          <div class="card-block mt-16">
+            <div class="block-header gold-dot"><span>Projection selon scénarios (pessimiste / base / optimiste)</span></div>
+            <div class="chart-area"><canvas id="alloc-proj-chart"></canvas></div>
+          </div>
+
+          <div class="card-block mt-16">
+            <div class="block-header purple-dot"><span>Profil risque / rendement par classe d'actif</span></div>
+            <div class="chart-area" style="height:240px"><canvas id="alloc-scatter-chart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analyse détaillée par classe -->
+      <div class="card-block mt-16">
+        <div class="block-header teal-dot"><span>Analyse par classe d'actif</span></div>
+        <div id="alloc-detail-table" style="overflow-x:auto"></div>
       </div>
     </div>
 
