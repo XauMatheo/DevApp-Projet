@@ -1,955 +1,1097 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wealth OS — Dashboard</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Satoshi:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wealth OS — Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Satoshi:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
 </head>
+
 <body>
 
-<!-- SIDEBAR -->
-<nav id="sidebar">
-  <div class="logo">
-    <div class="logo-wordmark">
-      <span class="logo-w">W</span><span class="logo-rest">ealth</span>
-      <span class="logo-os">OS</span>
-    </div>
-    <div class="logo-tagline">Dashboard</div>
-  </div>
-
-  <button class="sidebar-toggle" onclick="toggleSidebar()" title="Réduire la sidebar">
-  <span class="toggle-icon">
-    <span></span><span></span><span></span>
-  </span>
-</button>
-
-  <div class="nav-group">
-    <div class="nav-group-label">Vue globale</div>
-    <div class="nav-item active" data-page="home"><span class="nav-icon">◈</span><span class="nav-label">Tableau de bord</span></div>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-group-label">Simulateurs</div>
-    <div class="nav-item" data-page="invest"><span class="nav-icon">◆</span><span class="nav-label">Investissement</span></div>
-    <div class="nav-item" data-page="retraite"><span class="nav-icon">◇</span><span class="nav-label">Retraite</span></div>
-    <div class="nav-item" data-page="budget"><span class="nav-icon">○</span><span class="nav-label">Budget</span></div>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-group-label">Analyse</div>
-    <div class="nav-item" data-page="analyse"><span class="nav-icon">▣</span><span class="nav-label">Patrimoine</span></div>
-    <div class="nav-item" data-page="compare"><span class="nav-icon">⊞</span><span class="nav-label">Comparaison</span></div>
-    <div class="nav-item" data-page="allocation"><span class="nav-icon">▲</span><span class="nav-label">Allocation</span></div>
-  </div>
-
-  <div class="sidebar-bottom">
-    <div class="sys-status">
-      <span class="pulse-dot"></span>
-      <span>Système actif</span>
-      <span id="clock" class="sys-clock">--:--</span>
-    </div>
-  </div>
-</nav>
-
-<!-- MAIN -->
-<main id="main">
-  <header class="topbar">
-    <div class="topbar-left">
-      <div class="page-path">
-        <span class="path-root">WealthOS</span>
-        <span class="path-sep">/</span>
-        <span class="path-current" id="page-title">Tableau de bord</span>
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="logo">
+      <div class="logo-wordmark">
+        <span class="logo-w">W</span><span class="logo-rest">ealth</span>
+        <span class="logo-os">OS</span>
       </div>
+      <div class="logo-tagline">Dashboard</div>
     </div>
-  </header>
 
-  <div class="content">
+    <button class="sidebar-toggle" onclick="toggleSidebar()" title="Réduire la sidebar">
+      <span class="toggle-icon">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
 
-    <!-- ══ HOME ══ -->
-    <div id="home-page" class="page active">
+    <div class="nav-group">
+      <div class="nav-group-label">Vue globale</div>
+      <div class="nav-item active" data-page="home"><span class="nav-icon">◈</span><span class="nav-label">Tableau de
+          bord</span></div>
+    </div>
 
-      <div class="home-hero">
-        <div class="hero-bg-grid"></div>
-        <div class="hero-content">
-          <div class="hero-eyebrow">Bienvenue sur votre espace</div>
-          <h1 class="hero-title">Pilotez votre <span class="hero-accent">patrimoine</span><br>avec précision</h1>
-          <p class="hero-sub">Simulez, analysez et optimisez vos finances personnelles en temps réel. Tous vos calculs, un seul tableau de bord.</p>
-          <div class="hero-actions">
-            <button class="btn-hero-primary" onclick="goPage('invest')">◆ Simuler un investissement</button>
-            <button class="btn-hero-secondary" onclick="goPage('retraite')">◇ Planifier ma retraite</button>
-          </div>
-        </div>
-        <div class="hero-visual">
-          <canvas id="home-chart" height="200"></canvas>
-        </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Simulateurs</div>
+      <div class="nav-item" data-page="invest"><span class="nav-icon">◆</span><span
+          class="nav-label">Investissement</span></div>
+      <div class="nav-item" data-page="retraite"><span class="nav-icon">◇</span><span class="nav-label">Retraite</span>
       </div>
-
-      <div class="home-kpis">
-        <div class="kpi-tile">
-          <div class="kpi-icon">◆</div>
-          <div class="kpi-body">
-            <div class="kpi-val" id="home-capital">—</div>
-            <div class="kpi-lbl">Capital projeté</div>
-            <div class="kpi-sub">Investissement</div>
-          </div>
-          <div class="kpi-arrow" onclick="goPage('invest')">→</div>
-        </div>
-        <div class="kpi-tile">
-          <div class="kpi-icon" style="color:var(--em)">◈</div>
-          <div class="kpi-body">
-            <div class="kpi-val" id="home-gains">—</div>
-            <div class="kpi-lbl">Gains générés</div>
-            <div class="kpi-sub">Intérêts composés</div>
-          </div>
-          <div class="kpi-arrow" onclick="goPage('invest')">→</div>
-        </div>
-        <div class="kpi-tile">
-          <div class="kpi-icon" style="color:var(--gold)">◇</div>
-          <div class="kpi-body">
-            <div class="kpi-val" id="home-retraite">—</div>
-            <div class="kpi-lbl">Capital retraite</div>
-            <div class="kpi-sub">À l'âge cible</div>
-          </div>
-          <div class="kpi-arrow" onclick="goPage('retraite')">→</div>
-        </div>
-        <div class="kpi-tile">
-          <div class="kpi-icon" style="color:var(--teal)">○</div>
-          <div class="kpi-body">
-            <div class="kpi-val" id="home-ral">—</div>
-            <div class="kpi-lbl">Reste à vivre</div>
-            <div class="kpi-sub">Budget mensuel</div>
-          </div>
-          <div class="kpi-arrow" onclick="goPage('budget')">→</div>
-        </div>
-      </div>
-
-      <div class="home-grid">
-        <div class="home-module">
-          <div class="module-header">
-            <span class="module-dot"></span>
-            <span class="module-title">Accès rapide</span>
-          </div>
-          <div class="quick-links">
-            <div class="ql-item" onclick="goPage('invest')">
-              <div class="ql-icon">◆</div>
-              <div class="ql-text">
-                <div class="ql-name">Investissement</div>
-                <div class="ql-desc">Simulez l'évolution de votre capital</div>
-              </div>
-              <span class="ql-chevron">→</span>
-            </div>
-            <div class="ql-item" onclick="goPage('retraite')">
-              <div class="ql-icon" style="color:var(--gold)">◇</div>
-              <div class="ql-text">
-                <div class="ql-name">Retraite</div>
-                <div class="ql-desc">Planifiez votre capitalisation</div>
-              </div>
-              <span class="ql-chevron">→</span>
-            </div>
-            <div class="ql-item" onclick="goPage('analyse')">
-              <div class="ql-icon" style="color:var(--teal)">▣</div>
-              <div class="ql-text">
-                <div class="ql-name">Patrimoine</div>
-                <div class="ql-desc">Bilan actifs / passifs</div>
-              </div>
-              <span class="ql-chevron">→</span>
-            </div>
-            <div class="ql-item" onclick="goPage('compare')">
-              <div class="ql-icon" style="color:var(--purple)">⊞</div>
-              <div class="ql-text">
-                <div class="ql-name">Comparaison</div>
-                <div class="ql-desc">Scénarios A vs B détaillés</div>
-              </div>
-              <span class="ql-chevron">→</span>
-            </div>
-            <div class="ql-item" onclick="goPage('allocation')">
-              <div class="ql-icon" style="color:var(--red)">▲</div>
-              <div class="ql-text">
-                <div class="ql-name">Allocation de portefeuille</div>
-                <div class="ql-desc">Optimisation risque/rendement</div>
-              </div>
-              <span class="ql-chevron">→</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="home-module">
-          <div class="module-header">
-            <span class="module-dot" style="background:var(--em)"></span>
-            <span class="module-title">Concepts clés</span>
-          </div>
-          <div class="concepts-grid">
-            <div class="concept-pill">
-              <div class="concept-num">1</div>
-              <div class="concept-text">
-                <b>Intérêts composés</b><br>
-                Votre argent génère des intérêts sur les intérêts — la base de tout enrichissement à long terme.
-              </div>
-            </div>
-            <div class="concept-pill">
-              <div class="concept-num">2</div>
-              <div class="concept-text">
-                <b>Règle des 4 %</b><br>
-                Retirer 4 % de son capital par an est considéré comme soutenable sur 30 ans selon la règle de Trinity.
-              </div>
-            </div>
-            <div class="concept-pill">
-              <div class="concept-num">3</div>
-              <div class="concept-text">
-                <b>Diversification</b><br>
-                Répartir entre actions, obligataire et immobilier réduit le risque sans sacrifier la performance.
-              </div>
-            </div>
-            <div class="concept-pill">
-              <div class="concept-num">4</div>
-              <div class="concept-text">
-                <b>Taux d'endettement</b><br>
-                Ne pas dépasser 33 % de ses revenus en remboursements de crédit — le seuil bancaire standard.
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="nav-item" data-page="budget"><span class="nav-icon">○</span><span class="nav-label">Budget</span>
       </div>
     </div>
 
-    <!-- ══ INVESTISSEMENT ══ -->
-    <div id="invest-page" class="page">
-
-      <div class="page-intro">
-        <h2 class="page-h2">Simulateur d'investissement</h2>
-        <p class="page-desc">Calculez la croissance de votre capital avec intérêts composés, comparez plusieurs taux et analysez l'impact de l'inflation.</p>
+    <div class="nav-group">
+      <div class="nav-group-label">Analyse</div>
+      <div class="nav-item" data-page="analyse"><span class="nav-icon">▣</span><span class="nav-label">Patrimoine</span>
       </div>
+      <div class="nav-item" data-page="compare"><span class="nav-icon">⊞</span><span
+          class="nav-label">Comparaison</span></div>
+      <div class="nav-item" data-page="allocation"><span class="nav-icon">▲</span><span
+          class="nav-label">Allocation</span></div>
+    </div>
 
-      <div class="two-col-layout">
-        <!-- Paramètres -->
-        <div class="params-panel">
-          <div class="panel-section">
-            <div class="panel-section-title">◆ Paramètres de base</div>
+    <div class="sidebar-bottom">
+      <div class="sys-status">
+        <span class="pulse-dot"></span>
+        <span>Système actif</span>
+        <span id="clock" class="sys-clock">--:--</span>
+      </div>
+    </div>
+  </nav>
 
-            <div class="field-group">
-              <label class="field-label">Capital initial</label>
-              <div class="field-input-wrap">
-                <input type="number" class="field-input" id="r-capital" placeholder="10 000" value="" oninput="updateInvest()">
-                <span class="field-unit">€</span>
+  <!-- MAIN -->
+  <main id="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="page-path">
+          <span class="path-root">WealthOS</span>
+          <span class="path-sep">/</span>
+          <span class="path-current" id="page-title">Tableau de bord</span>
+        </div>
+        <span class="topbar-badge" id="topbar-badge">Vue globale</span>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-clock" id="topbar-clock">—</span>
+        <div class="topbar-avatar" title="Mon espace">W</div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ══ HOME ══ -->
+      <div id="home-page" class="page active">
+
+        <div class="home-hero">
+          <div class="hero-bg-grid"></div>
+          <div class="hero-content">
+            <div class="hero-eyebrow">Bienvenue sur votre espace</div>
+            <h1 class="hero-title">Pilotez votre <span class="hero-accent">patrimoine</span><br>avec précision</h1>
+            <p class="hero-sub">Simulez, analysez et optimisez vos finances personnelles en temps réel. Tous vos
+              calculs, un seul tableau de bord.</p>
+            <div class="hero-actions">
+              <button class="btn-hero-primary" onclick="goPage('invest')">◆ Simuler un investissement</button>
+              <button class="btn-hero-secondary" onclick="goPage('retraite')">◇ Planifier ma retraite</button>
+            </div>
+          </div>
+          <div class="hero-visual">
+            <canvas id="home-chart" height="200"></canvas>
+          </div>
+        </div>
+
+        <div class="home-kpis">
+          <div class="kpi-tile">
+            <div class="kpi-icon">◆</div>
+            <div class="kpi-body">
+              <div class="kpi-val" id="home-capital">—</div>
+              <div class="kpi-lbl">Capital projeté</div>
+              <div class="kpi-sub">Investissement</div>
+            </div>
+            <div class="kpi-arrow" onclick="goPage('invest')">→</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-icon" style="color:var(--em)">◈</div>
+            <div class="kpi-body">
+              <div class="kpi-val" id="home-gains">—</div>
+              <div class="kpi-lbl">Gains générés</div>
+              <div class="kpi-sub">Intérêts composés</div>
+            </div>
+            <div class="kpi-arrow" onclick="goPage('invest')">→</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-icon" style="color:var(--gold)">◇</div>
+            <div class="kpi-body">
+              <div class="kpi-val" id="home-retraite">—</div>
+              <div class="kpi-lbl">Capital retraite</div>
+              <div class="kpi-sub">À l'âge cible</div>
+            </div>
+            <div class="kpi-arrow" onclick="goPage('retraite')">→</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-icon" style="color:var(--teal)">○</div>
+            <div class="kpi-body">
+              <div class="kpi-val" id="home-ral">—</div>
+              <div class="kpi-lbl">Reste à vivre</div>
+              <div class="kpi-sub">Budget mensuel</div>
+            </div>
+            <div class="kpi-arrow" onclick="goPage('budget')">→</div>
+          </div>
+        </div>
+
+        <div class="home-grid">
+          <div class="home-module">
+            <div class="module-header">
+              <span class="module-dot"></span>
+              <span class="module-title">Accès rapide</span>
+            </div>
+            <div class="quick-links">
+              <div class="ql-item" onclick="goPage('invest')">
+                <div class="ql-icon">◆</div>
+                <div class="ql-text">
+                  <div class="ql-name">Investissement</div>
+                  <div class="ql-desc">Simulez l'évolution de votre capital</div>
+                </div>
+                <span class="ql-chevron">→</span>
+              </div>
+              <div class="ql-item" onclick="goPage('retraite')">
+                <div class="ql-icon" style="color:var(--gold)">◇</div>
+                <div class="ql-text">
+                  <div class="ql-name">Retraite</div>
+                  <div class="ql-desc">Planifiez votre capitalisation</div>
+                </div>
+                <span class="ql-chevron">→</span>
+              </div>
+              <div class="ql-item" onclick="goPage('analyse')">
+                <div class="ql-icon" style="color:var(--teal)">▣</div>
+                <div class="ql-text">
+                  <div class="ql-name">Patrimoine</div>
+                  <div class="ql-desc">Bilan actifs / passifs</div>
+                </div>
+                <span class="ql-chevron">→</span>
+              </div>
+              <div class="ql-item" onclick="goPage('compare')">
+                <div class="ql-icon" style="color:var(--purple)">⊞</div>
+                <div class="ql-text">
+                  <div class="ql-name">Comparaison</div>
+                  <div class="ql-desc">Scénarios A vs B détaillés</div>
+                </div>
+                <span class="ql-chevron">→</span>
+              </div>
+              <div class="ql-item" onclick="goPage('allocation')">
+                <div class="ql-icon" style="color:var(--red)">▲</div>
+                <div class="ql-text">
+                  <div class="ql-name">Allocation de portefeuille</div>
+                  <div class="ql-desc">Optimisation risque/rendement</div>
+                </div>
+                <span class="ql-chevron">→</span>
               </div>
             </div>
+          </div>
 
-            <div class="field-group">
-              <label class="field-label">Versement mensuel</label>
-              <div class="field-input-wrap">
-                <input type="number" class="field-input" id="r-monthly" placeholder="200" value="" oninput="updateInvest()">
-                <span class="field-unit">€/m</span>
-              </div>
+          <div class="home-module">
+            <div class="module-header">
+              <span class="module-dot" style="background:var(--em)"></span>
+              <span class="module-title">Concepts clés</span>
             </div>
-
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Taux annuel brut</label>
-                <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="r-rate" placeholder="7" value="" step="0.1" oninput="updateInvest()">
-                  <span class="field-unit">%</span>
+            <div class="concepts-grid">
+              <div class="concept-pill">
+                <div class="concept-num">1</div>
+                <div class="concept-text">
+                  <b>Intérêts composés</b><br>
+                  Votre argent génère des intérêts sur les intérêts — la base de tout enrichissement à long terme.
                 </div>
               </div>
-              <div class="field-group">
-                <label class="field-label">Durée</label>
-                <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="r-years" placeholder="20" value="" oninput="updateInvest()">
-                  <span class="field-unit">ans</span>
+              <div class="concept-pill">
+                <div class="concept-num">2</div>
+                <div class="concept-text">
+                  <b>Règle des 4 %</b><br>
+                  Retirer 4 % de son capital par an est considéré comme soutenable sur 30 ans selon la règle de Trinity.
+                </div>
+              </div>
+              <div class="concept-pill">
+                <div class="concept-num">3</div>
+                <div class="concept-text">
+                  <b>Diversification</b><br>
+                  Répartir entre actions, obligataire et immobilier réduit le risque sans sacrifier la performance.
+                </div>
+              </div>
+              <div class="concept-pill">
+                <div class="concept-num">4</div>
+                <div class="concept-text">
+                  <b>Taux d'endettement</b><br>
+                  Ne pas dépasser 33 % de ses revenus en remboursements de crédit — le seuil bancaire standard.
                 </div>
               </div>
             </div>
           </div>
-
-          <div class="panel-section">
-            <div class="panel-section-title">⚙ Paramètres avancés</div>
-
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Inflation estimée</label>
-                <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="r-inflation" placeholder="2" value="" step="0.1" oninput="updateInvest()">
-                  <span class="field-unit">%</span>
-                </div>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Frais de gestion</label>
-                <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="r-frais" placeholder="0.5" value="" step="0.1" oninput="updateInvest()">
-                  <span class="field-unit">%/an</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">TMI fiscal</label>
-                <select class="field-select" id="r-tmi" onchange="updateInvest()">
-                  <option value="0">0 % (PEA/AV exo)</option>
-                  <option value="0.128" selected>12,8 % (PFU flat tax)</option>
-                  <option value="0.30">30 % TMI</option>
-                  <option value="0.41">41 % TMI</option>
-                  <option value="0.45">45 % TMI</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label">Revalorisation vers.</label>
-                <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="r-revalor" placeholder="0" value="" step="0.5" oninput="updateInvest()">
-                  <span class="field-unit">%/an</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">Type d'enveloppe fiscale</label>
-              <select class="field-select" id="r-envelope" onchange="updateInvest()">
-                <option value="pea">PEA — Plan d'Épargne en Actions</option>
-                <option value="av">Assurance-vie</option>
-                <option value="cto">CTO — Compte-Titres Ordinaire</option>
-                <option value="per">PER — Plan d'Épargne Retraite</option>
-              </select>
-            </div>
-
-            <div id="envelope-info-box" class="envelope-info"></div>
-          </div>
-
-          <!-- Résultats synthèse -->
-          <div class="results-summary">
-            <div class="rs-row">
-              <span>Capital final brut</span>
-              <span class="rs-val accent" id="res-final">—</span>
-            </div>
-            <div class="rs-row">
-              <span>Capital net (après fiscalité enveloppe)</span>
-              <span class="rs-val" id="res-net">—</span>
-            </div>
-            <div class="rs-row">
-              <span>Capital réel (inflation)</span>
-              <span class="rs-val" id="res-reel">—</span>
-            </div>
-            <div class="rs-row">
-              <span>Total versé</span>
-              <span class="rs-val blue" id="res-versed">—</span>
-            </div>
-            <div class="rs-row">
-              <span>Gains bruts</span>
-              <span class="rs-val teal" id="res-gains">—</span>
-            </div>
-            <div class="rs-row">
-              <span>Multiplicateur</span>
-              <span class="rs-val gold" id="res-ratio">—</span>
-            </div>
-            <div class="rs-row">
-              <span>Rente mensuelle (règle des 4 %)</span>
-              <span class="rs-val purple" id="res-rente">—</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Graphiques -->
-        <div class="charts-panel">
-          <div class="chart-tabs" id="invest-chart-tabs">
-            <button class="ct-tab active" onclick="switchInvestTab('evolution',this)">Évolution</button>
-            <button class="ct-tab" onclick="switchInvestTab('multitaux',this)">Multi-taux</button>
-            <button class="ct-tab" onclick="switchInvestTab('compo',this)">Composition</button>
-            <button class="ct-tab" onclick="switchInvestTab('inflation',this)">Inflation</button>
-            <button class="ct-tab" onclick="switchInvestTab('amortissement',this)">Amortissement</button>
-            <button class="ct-tab" onclick="switchInvestTab('montecarlo',this)">Monte Carlo</button>
-          </div>
-
-          <div class="chart-pane active" id="pane-evolution">
-            <div class="chart-area"><canvas id="invest-chart"></canvas></div>
-          </div>
-          <div class="chart-pane" id="pane-multitaux">
-            <p class="chart-note">Comparaison 3% · 5% · 7% · 10% · 12% — avec vos paramètres de frais et durée</p>
-            <div class="chart-area"><canvas id="rend-multi-chart"></canvas></div>
-          </div>
-          <div class="chart-pane" id="pane-compo">
-            <p class="chart-note">Répartition versements / intérêts selon différents taux</p>
-            <div class="chart-area"><canvas id="rend-compo-chart"></canvas></div>
-          </div>
-          <div class="chart-pane" id="pane-inflation">
-            <p class="chart-note">Valeur nominale vs valeur réelle — érosion du pouvoir d'achat</p>
-            <div class="chart-area"><canvas id="rend-inflation-chart"></canvas></div>
-          </div>
-          <div class="chart-pane" id="pane-amortissement">
-            <p class="chart-note">Progression annuelle du capital — versements, intérêts et solde par tranche</p>
-            <div id="amort-table-container" style="max-height:360px;overflow-y:auto;margin-top:8px"></div>
-          </div>
-          <div class="chart-pane" id="pane-montecarlo">
-            <p class="chart-note">Simulation de 200 trajectoires aléatoires — distribution des résultats possibles selon la volatilité estimée</p>
-            <div class="chart-area"><canvas id="invest-mc-chart"></canvas></div>
-            <div id="mc-kpis" class="detail-kpis" style="margin-top:14px"></div>
-          </div>
-
-          <!-- Détail annuel bar -->
-          <div class="card-block mt-16">
-            <div class="block-header" style="justify-content:space-between">
-              <span>Détail annuel — versements & intérêts</span>
-              <div class="taux-btns">
-                <button class="tb" onclick="setRendTaux(5,this)">5%</button>
-                <button class="tb active" onclick="setRendTaux(7,this)">7%</button>
-                <button class="tb" onclick="setRendTaux(10,this)">10%</button>
-              </div>
-            </div>
-            <div class="chart-area"><canvas id="rend-detail-chart"></canvas></div>
-            <div id="rend-detail-kpis" class="detail-kpis"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ RETRAITE ══ -->
-    <div id="retraite-page" class="page">
-      <div class="page-intro">
-        <h2 class="page-h2">Calculateur de retraite</h2>
-        <p class="page-desc">Estimez votre capital à la retraite, la rente mensuelle et comparez les scénarios selon votre profil d'épargnant.</p>
-      </div>
-
-      <div class="kpi-row-4">
-        <div class="kpi-slim"><div class="ks-val" id="ret-capital-final">—</div><div class="ks-lbl">Capital à la retraite</div></div>
-        <div class="kpi-slim"><div class="ks-val" id="ret-rente">—</div><div class="ks-lbl">Rente / mois</div></div>
-        <div class="kpi-slim"><div class="ks-val" id="ret-annees">—</div><div class="ks-lbl">Années d'épargne</div></div>
-        <div class="kpi-slim"><div class="ks-val" id="ret-effort">—</div><div class="ks-lbl">Effort total versé</div></div>
-      </div>
-
-      <div class="two-col-layout">
-        <div class="params-panel">
-          <div class="panel-section">
-            <div class="panel-section-title">◇ Profil</div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Âge actuel</label><strong id="v-age-actuel">—</strong></div>
-              <input type="range" class="slider" id="ret-age-actuel" min="18" max="64" value="35" oninput="updateRetraite()">
-              <div class="sg-range"><span>18 ans</span><span>64 ans</span></div>
-            </div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Départ à la retraite</label><strong id="v-age-retraite">—</strong></div>
-              <input type="range" class="slider" id="ret-age-retraite" min="50" max="75" value="65" oninput="updateRetraite()">
-              <div class="sg-range"><span>50 ans</span><span>75 ans</span></div>
-            </div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Espérance de vie</label><strong id="v-esperance">—</strong></div>
-              <input type="range" class="slider" id="ret-esperance" min="65" max="100" value="85" oninput="updateRetraite()">
-              <div class="sg-range"><span>65 ans</span><span>100 ans</span></div>
-            </div>
-          </div>
-
-          <div class="panel-section">
-            <div class="panel-section-title">○ Épargne</div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Capital déjà épargné</label><strong id="v-capital-actuel">—</strong></div>
-              <input type="range" class="slider" id="ret-capital-actuel" min="0" max="500000" step="500" value="0" oninput="updateRetraite()">
-              <div class="sg-range"><span>0 €</span><span>500 000 €</span></div>
-            </div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Épargne mensuelle</label><strong id="v-epargne-mensuelle">—</strong></div>
-              <input type="range" class="slider" id="ret-epargne-mensuelle" min="0" max="5000" step="50" value="0" oninput="updateRetraite()">
-              <div class="sg-range"><span>0 €</span><span>5 000 €</span></div>
-            </div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Taux de rendement annuel</label><strong id="v-taux-ret">—</strong></div>
-              <input type="range" class="slider" id="ret-taux" min="0.5" max="15" step="0.5" value="5" oninput="updateRetraite()">
-              <div class="sg-range"><span>0,5 %</span><span>15 %</span></div>
-            </div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Inflation estimée</label><strong id="v-inflation">—</strong></div>
-              <input type="range" class="slider" id="ret-inflation" min="0" max="8" step="0.5" value="2" oninput="updateRetraite()">
-              <div class="sg-range"><span>0 %</span><span>8 %</span></div>
-            </div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Revalorisation annuelle épargne</label><strong id="v-revalor-ret">—</strong></div>
-              <input type="range" class="slider" id="ret-revalor" min="0" max="10" step="0.5" value="0" oninput="updateRetraite()">
-              <div class="sg-range"><span>0 %</span><span>10 %</span></div>
-            </div>
-          </div>
-
-          <div class="panel-section">
-            <div class="panel-section-title">◈ Objectif mensuel à la retraite</div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Revenu mensuel souhaité</label><strong id="v-objectif">—</strong></div>
-              <input type="range" class="slider" id="ret-objectif" min="500" max="10000" step="100" value="2000" oninput="updateRetraite()">
-              <div class="sg-range"><span>500 €</span><span>10 000 €</span></div>
-            </div>
-            <div class="progress-track">
-              <div class="pt-bar-bg">
-                <div id="ret-progress-bar" class="pt-bar-fill"></div>
-              </div>
-              <span id="ret-progress-pct" class="pt-pct">0 %</span>
-            </div>
-            <div id="ret-objectif-msg" class="obj-msg"></div>
-          </div>
-        </div>
-
-        <div class="charts-panel">
-          <div class="card-block">
-            <div class="block-header"><span>Résultats détaillés</span></div>
-            <div class="res-grid-4">
-              <div class="res-cell highlight"><div class="rc-val" id="ret-res-capital">—</div><div class="rc-lbl">Capital nominal</div></div>
-              <div class="res-cell"><div class="rc-val" id="ret-res-capital-reel">—</div><div class="rc-lbl">Capital réel</div></div>
-              <div class="res-cell"><div class="rc-val" id="ret-res-rente-nominale">—</div><div class="rc-lbl">Rente nominale/m</div></div>
-              <div class="res-cell"><div class="rc-val" id="ret-res-rente-reelle">—</div><div class="rc-lbl">Rente réelle/m</div></div>
-            </div>
-          </div>
-
-          <div class="card-block mt-16">
-            <div class="block-header"><span>Scénarios comparés</span></div>
-            <div id="ret-scenarios"></div>
-          </div>
-
-          <div class="card-block mt-16">
-            <div class="block-header"><span>Évolution de l'épargne</span></div>
-            <div class="chart-area"><canvas id="retraite-chart"></canvas></div>
-          </div>
-
-          <div class="card-block mt-16">
-            <div class="block-header gold-dot"><span>Trajectoire de décaissement à la retraite</span></div>
-            <p class="chart-note" style="margin-bottom:12px">Évolution du capital pendant la phase de retraite selon différents taux de retrait (3% · 4% · 5% · 6%)</p>
-            <div class="chart-area"><canvas id="retraite-decaissement-chart"></canvas></div>
-        </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ ANALYSE / PATRIMOINE ══ -->
-    <div id="analyse-page" class="page">
-      <div class="page-intro">
-        <h2 class="page-h2">Bilan patrimonial</h2>
-        <p class="page-desc">Recensez vos actifs et passifs pour connaître votre patrimoine net et évaluer votre santé financière.</p>
-      </div>
-
-      <div class="kpi-row-4">
-        <div class="kpi-slim teal"><div class="ks-val" id="patri-net">—</div><div class="ks-lbl">Patrimoine net</div></div>
-        <div class="kpi-slim"><div class="ks-val" id="patri-actifs-total">—</div><div class="ks-lbl">Total actifs</div></div>
-        <div class="kpi-slim red"><div class="ks-val" id="patri-passifs-total">—</div><div class="ks-lbl">Total passifs</div></div>
-        <div class="kpi-slim"><div class="ks-val" id="patri-taux-dette">—</div><div class="ks-lbl">Taux d'endettement</div></div>
-      </div>
-
-      <div class="two-col-layout mb-20">
-        <div class="card-block">
-          <div class="block-header teal-dot"><span>Actifs</span></div>
-          <div id="patri-actifs-list" class="patri-list">
-            <div class="patri-row">
-              <input class="field-input flex2" placeholder="Épargne (livrets, PEA…)" value="Épargne" oninput="updatePatrimoine()">
-              <input class="field-input flex1" type="number" value="15000" oninput="updatePatrimoine()">
-              <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
-            </div>
-            <div class="patri-row">
-              <input class="field-input flex2" placeholder="Immobilier" value="Immobilier" oninput="updatePatrimoine()">
-              <input class="field-input flex1" type="number" value="180000" oninput="updatePatrimoine()">
-              <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
-            </div>
-          </div>
-          <button class="add-row-btn" onclick="addPatriRow('actifs')">+ Ajouter un actif</button>
-        </div>
-        <div class="card-block">
-          <div class="block-header red-dot"><span>Passifs</span></div>
-          <div id="patri-passifs-list" class="patri-list">
-            <div class="patri-row">
-              <input class="field-input flex2" placeholder="Crédit immobilier" value="Crédit immo" oninput="updatePatrimoine()">
-              <input class="field-input flex1" type="number" value="120000" oninput="updatePatrimoine()">
-              <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
-            </div>
-          </div>
-          <button class="add-row-btn" onclick="addPatriRow('passifs')">+ Ajouter un passif</button>
         </div>
       </div>
 
-      <div class="three-col-layout mb-20">
-        <div class="card-block">
-          <div class="block-header"><span>Répartition actifs</span></div>
-          <div class="chart-area-sm"><canvas id="patri-actifs-chart"></canvas></div>
-        </div>
-        <div class="card-block">
-          <div class="block-header red-dot"><span>Répartition passifs</span></div>
-          <div class="chart-area-sm"><canvas id="patri-passifs-chart"></canvas></div>
-        </div>
-        <div class="card-block">
-          <div class="block-header gold-dot"><span>Actifs vs Passifs</span></div>
-          <div class="chart-area-sm"><canvas id="patri-compare-chart"></canvas></div>
-        </div>
-      </div>
+      <!-- ══ INVESTISSEMENT ══ -->
+      <div id="invest-page" class="page">
 
-      <div class="card-block">
-        <div class="block-header purple-dot"><span>Santé financière</span></div>
-        <div class="health-bars">
-          <div class="hb-row">
-            <span class="hb-lbl">Actifs</span>
-            <div class="hb-track"><div id="patri-bar-actifs" class="hb-fill teal"></div></div>
-            <span id="patri-bar-actifs-lbl" class="hb-val teal">—</span>
-          </div>
-          <div class="hb-row">
-            <span class="hb-lbl">Passifs</span>
-            <div class="hb-track"><div id="patri-bar-passifs" class="hb-fill red"></div></div>
-            <span id="patri-bar-passifs-lbl" class="hb-val red">—</span>
-          </div>
-        </div>
-        <div id="patri-health-msg" class="health-msg"></div>
-      </div>
-    </div>
-
-    <!-- ══ BUDGET ══ -->
-    <div id="budget-page" class="page">
-      <div class="page-intro">
-        <h2 class="page-h2">Simulateur de budget</h2>
-        <p class="page-desc">Gérez vos revenus et dépenses pour piloter votre reste à vivre mensuel.</p>
-      </div>
-
-      <div class="two-col-layout">
-        <div class="card-block">
-          <div class="block-header teal-dot"><span>Revenus</span></div>
-          <div id="revenus-list"></div>
-          <button class="add-row-btn" onclick="addRevenu()">+ Ajouter un revenu</button>
-        </div>
-        <div class="card-block">
-          <div class="block-header red-dot"><span>Dépenses</span></div>
-          <div id="depenses-list"></div>
-          <button class="add-row-btn" onclick="addDepense()">+ Ajouter une dépense</button>
-        </div>
-      </div>
-
-      <div class="budget-summary">
-        <div class="bs-item teal"><div class="bs-val" id="b-revenus">0 €</div><div class="bs-lbl">Total revenus</div></div>
-        <div class="bs-item red"><div class="bs-val" id="b-depenses">0 €</div><div class="bs-lbl">Total dépenses</div></div>
-        <div class="bs-item accent highlight"><div class="bs-val" id="b-ral">0 €</div><div class="bs-lbl">Reste à vivre</div></div>
-      </div>
-
-      <div class="card-block mt-16">
-        <div class="block-header"><span>Répartition des dépenses</span></div>
-        <div class="budget-charts">
-          <div class="chart-area-sm"><canvas id="budget-pie"></canvas></div>
-          <div id="budget-bars" class="budget-bar-list"></div>
-        </div>
-      </div>
-
-      <!-- Règle 50/30/20 -->
-      <div class="card-block mt-16">
-        <div class="block-header gold-dot"><span>Règle 50 / 30 / 20 — analyse budgétaire</span></div>
-        <p class="chart-note">Idéalement : 50% en besoins essentiels, 30% en loisirs/envies, 20% en épargne.</p>
-        <div id="budget-503020" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px"></div>
-        <div class="chart-area" style="height:220px"><canvas id="budget-503020-chart"></canvas></div>
-      </div>
-
-      <!-- Projection épargne mensuelle -->
-      <div class="card-block mt-16">
-        <div class="block-header purple-dot"><span>Projection de l'épargne sur 10 ans</span></div>
-        <p class="chart-note">Simulation de votre reste à vivre investi chaque mois à différents taux de rendement.</p>
-        <div class="chart-area"><canvas id="budget-projection-chart"></canvas></div>
-      </div>
-    </div>
-
-    <!-- ══ COMPARAISON ══ -->
-    <div id="compare-page" class="page">
-      <div class="page-intro">
-        <h2 class="page-h2">Comparaison de scénarios</h2>
-        <p class="page-desc">Comparez deux stratégies d'investissement avec des paramètres avancés : fiscalité, frais, revalorisation, objectif de rente.</p>
-      </div>
-
-      <div class="compare-panels">
-        <!-- Scénario A -->
-        <div class="compare-block sc-a">
-          <div class="sc-header sc-a-h">
-            <span class="sc-letter">A</span>
-            <input class="sc-name-input" id="ca-name" value="Scénario A" placeholder="Nom du scénario">
-          </div>
-          <div class="sc-fields">
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Capital initial (€)</label>
-                <input type="number" class="field-input" id="ca-capital" placeholder="0" oninput="updateCompare()">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Versement mensuel (€)</label>
-                <input type="number" class="field-input" id="ca-monthly" placeholder="0" oninput="updateCompare()">
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Taux annuel brut (%)</label>
-                <input type="number" class="field-input" id="ca-rate" placeholder="0" step="0.1" oninput="updateCompare()">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Durée (années)</label>
-                <input type="number" class="field-input" id="ca-years" placeholder="0" oninput="updateCompare()">
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Inflation (%)</label>
-                <input type="number" class="field-input" id="ca-inflation" placeholder="2" step="0.1" oninput="updateCompare()">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Frais gestion (%/an)</label>
-                <input type="number" class="field-input" id="ca-frais" placeholder="0" step="0.1" oninput="updateCompare()">
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">TMI fiscal (%)</label>
-                <input type="number" class="field-input" id="ca-tmi" placeholder="12.8" step="0.1" oninput="updateCompare()">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Revalorisation vers. (%/an)</label>
-                <input type="number" class="field-input" id="ca-revalor" placeholder="0" step="0.5" oninput="updateCompare()">
-              </div>
-            </div>
-            <div class="field-group">
-              <label class="field-label">Enveloppe fiscale</label>
-              <select class="field-select" id="ca-env" onchange="updateCompare()">
-                <option value="pea">PEA — exonération IR après 5 ans</option>
-                <option value="av">Assurance-vie — abattement 4 600 €/an</option>
-                <option value="cto">CTO — PFU 30 %</option>
-                <option value="per">PER — déductible à l'entrée</option>
-              </select>
-            </div>
-          </div>
-          <div class="sc-results">
-            <div class="scr-item"><span>Capital brut</span><span class="scr-val blue" id="ca-result">—</span></div>
-            <div class="scr-item"><span>Capital net</span><span class="scr-val" id="ca-net">—</span></div>
-            <div class="scr-item"><span>Capital réel</span><span class="scr-val" id="ca-reel">—</span></div>
-            <div class="scr-item"><span>Rente/mois (4%)</span><span class="scr-val teal" id="ca-rente">—</span></div>
-            <div class="scr-item"><span>Total versé</span><span class="scr-val" id="ca-versed">—</span></div>
-            <div class="scr-item"><span>Gains nets</span><span class="scr-val em" id="ca-gains">—</span></div>
-            <div class="scr-item"><span>Multiplicateur</span><span class="scr-val gold" id="ca-multi">—</span></div>
+        <div class="page-intro">
+          <div class="page-intro-text">
+            <h2 class="page-h2">Simulateur d'investissement</h2>
+            <p class="page-desc">Calculez la croissance de votre capital avec intérêts composés, comparez plusieurs taux et analysez l'impact de l'inflation.</p>
           </div>
         </div>
 
-        <div class="vs-badge">VS</div>
+        <div class="vertical-layout">
+          <!-- Paramètres -->
+          <div class="three-col-layout mb-20">
+            <div class="panel-section">
+              <div class="panel-section-title">◆ Paramètres de base</div>
 
-        <!-- Scénario B -->
-        <div class="compare-block sc-b">
-          <div class="sc-header sc-b-h">
-            <span class="sc-letter b">B</span>
-            <input class="sc-name-input" id="cb-name" value="Scénario B" placeholder="Nom du scénario">
-          </div>
-          <div class="sc-fields">
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Capital initial (€)</label>
-                <input type="number" class="field-input" id="cb-capital" placeholder="0" oninput="updateCompare()">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Versement mensuel (€)</label>
-                <input type="number" class="field-input" id="cb-monthly" placeholder="0" oninput="updateCompare()">
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Taux annuel brut (%)</label>
-                <input type="number" class="field-input" id="cb-rate" placeholder="0" step="0.1" oninput="updateCompare()">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Durée (années)</label>
-                <input type="number" class="field-input" id="cb-years" placeholder="0" oninput="updateCompare()">
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Inflation (%)</label>
-                <input type="number" class="field-input" id="cb-inflation" placeholder="2" step="0.1" oninput="updateCompare()">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Frais gestion (%/an)</label>
-                <input type="number" class="field-input" id="cb-frais" placeholder="0" step="0.1" oninput="updateCompare()">
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">TMI fiscal (%)</label>
-                <input type="number" class="field-input" id="cb-tmi" placeholder="30" step="0.1" oninput="updateCompare()">
-              </div>
-              <div class="field-group">
-                <label class="field-label">Revalorisation vers. (%/an)</label>
-                <input type="number" class="field-input" id="cb-revalor" placeholder="0" step="0.5" oninput="updateCompare()">
-              </div>
-            </div>
-            <div class="field-group">
-              <label class="field-label">Enveloppe fiscale</label>
-              <select class="field-select" id="cb-env" onchange="updateCompare()">
-                <option value="pea">PEA — exonération IR après 5 ans</option>
-                <option value="av">Assurance-vie — abattement 4 600 €/an</option>
-                <option value="cto" selected>CTO — PFU 30 %</option>
-                <option value="per">PER — déductible à l'entrée</option>
-              </select>
-            </div>
-          </div>
-          <div class="sc-results">
-            <div class="scr-item"><span>Capital brut</span><span class="scr-val purple" id="cb-result">—</span></div>
-            <div class="scr-item"><span>Capital net</span><span class="scr-val" id="cb-net">—</span></div>
-            <div class="scr-item"><span>Capital réel</span><span class="scr-val" id="cb-reel">—</span></div>
-            <div class="scr-item"><span>Rente/mois (4%)</span><span class="scr-val teal" id="cb-rente">—</span></div>
-            <div class="scr-item"><span>Total versé</span><span class="scr-val" id="cb-versed">—</span></div>
-            <div class="scr-item"><span>Gains nets</span><span class="scr-val em" id="cb-gains">—</span></div>
-            <div class="scr-item"><span>Multiplicateur</span><span class="scr-val gold" id="cb-multi">—</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="compare-charts-grid mt-20">
-        <div class="card-block">
-          <div class="block-header"><span>Évolution capitaux</span></div>
-          <div class="chart-area"><canvas id="compare-chart"></canvas></div>
-        </div>
-        <div class="card-block">
-          <div class="block-header"><span>Capitaux réels (inflation)</span></div>
-          <div class="chart-area"><canvas id="compare-reel-chart"></canvas></div>
-        </div>
-        <div class="card-block">
-          <div class="block-header"><span>Composition finale</span></div>
-          <div class="chart-area"><canvas id="compare-compo-chart"></canvas></div>
-        </div>
-        <div class="card-block">
-          <div class="block-header"><span>Rentes mensuelles projetées</span></div>
-          <div class="chart-area"><canvas id="compare-rente-chart"></canvas></div>
-        </div>
-      </div>
-
-      <div class="card-block mt-16">
-        <div class="block-header"><span>Analyse différentielle A vs B</span></div>
-        <div id="compare-delta" class="delta-grid"></div>
-      </div>
-    </div>
-
-    <!-- ══ ALLOCATION DE PORTEFEUILLE ══ -->
-    <div id="allocation-page" class="page">
-      <div class="page-intro">
-        <h2 class="page-h2">Allocation de portefeuille</h2>
-        <p class="page-desc">Construisez votre allocation stratégique, visualisez le profil risque/rendement de votre portefeuille et simulez son évolution selon votre horizon.</p>
-      </div>
-
-      <!-- KPIs portefeuille -->
-      <div class="kpi-row-4" id="alloc-kpis">
-        <div class="kpi-slim"><div class="ks-val" id="alloc-rendement">—</div><div class="ks-lbl">Rendement annuel estimé</div></div>
-        <div class="kpi-slim red"><div class="ks-val" id="alloc-risque">—</div><div class="ks-lbl">Volatilité estimée</div></div>
-        <div class="kpi-slim teal"><div class="ks-val" id="alloc-sharpe">—</div><div class="ks-lbl">Ratio de Sharpe</div></div>
-        <div class="kpi-slim"><div class="ks-val" id="alloc-max-dd">—</div><div class="ks-lbl">Drawdown max estimé</div></div>
-      </div>
-
-      <div class="two-col-layout">
-        <!-- Paramètres allocation -->
-        <div class="params-panel">
-          <div class="panel-section">
-            <div class="panel-section-title">▲ Allocation cible (%)</div>
-            <p style="font-size:0.73rem;color:var(--t2);margin-bottom:14px">Ajustez les curseurs — le total doit faire 100 %.</p>
-
-            <div class="slider-group">
-              <div class="sg-head"><label>Actions (ETF monde / actions)</label><strong id="v-alloc-actions">40 %</strong></div>
-              <input type="range" class="slider" id="alloc-actions" min="0" max="100" step="5" value="40" oninput="updateAllocation()">
-            </div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Obligations / fonds €</label><strong id="v-alloc-oblig">20 %</strong></div>
-              <input type="range" class="slider" id="alloc-oblig" min="0" max="100" step="5" value="20" oninput="updateAllocation()">
-            </div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Immobilier (SCPI / REIT)</label><strong id="v-alloc-immo">20 %</strong></div>
-              <input type="range" class="slider" id="alloc-immo" min="0" max="100" step="5" value="20" oninput="updateAllocation()">
-            </div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Cryptomonnaies</label><strong id="v-alloc-crypto">5 %</strong></div>
-              <input type="range" class="slider" id="alloc-crypto" min="0" max="100" step="5" value="5" oninput="updateAllocation()">
-            </div>
-            <div class="slider-group">
-              <div class="sg-head"><label>Liquidités / Livrets</label><strong id="v-alloc-cash">15 %</strong></div>
-              <input type="range" class="slider" id="alloc-cash" min="0" max="100" step="5" value="15" oninput="updateAllocation()">
-            </div>
-
-            <div id="alloc-total-check" style="margin-top:10px;padding:8px 12px;border-radius:var(--r-sm);font-size:0.78rem;background:var(--bg3)">
-              Total : <strong id="alloc-total">100 %</strong>
-            </div>
-          </div>
-
-          <div class="panel-section">
-            <div class="panel-section-title">⚙ Simulation</div>
-            <div class="field-row">
               <div class="field-group">
                 <label class="field-label">Capital initial</label>
                 <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="alloc-capital" placeholder="10000" value="10000" oninput="updateAllocation()">
+                  <input type="number" class="field-input" id="r-capital" placeholder="10 000" value=""
+                    oninput="updateInvest()">
                   <span class="field-unit">€</span>
                 </div>
               </div>
+
               <div class="field-group">
-                <label class="field-label">Apport mensuel</label>
+                <label class="field-label">Versement mensuel</label>
                 <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="alloc-monthly" placeholder="300" value="300" oninput="updateAllocation()">
+                  <input type="number" class="field-input" id="r-monthly" placeholder="200" value=""
+                    oninput="updateInvest()">
                   <span class="field-unit">€/m</span>
                 </div>
               </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">Taux annuel brut</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="r-rate" placeholder="7" value="" step="0.1"
+                      oninput="updateInvest()">
+                    <span class="field-unit">%</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Durée</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="r-years" placeholder="20" value=""
+                      oninput="updateInvest()">
+                    <span class="field-unit">ans</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">Horizon</label>
-                <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="alloc-years" placeholder="20" value="20" oninput="updateAllocation()">
-                  <span class="field-unit">ans</span>
+
+            <div class="panel-section">
+              <div class="panel-section-title">⚙ Paramètres avancés</div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">Inflation estimée</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="r-inflation" placeholder="2" value="" step="0.1"
+                      oninput="updateInvest()">
+                    <span class="field-unit">%</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Frais de gestion</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="r-frais" placeholder="0.5" value="" step="0.1"
+                      oninput="updateInvest()">
+                    <span class="field-unit">%/an</span>
+                  </div>
                 </div>
               </div>
-              <div class="field-group">
-                <label class="field-label">Taux sans risque</label>
-                <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="alloc-rfree" placeholder="3" value="3" step="0.1" oninput="updateAllocation()">
-                  <span class="field-unit">%</span>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">TMI fiscal</label>
+                  <select class="field-select" id="r-tmi" onchange="updateInvest()">
+                    <option value="0">0 % (PEA/AV exo)</option>
+                    <option value="0.128" selected>12,8 % (PFU flat tax)</option>
+                    <option value="0.30">30 % TMI</option>
+                    <option value="0.41">41 % TMI</option>
+                    <option value="0.45">45 % TMI</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Revalorisation vers.</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="r-revalor" placeholder="0" value="" step="0.5"
+                      oninput="updateInvest()">
+                    <span class="field-unit">%/an</span>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            <div class="panel-section">
+              <div class="panel-section-title">🏦 Fiscalité</div>
+              <div class="field-group">
+                <label class="field-label">Type d'enveloppe fiscale</label>
+                <select class="field-select" id="r-envelope" onchange="updateInvest()">
+                  <option value="pea">PEA — Plan d'Épargne en Actions</option>
+                  <option value="av">Assurance-vie</option>
+                  <option value="cto">CTO — Compte-Titres Ordinaire</option>
+                  <option value="per">PER — Plan d'Épargne Retraite</option>
+                </select>
+              </div>
+
+              <div id="envelope-info-box" class="envelope-info"></div>
             </div>
           </div>
 
-          <!-- Profils prédéfinis -->
-          <div class="panel-section">
-            <div class="panel-section-title">◉ Profils prédéfinis</div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <button class="alloc-profile-btn" onclick="applyProfile('prudent')">
-                <span style="color:var(--teal)">◎ Prudent</span>
-                <span style="color:var(--t2);font-size:0.7rem">Actions 20% · Oblig 50% · Immo 15% · Cash 15%</span>
-              </button>
-              <button class="alloc-profile-btn" onclick="applyProfile('equilibre')">
-                <span style="color:var(--blue)">◎ Équilibré</span>
-                <span style="color:var(--t2);font-size:0.7rem">Actions 40% · Oblig 20% · Immo 20% · Cash 15%</span>
-              </button>
-              <button class="alloc-profile-btn" onclick="applyProfile('dynamique')">
-                <span style="color:var(--gold)">◎ Dynamique</span>
-                <span style="color:var(--t2);font-size:0.7rem">Actions 65% · Oblig 10% · Immo 15% · Crypto 10%</span>
-              </button>
-              <button class="alloc-profile-btn" onclick="applyProfile('agressif')">
-                <span style="color:var(--red)">◎ Agressif</span>
-                <span style="color:var(--t2);font-size:0.7rem">Actions 75% · Crypto 15% · Immo 10%</span>
-              </button>
+          <!-- Résultats synthèse -->
+          <div class="res-grid-auto mb-20">
+            <div class="res-cell highlight">
+              <div class="rc-val" style="color:var(--acc-l)" id="res-final">—</div>
+              <div class="rc-lbl">Capital final brut</div>
+            </div>
+            <div class="res-cell">
+              <div class="rc-val" id="res-net">—</div>
+              <div class="rc-lbl">Capital net</div>
+            </div>
+            <div class="res-cell">
+              <div class="rc-val" id="res-reel">—</div>
+              <div class="rc-lbl">Capital réel</div>
+            </div>
+            <div class="res-cell">
+              <div class="rc-val" style="color:var(--blue)" id="res-versed">—</div>
+              <div class="rc-lbl">Total versé</div>
+            </div>
+            <div class="res-cell">
+              <div class="rc-val" style="color:var(--teal)" id="res-gains">—</div>
+              <div class="rc-lbl">Gains bruts</div>
+            </div>
+            <div class="res-cell">
+              <div class="rc-val" style="color:var(--gold)" id="res-ratio">—</div>
+              <div class="rc-lbl">Multiplicateur</div>
+            </div>
+            <div class="res-cell">
+              <div class="rc-val" style="color:var(--purple)" id="res-rente">—</div>
+              <div class="rc-lbl">Rente (4%)</div>
+            </div>
+          </div>
+
+          <!-- Graphiques -->
+          <div class="charts-panel">
+            <div class="chart-tabs" id="invest-chart-tabs">
+              <button class="ct-tab active" onclick="switchInvestTab('evolution',this)">Évolution</button>
+              <button class="ct-tab" onclick="switchInvestTab('multitaux',this)">Multi-taux</button>
+              <button class="ct-tab" onclick="switchInvestTab('compo',this)">Composition</button>
+              <button class="ct-tab" onclick="switchInvestTab('inflation',this)">Inflation</button>
+              <button class="ct-tab" onclick="switchInvestTab('amortissement',this)">Amortissement</button>
+              <button class="ct-tab" onclick="switchInvestTab('montecarlo',this)">Monte Carlo</button>
+            </div>
+
+            <div class="chart-pane active" id="pane-evolution">
+              <div class="chart-area"><canvas id="invest-chart"></canvas></div>
+            </div>
+            <div class="chart-pane" id="pane-multitaux">
+              <p class="chart-note">Comparaison 3% · 5% · 7% · 10% · 12% — avec vos paramètres de frais et durée</p>
+              <div class="chart-area"><canvas id="rend-multi-chart"></canvas></div>
+            </div>
+            <div class="chart-pane" id="pane-compo">
+              <p class="chart-note">Répartition versements / intérêts selon différents taux</p>
+              <div class="chart-area"><canvas id="rend-compo-chart"></canvas></div>
+            </div>
+            <div class="chart-pane" id="pane-inflation">
+              <p class="chart-note">Valeur nominale vs valeur réelle — érosion du pouvoir d'achat</p>
+              <div class="chart-area"><canvas id="rend-inflation-chart"></canvas></div>
+            </div>
+            <div class="chart-pane" id="pane-amortissement">
+              <p class="chart-note">Progression annuelle du capital — versements, intérêts et solde par tranche</p>
+              <div id="amort-table-container" style="max-height:360px;overflow-y:auto;margin-top:8px"></div>
+            </div>
+            <div class="chart-pane" id="pane-montecarlo">
+              <p class="chart-note">Simulation de 200 trajectoires aléatoires — distribution des résultats possibles
+                selon la volatilité estimée</p>
+              <div class="chart-area"><canvas id="invest-mc-chart"></canvas></div>
+              <div id="mc-kpis" class="detail-kpis" style="margin-top:14px"></div>
+            </div>
+
+            <!-- Détail annuel bar -->
+            <div class="card-block mt-16">
+              <div class="block-header" style="justify-content:space-between">
+                <span>Détail annuel — versements & intérêts</span>
+                <div class="taux-btns">
+                  <button class="tb" onclick="setRendTaux(5,this)">5%</button>
+                  <button class="tb active" onclick="setRendTaux(7,this)">7%</button>
+                  <button class="tb" onclick="setRendTaux(10,this)">10%</button>
+                </div>
+              </div>
+              <div class="chart-area"><canvas id="rend-detail-chart"></canvas></div>
+              <div id="rend-detail-kpis" class="detail-kpis"></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Graphiques allocation -->
-        <div class="charts-panel">
+      <!-- ══ RETRAITE ══ -->
+      <div id="retraite-page" class="page">
+        <div class="page-intro">
+          <div class="page-intro-text">
+            <h2 class="page-h2">Calculateur de retraite</h2>
+            <p class="page-desc">Estimez votre capital à la retraite, la rente mensuelle et comparez les scénarios selon votre profil d'épargnant.</p>
+          </div>
+        </div>
+
+        <div class="kpi-row-4">
+          <div class="kpi-slim">
+            <div class="ks-val" id="ret-capital-final">—</div>
+            <div class="ks-lbl">Capital à la retraite</div>
+          </div>
+          <div class="kpi-slim">
+            <div class="ks-val" id="ret-rente">—</div>
+            <div class="ks-lbl">Rente / mois</div>
+          </div>
+          <div class="kpi-slim">
+            <div class="ks-val" id="ret-annees">—</div>
+            <div class="ks-lbl">Années d'épargne</div>
+          </div>
+          <div class="kpi-slim">
+            <div class="ks-val" id="ret-effort">—</div>
+            <div class="ks-lbl">Effort total versé</div>
+          </div>
+        </div>
+
+        <div class="vertical-layout">
+          <div class="three-col-layout mb-20">
+            <div class="panel-section">
+              <div class="panel-section-title">◇ Profil</div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Âge actuel</label><strong id="v-age-actuel">—</strong></div>
+                <input type="range" class="slider" id="ret-age-actuel" min="18" max="64" value="35"
+                  oninput="updateRetraite()">
+                <div class="sg-range"><span>18 ans</span><span>64 ans</span></div>
+              </div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Départ à la retraite</label><strong id="v-age-retraite">—</strong></div>
+                <input type="range" class="slider" id="ret-age-retraite" min="50" max="75" value="65"
+                  oninput="updateRetraite()">
+                <div class="sg-range"><span>50 ans</span><span>75 ans</span></div>
+              </div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Espérance de vie</label><strong id="v-esperance">—</strong></div>
+                <input type="range" class="slider" id="ret-esperance" min="65" max="100" value="85"
+                  oninput="updateRetraite()">
+                <div class="sg-range"><span>65 ans</span><span>100 ans</span></div>
+              </div>
+            </div>
+
+            <div class="panel-section">
+              <div class="panel-section-title">○ Épargne</div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Capital déjà épargné</label><strong id="v-capital-actuel">—</strong></div>
+                <input type="range" class="slider" id="ret-capital-actuel" min="0" max="500000" step="500" value="0"
+                  oninput="updateRetraite()">
+                <div class="sg-range"><span>0 €</span><span>500 000 €</span></div>
+              </div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Épargne mensuelle</label><strong id="v-epargne-mensuelle">—</strong></div>
+                <input type="range" class="slider" id="ret-epargne-mensuelle" min="0" max="5000" step="50" value="0"
+                  oninput="updateRetraite()">
+                <div class="sg-range"><span>0 €</span><span>5 000 €</span></div>
+              </div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Taux de rendement annuel</label><strong id="v-taux-ret">—</strong></div>
+                <input type="range" class="slider" id="ret-taux" min="0.5" max="15" step="0.5" value="5"
+                  oninput="updateRetraite()">
+                <div class="sg-range"><span>0,5 %</span><span>15 %</span></div>
+              </div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Inflation estimée</label><strong id="v-inflation">—</strong></div>
+                <input type="range" class="slider" id="ret-inflation" min="0" max="8" step="0.5" value="2"
+                  oninput="updateRetraite()">
+                <div class="sg-range"><span>0 %</span><span>8 %</span></div>
+              </div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Revalorisation annuelle épargne</label><strong id="v-revalor-ret">—</strong>
+                </div>
+                <input type="range" class="slider" id="ret-revalor" min="0" max="10" step="0.5" value="0"
+                  oninput="updateRetraite()">
+                <div class="sg-range"><span>0 %</span><span>10 %</span></div>
+              </div>
+            </div>
+
+            <div class="panel-section">
+              <div class="panel-section-title">◈ Objectif mensuel à la retraite</div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Revenu mensuel souhaité</label><strong id="v-objectif">—</strong></div>
+                <input type="range" class="slider" id="ret-objectif" min="500" max="10000" step="100" value="2000"
+                  oninput="updateRetraite()">
+                <div class="sg-range"><span>500 €</span><span>10 000 €</span></div>
+              </div>
+              <div class="progress-track">
+                <div class="pt-bar-bg">
+                  <div id="ret-progress-bar" class="pt-bar-fill"></div>
+                </div>
+                <span id="ret-progress-pct" class="pt-pct">0 %</span>
+              </div>
+              <div id="ret-objectif-msg" class="obj-msg"></div>
+            </div>
+          </div>
+
+          <div class="charts-panel">
+            <div class="card-block">
+              <div class="block-header"><span>Résultats détaillés</span></div>
+              <div class="res-grid-4">
+                <div class="res-cell highlight">
+                  <div class="rc-val" id="ret-res-capital">—</div>
+                  <div class="rc-lbl">Capital nominal</div>
+                </div>
+                <div class="res-cell">
+                  <div class="rc-val" id="ret-res-capital-reel">—</div>
+                  <div class="rc-lbl">Capital réel</div>
+                </div>
+                <div class="res-cell">
+                  <div class="rc-val" id="ret-res-rente-nominale">—</div>
+                  <div class="rc-lbl">Rente nominale/m</div>
+                </div>
+                <div class="res-cell">
+                  <div class="rc-val" id="ret-res-rente-reelle">—</div>
+                  <div class="rc-lbl">Rente réelle/m</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-block mt-16">
+              <div class="block-header"><span>Scénarios comparés</span></div>
+              <div id="ret-scenarios"></div>
+            </div>
+
+            <div class="card-block mt-16">
+              <div class="block-header"><span>Évolution de l'épargne</span></div>
+              <div class="chart-area"><canvas id="retraite-chart"></canvas></div>
+            </div>
+
+            <div class="card-block mt-16">
+              <div class="block-header gold-dot"><span>Trajectoire de décaissement à la retraite</span></div>
+              <p class="chart-note" style="margin-bottom:12px">Évolution du capital pendant la phase de retraite selon
+                différents taux de retrait (3% · 4% · 5% · 6%)</p>
+              <div class="chart-area"><canvas id="retraite-decaissement-chart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ANALYSE / PATRIMOINE ══ -->
+      <div id="analyse-page" class="page">
+        <div class="page-intro">
+          <div class="page-intro-text">
+            <h2 class="page-h2">Bilan patrimonial</h2>
+            <p class="page-desc">Recensez vos actifs et passifs pour connaître votre patrimoine net et évaluer votre santé financière.</p>
+          </div>
+        </div>
+
+        <div class="kpi-row-4">
+          <div class="kpi-slim teal">
+            <div class="ks-val" id="patri-net">—</div>
+            <div class="ks-lbl">Patrimoine net</div>
+          </div>
+          <div class="kpi-slim">
+            <div class="ks-val" id="patri-actifs-total">—</div>
+            <div class="ks-lbl">Total actifs</div>
+          </div>
+          <div class="kpi-slim red">
+            <div class="ks-val" id="patri-passifs-total">—</div>
+            <div class="ks-lbl">Total passifs</div>
+          </div>
+          <div class="kpi-slim">
+            <div class="ks-val" id="patri-taux-dette">—</div>
+            <div class="ks-lbl">Taux d'endettement</div>
+          </div>
+        </div>
+
+        <div class="two-col-layout mb-20">
           <div class="card-block">
-            <div class="block-header"><span>Répartition du portefeuille</span></div>
-            <div class="chart-area-sm"><canvas id="alloc-pie-chart"></canvas></div>
+            <div class="block-header teal-dot"><span>Actifs</span></div>
+            <div id="patri-actifs-list" class="patri-list">
+              <div class="patri-row">
+                <input class="field-input flex2" placeholder="Épargne (livrets, PEA…)" value="Épargne"
+                  oninput="updatePatrimoine()">
+                <input class="field-input flex1" type="number" value="15000" oninput="updatePatrimoine()">
+                <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
+              </div>
+              <div class="patri-row">
+                <input class="field-input flex2" placeholder="Immobilier" value="Immobilier"
+                  oninput="updatePatrimoine()">
+                <input class="field-input flex1" type="number" value="180000" oninput="updatePatrimoine()">
+                <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
+              </div>
+            </div>
+            <button class="add-row-btn" onclick="addPatriRow('actifs')">+ Ajouter un actif</button>
           </div>
+          <div class="card-block">
+            <div class="block-header red-dot"><span>Passifs</span></div>
+            <div id="patri-passifs-list" class="patri-list">
+              <div class="patri-row">
+                <input class="field-input flex2" placeholder="Crédit immobilier" value="Crédit immo"
+                  oninput="updatePatrimoine()">
+                <input class="field-input flex1" type="number" value="120000" oninput="updatePatrimoine()">
+                <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
+              </div>
+            </div>
+            <button class="add-row-btn" onclick="addPatriRow('passifs')">+ Ajouter un passif</button>
+          </div>
+        </div>
 
-          <div class="card-block mt-16">
-            <div class="block-header gold-dot"><span>Projection selon scénarios (pessimiste / base / optimiste)</span></div>
-            <div class="chart-area"><canvas id="alloc-proj-chart"></canvas></div>
+        <div class="three-col-layout mb-20">
+          <div class="card-block">
+            <div class="block-header"><span>Répartition actifs</span></div>
+            <div class="chart-area-sm"><canvas id="patri-actifs-chart"></canvas></div>
           </div>
+          <div class="card-block">
+            <div class="block-header red-dot"><span>Répartition passifs</span></div>
+            <div class="chart-area-sm"><canvas id="patri-passifs-chart"></canvas></div>
+          </div>
+          <div class="card-block">
+            <div class="block-header gold-dot"><span>Actifs vs Passifs</span></div>
+            <div class="chart-area-sm"><canvas id="patri-compare-chart"></canvas></div>
+          </div>
+        </div>
 
-          <div class="card-block mt-16">
-            <div class="block-header purple-dot"><span>Profil risque / rendement par classe d'actif</span></div>
-            <div class="chart-area" style="height:240px"><canvas id="alloc-scatter-chart"></canvas></div>
+        <div class="card-block">
+          <div class="block-header purple-dot"><span>Santé financière</span></div>
+          <div class="health-bars">
+            <div class="hb-row">
+              <span class="hb-lbl">Actifs</span>
+              <div class="hb-track">
+                <div id="patri-bar-actifs" class="hb-fill teal"></div>
+              </div>
+              <span id="patri-bar-actifs-lbl" class="hb-val teal">—</span>
+            </div>
+            <div class="hb-row">
+              <span class="hb-lbl">Passifs</span>
+              <div class="hb-track">
+                <div id="patri-bar-passifs" class="hb-fill red"></div>
+              </div>
+              <span id="patri-bar-passifs-lbl" class="hb-val red">—</span>
+            </div>
           </div>
+          <div id="patri-health-msg" class="health-msg"></div>
         </div>
       </div>
 
-      <!-- Analyse détaillée par classe -->
-      <div class="card-block mt-16">
-        <div class="block-header teal-dot"><span>Analyse par classe d'actif</span></div>
-        <div id="alloc-detail-table" style="overflow-x:auto"></div>
+      <!-- ══ BUDGET ══ -->
+      <div id="budget-page" class="page">
+        <div class="page-intro">
+          <div class="page-intro-text">
+            <h2 class="page-h2">Simulateur de budget</h2>
+            <p class="page-desc">Gérez vos revenus et dépenses pour piloter votre reste à vivre mensuel.</p>
+          </div>
+        </div>
+
+        <div class="two-col-layout">
+          <div class="card-block">
+            <div class="block-header teal-dot"><span>Revenus</span></div>
+            <div id="revenus-list"></div>
+            <button class="add-row-btn" onclick="addRevenu()">+ Ajouter un revenu</button>
+          </div>
+          <div class="card-block">
+            <div class="block-header red-dot"><span>Dépenses</span></div>
+            <div id="depenses-list"></div>
+            <button class="add-row-btn" onclick="addDepense()">+ Ajouter une dépense</button>
+          </div>
+        </div>
+
+        <div class="budget-summary">
+          <div class="bs-item teal">
+            <div class="bs-val" id="b-revenus">0 €</div>
+            <div class="bs-lbl">Total revenus</div>
+          </div>
+          <div class="bs-item red">
+            <div class="bs-val" id="b-depenses">0 €</div>
+            <div class="bs-lbl">Total dépenses</div>
+          </div>
+          <div class="bs-item accent highlight">
+            <div class="bs-val" id="b-ral">0 €</div>
+            <div class="bs-lbl">Reste à vivre</div>
+          </div>
+        </div>
+
+        <div class="card-block mt-16">
+          <div class="block-header"><span>Répartition des dépenses</span></div>
+          <div class="budget-charts">
+            <div class="chart-area-sm"><canvas id="budget-pie"></canvas></div>
+            <div id="budget-bars" class="budget-bar-list"></div>
+          </div>
+        </div>
+
+        <!-- Règle 50/30/20 -->
+        <div class="card-block mt-16">
+          <div class="block-header gold-dot"><span>Règle 50 / 30 / 20 — analyse budgétaire</span></div>
+          <p class="chart-note">Idéalement : 50% en besoins essentiels, 30% en loisirs/envies, 20% en épargne.</p>
+          <div id="budget-503020" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+          </div>
+          <div class="chart-area" style="height:220px"><canvas id="budget-503020-chart"></canvas></div>
+        </div>
+
+        <!-- Projection épargne mensuelle -->
+        <div class="card-block mt-16">
+          <div class="block-header purple-dot"><span>Projection de l'épargne sur 10 ans</span></div>
+          <p class="chart-note">Simulation de votre reste à vivre investi chaque mois à différents taux de rendement.
+          </p>
+          <div class="chart-area"><canvas id="budget-projection-chart"></canvas></div>
+        </div>
       </div>
+
+      <!-- ══ COMPARAISON ══ -->
+      <div id="compare-page" class="page">
+        <div class="page-intro">
+          <div class="page-intro-text">
+            <h2 class="page-h2">Comparaison de scénarios</h2>
+            <p class="page-desc">Comparez deux stratégies d'investissement avec des paramètres avancés : fiscalité, frais, revalorisation, objectif de rente.</p>
+          </div>
+        </div>
+
+        <div class="compare-panels">
+          <!-- Scénario A -->
+          <div class="compare-block sc-a">
+            <div class="sc-header sc-a-h">
+              <span class="sc-letter">A</span>
+              <input class="sc-name-input" id="ca-name" value="Scénario A" placeholder="Nom du scénario">
+            </div>
+            <div class="sc-fields">
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">Capital initial (€)</label>
+                  <input type="number" class="field-input" id="ca-capital" placeholder="0" oninput="updateCompare()">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Versement mensuel (€)</label>
+                  <input type="number" class="field-input" id="ca-monthly" placeholder="0" oninput="updateCompare()">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">Taux annuel brut (%)</label>
+                  <input type="number" class="field-input" id="ca-rate" placeholder="0" step="0.1"
+                    oninput="updateCompare()">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Durée (années)</label>
+                  <input type="number" class="field-input" id="ca-years" placeholder="0" oninput="updateCompare()">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">Inflation (%)</label>
+                  <input type="number" class="field-input" id="ca-inflation" placeholder="2" step="0.1"
+                    oninput="updateCompare()">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Frais gestion (%/an)</label>
+                  <input type="number" class="field-input" id="ca-frais" placeholder="0" step="0.1"
+                    oninput="updateCompare()">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">TMI fiscal (%)</label>
+                  <input type="number" class="field-input" id="ca-tmi" placeholder="12.8" step="0.1"
+                    oninput="updateCompare()">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Revalorisation vers. (%/an)</label>
+                  <input type="number" class="field-input" id="ca-revalor" placeholder="0" step="0.5"
+                    oninput="updateCompare()">
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Enveloppe fiscale</label>
+                <select class="field-select" id="ca-env" onchange="updateCompare()">
+                  <option value="pea">PEA — exonération IR après 5 ans</option>
+                  <option value="av">Assurance-vie — abattement 4 600 €/an</option>
+                  <option value="cto">CTO — PFU 30 %</option>
+                  <option value="per">PER — déductible à l'entrée</option>
+                </select>
+              </div>
+            </div>
+            <div class="sc-results">
+              <div class="scr-item"><span>Capital brut</span><span class="scr-val blue" id="ca-result">—</span></div>
+              <div class="scr-item"><span>Capital net</span><span class="scr-val" id="ca-net">—</span></div>
+              <div class="scr-item"><span>Capital réel</span><span class="scr-val" id="ca-reel">—</span></div>
+              <div class="scr-item"><span>Rente/mois (4%)</span><span class="scr-val teal" id="ca-rente">—</span></div>
+              <div class="scr-item"><span>Total versé</span><span class="scr-val" id="ca-versed">—</span></div>
+              <div class="scr-item"><span>Gains nets</span><span class="scr-val em" id="ca-gains">—</span></div>
+              <div class="scr-item"><span>Multiplicateur</span><span class="scr-val gold" id="ca-multi">—</span></div>
+            </div>
+          </div>
+
+          <div class="vs-badge">VS</div>
+
+          <!-- Scénario B -->
+          <div class="compare-block sc-b">
+            <div class="sc-header sc-b-h">
+              <span class="sc-letter b">B</span>
+              <input class="sc-name-input" id="cb-name" value="Scénario B" placeholder="Nom du scénario">
+            </div>
+            <div class="sc-fields">
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">Capital initial (€)</label>
+                  <input type="number" class="field-input" id="cb-capital" placeholder="0" oninput="updateCompare()">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Versement mensuel (€)</label>
+                  <input type="number" class="field-input" id="cb-monthly" placeholder="0" oninput="updateCompare()">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">Taux annuel brut (%)</label>
+                  <input type="number" class="field-input" id="cb-rate" placeholder="0" step="0.1"
+                    oninput="updateCompare()">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Durée (années)</label>
+                  <input type="number" class="field-input" id="cb-years" placeholder="0" oninput="updateCompare()">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">Inflation (%)</label>
+                  <input type="number" class="field-input" id="cb-inflation" placeholder="2" step="0.1"
+                    oninput="updateCompare()">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Frais gestion (%/an)</label>
+                  <input type="number" class="field-input" id="cb-frais" placeholder="0" step="0.1"
+                    oninput="updateCompare()">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">TMI fiscal (%)</label>
+                  <input type="number" class="field-input" id="cb-tmi" placeholder="30" step="0.1"
+                    oninput="updateCompare()">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Revalorisation vers. (%/an)</label>
+                  <input type="number" class="field-input" id="cb-revalor" placeholder="0" step="0.5"
+                    oninput="updateCompare()">
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Enveloppe fiscale</label>
+                <select class="field-select" id="cb-env" onchange="updateCompare()">
+                  <option value="pea">PEA — exonération IR après 5 ans</option>
+                  <option value="av">Assurance-vie — abattement 4 600 €/an</option>
+                  <option value="cto" selected>CTO — PFU 30 %</option>
+                  <option value="per">PER — déductible à l'entrée</option>
+                </select>
+              </div>
+            </div>
+            <div class="sc-results">
+              <div class="scr-item"><span>Capital brut</span><span class="scr-val purple" id="cb-result">—</span></div>
+              <div class="scr-item"><span>Capital net</span><span class="scr-val" id="cb-net">—</span></div>
+              <div class="scr-item"><span>Capital réel</span><span class="scr-val" id="cb-reel">—</span></div>
+              <div class="scr-item"><span>Rente/mois (4%)</span><span class="scr-val teal" id="cb-rente">—</span></div>
+              <div class="scr-item"><span>Total versé</span><span class="scr-val" id="cb-versed">—</span></div>
+              <div class="scr-item"><span>Gains nets</span><span class="scr-val em" id="cb-gains">—</span></div>
+              <div class="scr-item"><span>Multiplicateur</span><span class="scr-val gold" id="cb-multi">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="compare-charts-grid mt-20">
+          <div class="card-block">
+            <div class="block-header"><span>Évolution capitaux</span></div>
+            <div class="chart-area"><canvas id="compare-chart"></canvas></div>
+          </div>
+          <div class="card-block">
+            <div class="block-header"><span>Capitaux réels (inflation)</span></div>
+            <div class="chart-area"><canvas id="compare-reel-chart"></canvas></div>
+          </div>
+          <div class="card-block">
+            <div class="block-header"><span>Composition finale</span></div>
+            <div class="chart-area"><canvas id="compare-compo-chart"></canvas></div>
+          </div>
+          <div class="card-block">
+            <div class="block-header"><span>Rentes mensuelles projetées</span></div>
+            <div class="chart-area"><canvas id="compare-rente-chart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card-block mt-16">
+          <div class="block-header"><span>Analyse différentielle A vs B</span></div>
+          <div id="compare-delta" class="delta-grid"></div>
+        </div>
+      </div>
+
+      <!-- ══ ALLOCATION DE PORTEFEUILLE ══ -->
+      <div id="allocation-page" class="page">
+        <div class="page-intro">
+          <div class="page-intro-text">
+            <h2 class="page-h2">Allocation de portefeuille</h2>
+            <p class="page-desc">Construisez votre allocation stratégique, visualisez le profil risque/rendement de votre portefeuille et simulez son évolution selon votre horizon.</p>
+          </div>
+        </div>
+
+        <!-- KPIs portefeuille -->
+        <div class="kpi-row-4" id="alloc-kpis">
+          <div class="kpi-slim">
+            <div class="ks-val" id="alloc-rendement">—</div>
+            <div class="ks-lbl">Rendement annuel estimé</div>
+          </div>
+          <div class="kpi-slim red">
+            <div class="ks-val" id="alloc-risque">—</div>
+            <div class="ks-lbl">Volatilité estimée</div>
+          </div>
+          <div class="kpi-slim teal">
+            <div class="ks-val" id="alloc-sharpe">—</div>
+            <div class="ks-lbl">Ratio de Sharpe</div>
+          </div>
+          <div class="kpi-slim">
+            <div class="ks-val" id="alloc-max-dd">—</div>
+            <div class="ks-lbl">Drawdown max estimé</div>
+          </div>
+        </div>
+
+        <div class="vertical-layout">
+          <!-- Paramètres allocation -->
+          <div class="three-col-layout mb-20">
+            <div class="panel-section">
+              <div class="panel-section-title">▲ Allocation cible (%)</div>
+              <p style="font-size:0.73rem;color:var(--t2);margin-bottom:14px">Ajustez les curseurs — le total doit faire
+                100 %.</p>
+
+              <div class="slider-group">
+                <div class="sg-head"><label>Actions (ETF monde / actions)</label><strong id="v-alloc-actions">40
+                    %</strong></div>
+                <input type="range" class="slider" id="alloc-actions" min="0" max="100" step="5" value="40"
+                  oninput="updateAllocation()">
+              </div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Obligations / fonds €</label><strong id="v-alloc-oblig">20 %</strong></div>
+                <input type="range" class="slider" id="alloc-oblig" min="0" max="100" step="5" value="20"
+                  oninput="updateAllocation()">
+              </div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Immobilier (SCPI / REIT)</label><strong id="v-alloc-immo">20 %</strong>
+                </div>
+                <input type="range" class="slider" id="alloc-immo" min="0" max="100" step="5" value="20"
+                  oninput="updateAllocation()">
+              </div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Cryptomonnaies</label><strong id="v-alloc-crypto">5 %</strong></div>
+                <input type="range" class="slider" id="alloc-crypto" min="0" max="100" step="5" value="5"
+                  oninput="updateAllocation()">
+              </div>
+              <div class="slider-group">
+                <div class="sg-head"><label>Liquidités / Livrets</label><strong id="v-alloc-cash">15 %</strong></div>
+                <input type="range" class="slider" id="alloc-cash" min="0" max="100" step="5" value="15"
+                  oninput="updateAllocation()">
+              </div>
+
+              <div id="alloc-total-check"
+                style="margin-top:10px;padding:8px 12px;border-radius:var(--r-sm);font-size:0.78rem;background:var(--bg3)">
+                Total : <strong id="alloc-total">100 %</strong>
+              </div>
+            </div>
+
+            <div class="panel-section">
+              <div class="panel-section-title">⚙ Simulation</div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">Capital initial</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="alloc-capital" placeholder="10000" value="10000"
+                      oninput="updateAllocation()">
+                    <span class="field-unit">€</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Apport mensuel</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="alloc-monthly" placeholder="300" value="300"
+                      oninput="updateAllocation()">
+                    <span class="field-unit">€/m</span>
+                  </div>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">Horizon</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="alloc-years" placeholder="20" value="20"
+                      oninput="updateAllocation()">
+                    <span class="field-unit">ans</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Taux sans risque</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="alloc-rfree" placeholder="3" value="3" step="0.1"
+                      oninput="updateAllocation()">
+                    <span class="field-unit">%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profils prédéfinis -->
+            <div class="panel-section">
+              <div class="panel-section-title">◉ Profils prédéfinis</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button class="alloc-profile-btn" onclick="applyProfile('prudent')">
+                  <span style="color:var(--teal)">◎ Prudent</span>
+                  <span style="color:var(--t2);font-size:0.7rem">Actions 20% · Oblig 50% · Immo 15% · Cash 15%</span>
+                </button>
+                <button class="alloc-profile-btn" onclick="applyProfile('equilibre')">
+                  <span style="color:var(--blue)">◎ Équilibré</span>
+                  <span style="color:var(--t2);font-size:0.7rem">Actions 40% · Oblig 20% · Immo 20% · Cash 15%</span>
+                </button>
+                <button class="alloc-profile-btn" onclick="applyProfile('dynamique')">
+                  <span style="color:var(--gold)">◎ Dynamique</span>
+                  <span style="color:var(--t2);font-size:0.7rem">Actions 65% · Oblig 10% · Immo 15% · Crypto 10%</span>
+                </button>
+                <button class="alloc-profile-btn" onclick="applyProfile('agressif')">
+                  <span style="color:var(--red)">◎ Agressif</span>
+                  <span style="color:var(--t2);font-size:0.7rem">Actions 75% · Crypto 15% · Immo 10%</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Graphiques allocation -->
+          <div class="charts-panel">
+            <div class="card-block">
+              <div class="block-header"><span>Répartition du portefeuille</span></div>
+              <div class="chart-area-sm"><canvas id="alloc-pie-chart"></canvas></div>
+            </div>
+
+            <div class="card-block mt-16">
+              <div class="block-header gold-dot"><span>Projection selon scénarios (pessimiste / base / optimiste)</span>
+              </div>
+              <div class="chart-area"><canvas id="alloc-proj-chart"></canvas></div>
+            </div>
+
+            <div class="card-block mt-16">
+              <div class="block-header purple-dot"><span>Profil risque / rendement par classe d'actif</span></div>
+              <div class="chart-area" style="height:240px"><canvas id="alloc-scatter-chart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analyse détaillée par classe -->
+        <div class="card-block mt-16">
+          <div class="block-header teal-dot"><span>Analyse par classe d'actif</span></div>
+          <div id="alloc-detail-table" style="overflow-x:auto"></div>
+        </div>
+      </div>
+
     </div>
+  </main>
 
-  </div>
-</main>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
+
 </html>
