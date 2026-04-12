@@ -40,6 +40,20 @@ function updateClock() {
   const t = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
   document.getElementById('clock').textContent = t;
 }
+
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('collapsed');
+  localStorage.setItem('wos_sidebar', sidebar.classList.contains('collapsed') ? '1' : '0');
+}
+
+// Restaure l'état au chargement
+if (localStorage.getItem('wos_sidebar') === '1') {
+  document.getElementById('sidebar').classList.add('collapsed');
+}
+
+
 setInterval(updateClock, 1000); updateClock();
 
 /* ══ HELPERS ══ */
@@ -193,13 +207,15 @@ function updateEnvelopeInfo(envelopeId, containerId) {
 /* ══════════════════════════════════════════
    INVESTISSEMENT
    ══════════════════════════════════════════ */
+// APRÈS
 function switchInvestTab(tab, btn) {
   _investTabActive = tab;
   document.querySelectorAll('.ct-tab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.chart-pane').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('pane-'+tab).classList.add('active');
-  renderInvestCharts();
+  if (tab === 'montecarlo') renderMonteCarlo();
+  else renderInvestCharts();
 }
 
 function calcCapital(capital, monthly, rateNet, years, revalor) {
@@ -352,6 +368,7 @@ function renderInvestCharts() {
   renderAmortTable(capital, monthly, rateNet, years, revalor);
 
   renderRendDetail();
+
 }
 
 /* ══ TABLEAU D'AMORTISSEMENT ══ */
@@ -456,6 +473,96 @@ function renderRendDetail() {
     { val:fmt(inter), lbl:'Intérêts', color:'var(--teal)' },
     { val:(final>0&&versed>0?(final/versed).toFixed(2)+'×':'—'), lbl:'Multiplicateur', color:'var(--gold)' }
   ].map(k=>`<div class="dk-item"><div class="dk-val" style="color:${k.color}">${k.val}</div><div class="dk-lbl">${k.lbl}</div></div>`).join('');
+}
+
+/* ══ MONTE CARLO ══ */
+function renderMonteCarlo() {
+  const canvas = document.getElementById('invest-mc-chart');
+  if (!canvas) return;
+
+  const capital  = fv('r-capital');
+  const monthly  = fv('r-monthly');
+  const rate     = fv('r-rate');
+  const years    = iv('r-years') || 0;
+  const frais    = fv('r-frais');
+  const rateNet  = Math.max(0, rate - frais);
+  if (years <= 0) return;
+
+  // Force dimensions explicites — sans ça Chart.js échoue sur canvas caché
+  canvas.width  = canvas.parentElement.offsetWidth  || 600;
+  canvas.height = canvas.parentElement.offsetHeight || 260;
+
+  const SIM = 200, annualVol = rateNet * 0.6;
+  const labels = Array.from({length: years + 1}, (_, i) => `An ${i}`);
+  const allFinals = [];
+  const percentileData = { p10: [], p25: [], p50: [], p75: [], p90: [] };
+
+  const sims = [];
+  for (let s = 0; s < SIM; s++) {
+    let cur = capital;
+    const path = [cur];
+    const monthlyVol = annualVol / 100 / Math.sqrt(12);
+    const monthlyRate = rateNet / 100 / 12;
+    for (let y = 0; y < years; y++) {
+      for (let m = 0; m < 12; m++) {
+        const u1 = Math.random() || 1e-10;
+        const shock = monthlyVol * (Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * Math.random()));
+        cur = cur * (1 + monthlyRate + shock) + monthly;
+      }
+      path.push(cur);
+    }
+    sims.push(path);
+    allFinals.push(cur);
+  }
+
+  for (let y = 0; y <= years; y++) {
+    const vals = sims.map(p => p[y]).sort((a, b) => a - b);
+    const pct = (p) => vals[Math.floor(p / 100 * vals.length)] || 0;
+    percentileData.p10.push(pct(10));
+    percentileData.p25.push(pct(25));
+    percentileData.p50.push(pct(50));
+    percentileData.p75.push(pct(75));
+    percentileData.p90.push(pct(90));
+  }
+
+  const sampledPaths = sims.filter((_, i) => i % 20 === 0).slice(0, 10);
+
+  destroyChart('invest-mc');
+
+  charts['invest-mc'] = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        ...sampledPaths.map(path => ({
+          data: path, borderColor: 'rgba(91,111,255,0.12)', borderWidth: 1,
+          fill: false, tension: 0.3, pointRadius: 0, pointHoverRadius: 0, label: ''
+        })),
+        { label: 'P90 (optimiste)', data: percentileData.p90, borderColor: '#00c9a7', borderWidth: 2, fill: false, tension: 0.4, pointRadius: 0, pointHoverRadius: 4, borderDash: [4, 3] },
+        { label: 'P75', data: percentileData.p75, borderColor: 'rgba(0,201,167,0.45)', borderWidth: 1.5, fill: false, backgroundColor: 'rgba(0,201,167,0.06)', tension: 0.4, pointRadius: 0, pointHoverRadius: 3 },
+        { label: 'Médiane (P50)', data: percentileData.p50, borderColor: '#5b6fff', borderWidth: 2.5, fill: false, tension: 0.4, pointRadius: 0, pointHoverRadius: 5 },
+        { label: 'P25', data: percentileData.p25, borderColor: 'rgba(242,68,99,0.45)', borderWidth: 1.5, fill: false, backgroundColor: 'rgba(242,68,99,0.06)', tension: 0.4, pointRadius: 0, pointHoverRadius: 3 },
+        { label: 'P10 (pessimiste)', data: percentileData.p10, borderColor: '#f24463', borderWidth: 2, fill: false, tension: 0.4, pointRadius: 0, pointHoverRadius: 4, borderDash: [4, 3] },
+      ]
+    },
+    options: {
+      ...chartDefaults(),
+      responsive: false  // désactivé pour éviter le bug de redimensionnement sur canvas caché
+    }
+  });
+
+  allFinals.sort((a, b) => a - b);
+  const pctF = (p) => allFinals[Math.floor(p / 100 * allFinals.length)];
+  const totalVerse = capital + monthly * years * 12;
+  const probPositif = allFinals.filter(v => v > totalVerse).length / SIM * 100;
+
+  const kpisEl = document.getElementById('mc-kpis');
+  if (kpisEl) kpisEl.innerHTML = [
+    { val: fmt(pctF(50)), lbl: 'Médiane finale', color: 'var(--acc-l)' },
+    { val: fmt(pctF(10)), lbl: 'Pessimiste (P10)', color: 'var(--red)' },
+    { val: fmt(pctF(90)), lbl: 'Optimiste (P90)', color: 'var(--teal)' },
+    { val: probPositif.toFixed(0) + '%', lbl: 'Prob. de gain', color: 'var(--gold)' }
+  ].map(k => `<div class="dk-item"><div class="dk-val" style="color:${k.color}">${k.val}</div><div class="dk-lbl">${k.lbl}</div></div>`).join('');
 }
 
 /* ══ HOME CHART ══ */
@@ -585,7 +692,43 @@ function updateRetraite() {
   });
 
   document.getElementById('home-retraite').textContent = fmt(final);
+  renderDecaissement(final, taux, anneesRetraite);
   saveLocal('retraiteResult', { final, renteNominale });
+}
+
+/* ══ DÉCAISSEMENT RETRAITE ══ */
+function renderDecaissement(capital, tauxPlacement, dureeAns) {
+  const canvas = document.getElementById('retraite-decaissement-chart');
+  if (!canvas || capital <= 0 || dureeAns <= 0) return;
+
+  const taux_retrait = [3, 4, 5, 6];
+  const colors = ['#00c9a7', '#5b6fff', '#d4af37', '#f24463'];
+  const labels = Array.from({length: dureeAns + 1}, (_, i) => `Année ${i}`);
+
+  const datasets = taux_retrait.map((tr, i) => {
+    const data = [capital];
+    let cur = capital;
+    const rente = capital * (tr / 100) / 12;
+    const r = tauxPlacement / 100 / 12;
+    for (let y = 0; y < dureeAns; y++) {
+      for (let m = 0; m < 12; m++) cur = cur * (1 + r) - rente;
+      data.push(Math.max(0, cur));
+    }
+    return {
+      label: `Retrait ${tr}% (${fmt(capital * tr / 100 / 12)}/m)`,
+      data, borderColor: colors[i],
+      backgroundColor: colors[i] + '0a',
+      borderWidth: 2, fill: true, tension: 0.4,
+      pointRadius: 0, pointHoverRadius: 5
+    };
+  });
+
+  destroyChart('retraite-decaissement');
+  charts['retraite-decaissement'] = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: { labels, datasets },
+    options: chartDefaults()
+  });
 }
 
 /* ══════════════════════════════════════════

@@ -21,6 +21,12 @@
     <div class="logo-tagline">Dashboard</div>
   </div>
 
+  <button class="sidebar-toggle" onclick="toggleSidebar()" title="Réduire la sidebar">
+  <span class="toggle-icon">
+    <span></span><span></span><span></span>
+  </span>
+</button>
+
   <div class="nav-group">
     <div class="nav-group-label">Vue globale</div>
     <div class="nav-item active" data-page="home"><span class="nav-icon">◈</span><span class="nav-label">Tableau de bord</span></div>
@@ -352,6 +358,7 @@
             <button class="ct-tab" onclick="switchInvestTab('compo',this)">Composition</button>
             <button class="ct-tab" onclick="switchInvestTab('inflation',this)">Inflation</button>
             <button class="ct-tab" onclick="switchInvestTab('amortissement',this)">Amortissement</button>
+            <button class="ct-tab" onclick="switchInvestTab('montecarlo',this)">Monte Carlo</button>
           </div>
 
           <div class="chart-pane active" id="pane-evolution">
@@ -372,6 +379,11 @@
           <div class="chart-pane" id="pane-amortissement">
             <p class="chart-note">Progression annuelle du capital — versements, intérêts et solde par tranche</p>
             <div id="amort-table-container" style="max-height:360px;overflow-y:auto;margin-top:8px"></div>
+          </div>
+          <div class="chart-pane" id="pane-montecarlo">
+            <p class="chart-note">Simulation de 200 trajectoires aléatoires — distribution des résultats possibles selon la volatilité estimée</p>
+            <div class="chart-area"><canvas id="invest-mc-chart"></canvas></div>
+            <div id="mc-kpis" class="detail-kpis" style="margin-top:14px"></div>
           </div>
 
           <!-- Détail annuel bar -->
@@ -492,6 +504,12 @@
             <div class="block-header"><span>Évolution de l'épargne</span></div>
             <div class="chart-area"><canvas id="retraite-chart"></canvas></div>
           </div>
+
+          <div class="card-block mt-16">
+            <div class="block-header gold-dot"><span>Trajectoire de décaissement à la retraite</span></div>
+            <p class="chart-note" style="margin-bottom:12px">Évolution du capital pendant la phase de retraite selon différents taux de retrait (3% · 4% · 5% · 6%)</p>
+            <div class="chart-area"><canvas id="retraite-decaissement-chart"></canvas></div>
+        </div>
         </div>
       </div>
     </div>
