@@ -90,7 +90,7 @@ function iv(id) { return parseInt(document.getElementById(id)?.value) || 0; }
 function sv(id) { return document.getElementById(id)?.value || ''; }
 
 function generateColors(n) {
-  const p = ['#5b6fff', '#00c9a7', '#d4af37', '#f24463', '#4aa3e8', '#b06cf8', '#ff9a3c', '#06b6d4', '#84cc16', '#f97316'];
+  const p = ['#818cf8', '#2dd4bf', '#fcd34d', '#fb7185', '#38bdf8', '#c084fc', '#f472b6', '#34d399'];
   return Array.from({ length: n }, (_, i) => p[i % p.length]);
 }
 
@@ -103,22 +103,22 @@ function chartDefaults() {
     plugins: {
       legend: {
         labels: {
-          color: '#a8b0d0',
+          color: '#a5b4fc',
           font: { family: 'DM Mono, monospace', size: 11 },
           boxWidth: 10, padding: 16, usePointStyle: true, pointStyleWidth: 8,
         }
       },
       tooltip: {
         enabled: true,
-        backgroundColor: '#0b0d17',
-        borderColor: 'rgba(91,111,255,0.4)',
+        backgroundColor: 'rgba(10, 12, 24, 0.85)',
+        borderColor: 'rgba(129, 140, 248, 0.4)',
         borderWidth: 1,
-        titleColor: '#8a9bff',
-        bodyColor: '#a8b0d0',
-        padding: { top: 10, bottom: 10, left: 14, right: 14 },
-        titleFont: { family: 'DM Mono, monospace', size: 11, weight: '600' },
+        titleColor: '#c7d2fe',
+        bodyColor: '#e0e7ff',
+        padding: { top: 12, bottom: 12, left: 16, right: 16 },
+        titleFont: { family: 'Outfit, sans-serif', size: 13, weight: '700' },
         bodyFont: { family: 'DM Mono, monospace', size: 12 },
-        caretSize: 6, cornerRadius: 8, boxPadding: 6,
+        caretSize: 6, cornerRadius: 10, boxPadding: 8,
         callbacks: {
           label: function (context) {
             let val = context.raw;
@@ -130,12 +130,12 @@ function chartDefaults() {
     },
     scales: {
       x: {
-        ticks: { color: '#5e6685', font: { family: 'DM Mono, monospace', size: 10 }, maxRotation: 0, maxTicksLimit: 12 },
-        grid: { color: 'rgba(91,111,255,0.05)' }
+        ticks: { color: '#5c6692', font: { family: 'DM Mono, monospace', size: 10 }, maxRotation: 0, maxTicksLimit: 12 },
+        grid: { color: 'rgba(255,255,255,0.03)' }
       },
       y: {
         ticks: {
-          color: '#5e6685',
+          color: '#5c6692',
           font: { family: 'DM Mono, monospace', size: 10 },
           callback: function (value) {
             if (Math.abs(value) >= 1e6) return (value / 1e6).toFixed(1) + 'M€';
@@ -143,7 +143,7 @@ function chartDefaults() {
             return value + '€';
           }
         },
-        grid: { color: 'rgba(91,111,255,0.05)' }
+        grid: { color: 'rgba(255,255,255,0.03)' }
       }
     }
   };
