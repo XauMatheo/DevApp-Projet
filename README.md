@@ -4,4 +4,3 @@
 ├── script.js
 └── style.css
 
-1 directory, 4 files
