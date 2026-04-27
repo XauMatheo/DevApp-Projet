@@ -57,6 +57,11 @@
           class="nav-label">Allocation</span></div>
     </div>
 
+    <div class="nav-group">
+      <div class="nav-group-label">Formation</div>
+      <div class="nav-item" data-page="academie"><span class="nav-icon">◉</span><span class="nav-label">Académie</span></div>
+    </div>
+
     <div class="sidebar-bottom">
       <div class="sys-status">
         <span class="pulse-dot"></span>
@@ -1088,6 +1093,117 @@
         </div>
       </div>
 
+
+<!-- ══ ACADÉMIE ══ -->
+      <div id="academie-page" class="page">
+        <div class="page-intro">
+          <div class="page-intro-text">
+            <h2 class="page-h2">Académie de l'investissement</h2>
+            <p class="page-desc">Maîtrisez les concepts essentiels de l'investissement — définitions claires, exemples concrets, calculs interactifs. De débutant à confirmé.</p>
+          </div>
+        </div>
+
+        <!-- Filtres thématiques -->
+        <div class="acad-filters" id="acad-filters">
+          <button class="acad-filter active" onclick="filterAcad('tous',this)">Tous</button>
+          <button class="acad-filter" onclick="filterAcad('base',this)">◆ Bases</button>
+          <button class="acad-filter" onclick="filterAcad('rendement',this)">◈ Rendement</button>
+          <button class="acad-filter" onclick="filterAcad('risque',this)">▲ Risque</button>
+          <button class="acad-filter" onclick="filterAcad('fiscalite',this)">○ Fiscalité</button>
+          <button class="acad-filter" onclick="filterAcad('strategie',this)">◇ Stratégie</button>
+          <button class="acad-filter" onclick="filterAcad('micro',this)">◉ Micro</button>
+          <button class="acad-filter" onclick="filterAcad('macro',this)">◇ Macro</button>
+        </div>
+
+        <!-- Barre de recherche -->
+        <div class="acad-search-wrap">
+          <input class="acad-search" id="acad-search" type="text" placeholder="Rechercher un terme… ex: ETF, dividende, volatilité" oninput="searchAcad(this.value)">
+          <span class="acad-search-icon">⌕</span>
+        </div>
+
+        <!-- Compteur -->
+        <div id="acad-count" style="font-size:0.7rem;color:var(--t3);font-family:var(--font-mono);margin-bottom:16px"></div>
+
+        <!-- Grille des termes -->
+        <div class="acad-grid" id="acad-grid"></div>
+
+        <!-- Calculette interactive -->
+        <div class="card-block mt-16" id="acad-calc-section">
+          <div class="block-header gold-dot"><span>Calculette interactive — visualisez les concepts</span></div>
+          <div class="acad-calc-tabs">
+            <button class="acad-ctab active" onclick="switchCalcTab('ic',this)">Intérêts composés</button>
+            <button class="acad-ctab" onclick="switchCalcTab('rr',this)">Règle 72</button>
+            <button class="acad-ctab" onclick="switchCalcTab('inf',this)">Inflation</button>
+            <button class="acad-ctab" onclick="switchCalcTab('sr',this)">Sharpe</button>
+          </div>
+
+          <!-- Intérêts composés -->
+          <div class="acad-calc-pane active" id="calc-ic">
+            <p class="chart-note">La magie des intérêts composés : vos gains génèrent eux-mêmes des gains.</p>
+            <div class="acad-calc-grid">
+              <div>
+                <div class="field-group"><label class="field-label">Capital initial (€)</label><div class="field-input-wrap"><input type="number" class="field-input" id="ic-capital" value="1000" oninput="calcIC()"><span class="field-unit">€</span></div></div>
+                <div class="field-group"><label class="field-label">Versement mensuel (€)</label><div class="field-input-wrap"><input type="number" class="field-input" id="ic-monthly" value="100" oninput="calcIC()"><span class="field-unit">€/m</span></div></div>
+                <div class="field-group"><label class="field-label">Taux annuel (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="ic-rate" value="7" step="0.5" oninput="calcIC()"><span class="field-unit">%</span></div></div>
+                <div class="field-group"><label class="field-label">Durée (années)</label><div class="field-input-wrap"><input type="number" class="field-input" id="ic-years" value="20" oninput="calcIC()"><span class="field-unit">ans</span></div></div>
+              </div>
+              <div id="ic-results" class="acad-calc-results"></div>
+            </div>
+          </div>
+
+          <!-- Règle 72 -->
+          <div class="acad-calc-pane" id="calc-rr">
+            <p class="chart-note">La règle des 72 : divisez 72 par le taux annuel pour estimer le temps de doublement de votre capital.</p>
+            <div class="acad-calc-grid">
+              <div>
+                <div class="field-group"><label class="field-label">Taux de rendement annuel (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="r72-rate" value="7" step="0.5" oninput="calcR72()"><span class="field-unit">%</span></div></div>
+                <div class="field-group"><label class="field-label">Capital initial (€)</label><div class="field-input-wrap"><input type="number" class="field-input" id="r72-capital" value="10000" oninput="calcR72()"><span class="field-unit">€</span></div></div>
+              </div>
+              <div id="r72-results" class="acad-calc-results"></div>
+            </div>
+          </div>
+
+          <!-- Inflation -->
+          <div class="acad-calc-pane" id="calc-inf">
+            <p class="chart-note">L'inflation érode votre pouvoir d'achat. 100€ aujourd'hui vaudront moins demain.</p>
+            <div class="acad-calc-grid">
+              <div>
+                <div class="field-group"><label class="field-label">Montant aujourd'hui (€)</label><div class="field-input-wrap"><input type="number" class="field-input" id="inf-capital" value="10000" oninput="calcInf()"><span class="field-unit">€</span></div></div>
+                <div class="field-group"><label class="field-label">Taux d'inflation annuel (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="inf-rate" value="2.5" step="0.1" oninput="calcInf()"><span class="field-unit">%</span></div></div>
+                <div class="field-group"><label class="field-label">Horizon (années)</label><div class="field-input-wrap"><input type="number" class="field-input" id="inf-years" value="20" oninput="calcInf()"><span class="field-unit">ans</span></div></div>
+              </div>
+              <div id="inf-results" class="acad-calc-results"></div>
+            </div>
+          </div>
+
+          <!-- Sharpe -->
+          <div class="acad-calc-pane" id="calc-sr">
+            <p class="chart-note">Le ratio de Sharpe mesure la performance ajustée au risque : plus il est élevé, mieux c'est.</p>
+            <div class="acad-calc-grid">
+              <div>
+                <div class="field-group"><label class="field-label">Rendement du portefeuille (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="sr-rend" value="10" step="0.5" oninput="calcSharpe()"><span class="field-unit">%</span></div></div>
+                <div class="field-group"><label class="field-label">Taux sans risque (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="sr-rf" value="3" step="0.1" oninput="calcSharpe()"><span class="field-unit">%</span></div></div>
+                <div class="field-group"><label class="field-label">Volatilité annuelle (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="sr-vol" value="15" step="0.5" oninput="calcSharpe()"><span class="field-unit">%</span></div></div>
+              </div>
+              <div id="sr-results" class="acad-calc-results"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lexique rapide -->
+        <div class="card-block mt-16">
+          <div class="block-header purple-dot"><span>Lexique express — abréviations courantes</span></div>
+          <div class="acad-lexique" id="acad-lexique"></div>
+        </div>
+
+      </div>
+
+
+
+
+
+
+      
     </div>
   </main>
 

@@ -2408,3 +2408,360 @@ body {
     flex-direction: column;
   }
 }
+
+
+
+/* ══════════════════════════════════════════
+   ACADÉMIE
+══════════════════════════════════════════ */
+.acad-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.acad-filter {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--t2);
+  padding: 5px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--tr);
+  font-family: var(--font-body);
+}
+
+.acad-filter:hover {
+  border-color: var(--border-h);
+  color: var(--t1);
+}
+
+.acad-filter.active {
+  background: var(--acc-d);
+  border-color: var(--border-a);
+  color: var(--acc-l);
+}
+
+.acad-search-wrap {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.acad-search {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--t1);
+  font-size: 0.85rem;
+  padding: 11px 16px 11px 40px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color var(--tr), box-shadow var(--tr);
+}
+
+.acad-search:focus {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 3px var(--acc-d);
+}
+
+.acad-search::placeholder { color: var(--t3); }
+
+.acad-search-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--t3);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* Grille de cartes termes */
+.acad-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin-bottom: 4px;
+}
+
+.acad-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--tr);
+  position: relative;
+}
+
+.acad-card:hover {
+  border-color: var(--border-h);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+}
+
+.acad-card.expanded {
+  border-color: var(--border-a);
+}
+
+.acad-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px 14px;
+}
+
+.acad-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+}
+
+.acad-card-icon.base    { background: var(--acc-d); color: var(--acc-l); border: 1px solid var(--border-a); }
+.acad-card-icon.rendement { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.25); }
+.acad-card-icon.risque  { background: rgba(251,113,133,0.12); color: var(--red); border: 1px solid rgba(251,113,133,0.25); }
+.acad-card-icon.fiscalite { background: rgba(252,211,77,0.12); color: var(--gold); border: 1px solid rgba(252,211,77,0.25); }
+.acad-card-icon.strategie { background: rgba(192,132,252,0.12); color: var(--purple); border: 1px solid rgba(192,132,252,0.25); }
+
+.acad-card-head {
+  flex: 1;
+}
+
+.acad-card-titre {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 3px;
+}
+
+.acad-card-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.acad-card-tag.base     { background: var(--acc-d); color: var(--acc-l); }
+.acad-card-tag.rendement{ background: rgba(45,212,191,0.12); color: var(--teal); }
+.acad-card-tag.risque   { background: rgba(251,113,133,0.12); color: var(--red); }
+.acad-card-tag.fiscalite{ background: rgba(252,211,77,0.12); color: var(--gold); }
+.acad-card-tag.strategie{ background: rgba(192,132,252,0.12); color: var(--purple); }
+
+.acad-card-def {
+  padding: 0 18px 14px;
+  font-size: 0.81rem;
+  color: var(--t2);
+  line-height: 1.65;
+}
+
+.acad-card-expand {
+  border-top: 1px solid var(--border);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+.acad-card.expanded .acad-card-expand {
+  max-height: 400px;
+}
+
+.acad-card-expand-inner {
+  padding: 14px 18px 16px;
+}
+
+.acad-example-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--t3);
+  font-family: var(--font-mono);
+  margin-bottom: 6px;
+}
+
+.acad-example {
+  background: var(--bg3);
+  border-left: 3px solid var(--acc);
+  border-radius: 0 var(--r-xs) var(--r-xs) 0;
+  padding: 10px 14px;
+  font-size: 0.79rem;
+  color: var(--t2);
+  line-height: 1.65;
+  margin-bottom: 10px;
+}
+
+.acad-example.teal  { border-left-color: var(--teal); }
+.acad-example.gold  { border-left-color: var(--gold); }
+.acad-example.red   { border-left-color: var(--red); }
+.acad-example.purple{ border-left-color: var(--purple); }
+
+.acad-formula {
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--acc-l);
+  margin-top: 6px;
+}
+
+.acad-toggle-icon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--t3);
+  transition: all var(--tr);
+  flex-shrink: 0;
+}
+
+.acad-card.expanded .acad-toggle-icon {
+  transform: rotate(180deg);
+  color: var(--acc-l);
+  background: var(--acc-d);
+}
+
+/* Calculette */
+.acad-calc-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.acad-ctab {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  color: var(--t2);
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--tr);
+  font-family: var(--font-body);
+}
+
+.acad-ctab:hover { color: var(--t1); border-color: var(--border-h); }
+.acad-ctab.active { background: var(--acc-d); border-color: var(--border-a); color: var(--acc-l); }
+
+.acad-calc-pane { display: none; }
+.acad-calc-pane.active { display: block; }
+
+.acad-calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.acad-calc-results {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.acr-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+
+.acr-item:last-child { border-bottom: none; }
+.acr-item span:first-child { color: var(--t2); }
+.acr-val { font-family: var(--font-mono); font-weight: 600; font-size: 0.9rem; color: var(--acc-l); }
+.acr-val.teal { color: var(--teal); }
+.acr-val.gold { color: var(--gold); }
+.acr-val.red { color: var(--red); }
+.acr-val.purple { color: var(--purple); }
+
+.acad-verdict {
+  margin-top: 10px;
+  padding: 10px 13px;
+  border-radius: var(--r-sm);
+  font-size: 0.77rem;
+  line-height: 1.55;
+  border: 1px solid var(--border);
+  background: var(--bg4);
+  color: var(--t2);
+}
+
+/* Lexique */
+.acad-lexique {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.lex-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  transition: border-color var(--tr);
+}
+
+.lex-item:hover { border-color: var(--border-h); }
+
+.lex-abbr {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--acc-l);
+  margin-bottom: 3px;
+}
+
+.lex-full {
+  font-size: 0.72rem;
+  color: var(--t2);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.lex-desc {
+  font-size: 0.68rem;
+  color: var(--t3);
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .acad-calc-grid { grid-template-columns: 1fr; }
+  .acad-grid { grid-template-columns: 1fr; }
+}
+
+
+.acad-card-icon.micro { background: rgba(56,189,248,0.12); color: var(--blue); border: 1px solid rgba(56,189,248,0.25); }
+.acad-card-icon.macro { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.25); }
+.acad-card-tag.micro  { background: rgba(56,189,248,0.12); color: var(--blue); }
+.acad-card-tag.macro  { background: rgba(45,212,191,0.12); color: var(--teal); }

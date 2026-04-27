@@ -12,7 +12,8 @@ const pageTitles = {
   analyse: 'Bilan patrimonial',
   budget: 'Budget mensuel',
   compare: 'Comparaison A/B',
-  allocation: 'Allocation de portefeuille'
+  allocation: 'Allocation de portefeuille',
+  academie: 'Académie de l\'investissement'
 };
 
 const pageBadges = {
@@ -22,7 +23,8 @@ const pageBadges = {
   analyse: 'Patrimoine',
   budget: 'Cash flow',
   compare: 'Scénarios',
-  allocation: 'Portefeuille'
+  allocation: 'Portefeuille',
+  academie: 'Formation'
 };
 
 function goPage(id) {
@@ -42,6 +44,7 @@ function goPage(id) {
     if (id === 'compare') updateCompare();
     if (id === 'allocation') updateAllocation();
     if (id === 'budget') initBudget();
+    if (id === 'academie') initAcademie();
   });
 }
 
@@ -1377,3 +1380,676 @@ function init() {
   updateEnvelopeInfo('pea', 'envelope-info-box');
 }
 init();
+
+
+
+/* ══════════════════════════════════════════
+   ACADÉMIE — DONNÉES & LOGIQUE
+══════════════════════════════════════════ */
+
+const ACAD_TERMS = [
+  // BASES
+  {
+    id: 'capital',
+    titre: 'Capital',
+    categorie: 'base',
+    icon: '◆',
+    def: 'Somme d\'argent que vous investissez ou possédez. C\'est la base de toute stratégie d\'investissement.',
+    exemple: 'Vous avez 5 000 € d\'économies sur votre livret A. Ces 5 000 € constituent votre capital de départ.',
+    formule: 'Capital final = Capital initial × (1 + r)^n',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'ic',
+    titre: 'Intérêts composés',
+    categorie: 'base',
+    icon: '◈',
+    def: 'Les intérêts que vous gagnez génèrent eux-mêmes des intérêts. C\'est l\'effet "boule de neige" : plus le temps passe, plus la croissance s\'accélère.',
+    exemple: '1 000 € à 7%/an pendant 10 ans donnent 1 967 € (et non 1 700 €). Les 967 € de gains incluent des intérêts sur les intérêts.',
+    formule: 'Capital = Capital × (1 + r/12)^(12×n) + mensualité × [(1+r/12)^(12×n) - 1]/(r/12)',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'dividende',
+    titre: 'Dividende',
+    categorie: 'base',
+    icon: '○',
+    def: 'Part des bénéfices d\'une entreprise versée à ses actionnaires. C\'est un revenu passif régulier issu de vos actions.',
+    exemple: 'Vous détenez 100 actions Total à 50 €. Total verse 3 €/action de dividende annuel → vous recevez 300 € sans rien vendre.',
+    formule: 'Rendement dividende = Dividende annuel / Prix de l\'action × 100',
+    couleurEx: 'gold'
+  },
+  {
+    id: 'action',
+    titre: 'Action',
+    categorie: 'base',
+    icon: '▲',
+    def: 'Part de propriété dans une entreprise. En achetant une action, vous devenez actionnaire (propriétaire d\'une fraction de la société).',
+    exemple: 'Apple a environ 15 milliards d\'actions en circulation. Si vous en achetez 1 à 180 $, vous possédez 0,0000000067% d\'Apple.',
+    formule: null,
+    couleurEx: null
+  },
+  {
+    id: 'obligation',
+    titre: 'Obligation',
+    categorie: 'base',
+    icon: '◇',
+    def: 'Titre de créance : vous prêtez de l\'argent à une entreprise ou un État, qui vous rembourse avec des intérêts (le "coupon"). Moins risqué que l\'action mais rendement plus faible.',
+    exemple: 'OAT France à 10 ans : l\'État vous emprunte 1 000 €, vous verse 3%/an (30 €/an) et vous rembourse 1 000 € au bout de 10 ans.',
+    formule: 'Prix obligation ≈ Coupon / Taux marché (relation inverse)',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'etf',
+    titre: 'ETF (Tracker)',
+    categorie: 'base',
+    icon: '◉',
+    def: 'Fonds indiciel coté en bourse qui réplique un indice (CAC 40, S&P 500…). Permet de diversifier en achetant un seul produit à faible coût.',
+    exemple: 'En achetant 1 part du Lyxor CAC 40 pour ~75 €, vous investissez indirectement dans les 40 plus grandes entreprises françaises simultanément.',
+    formule: null,
+    couleurEx: 'teal'
+  },
+
+  // RENDEMENT
+  {
+    id: 'taux-rendement',
+    titre: 'Taux de rendement',
+    categorie: 'rendement',
+    icon: '◈',
+    def: 'Gain ou perte d\'un investissement exprimé en pourcentage du capital investi sur une période donnée.',
+    exemple: 'Vous investissez 1 000 €, qui deviennent 1 080 € en un an. Votre taux de rendement est de +8%.',
+    formule: 'Rendement = (Valeur finale - Valeur initiale) / Valeur initiale × 100',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'plus-value',
+    titre: 'Plus-value',
+    categorie: 'rendement',
+    icon: '◆',
+    def: 'Gain réalisé lors de la vente d\'un actif à un prix supérieur à son prix d\'achat. C\'est la différence entre le prix de cession et le prix de revient.',
+    exemple: 'Vous achetez une action LVMH à 700 € et la revendez à 850 €. Votre plus-value est de 150 € (21,4%). Elle est soumise à l\'impôt.',
+    formule: 'Plus-value = Prix de vente - Prix d\'achat (- frais)',
+    couleurEx: 'gold'
+  },
+  {
+    id: 'cagr',
+    titre: 'CAGR (Taux annualisé)',
+    categorie: 'rendement',
+    icon: '◇',
+    def: 'Taux de croissance annuel composé : le taux constant qui explique l\'évolution d\'un placement sur plusieurs années. Permet de comparer des placements sur des durées différentes.',
+    exemple: 'Votre portefeuille passe de 10 000 € à 19 487 € en 7 ans. Le CAGR est de 10%/an — même si certaines années étaient à +30% et d\'autres à -15%.',
+    formule: 'CAGR = (Valeur finale / Valeur initiale)^(1/n) - 1',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'rendement-reel',
+    titre: 'Rendement réel',
+    categorie: 'rendement',
+    icon: '○',
+    def: 'Rendement nominal corrigé de l\'inflation. Ce qui compte vraiment : ce que vous pouvez acheter avec votre argent, pas juste les chiffres.',
+    exemple: 'Votre livret rapporte 3%/an mais l\'inflation est à 4%. Votre rendement réel est de -1% : vous perdez du pouvoir d\'achat malgré les intérêts.',
+    formule: 'Rendement réel ≈ Rendement nominal - Inflation (approximation de Fisher)',
+    couleurEx: 'red'
+  },
+  {
+    id: 'regle72',
+    titre: 'Règle des 72',
+    categorie: 'rendement',
+    icon: '▣',
+    def: 'Astuce de calcul mental pour estimer le temps de doublement de votre capital : divisez 72 par le taux de rendement annuel.',
+    exemple: 'À 6%/an → 72 / 6 = 12 ans pour doubler votre argent. À 9%/an → 72 / 9 = 8 ans. À 12%/an → 72 / 12 = 6 ans.',
+    formule: 'Durée doublement (ans) ≈ 72 / Taux annuel (%)',
+    couleurEx: 'gold'
+  },
+  {
+    id: 'rente',
+    titre: 'Rente (règle des 4%)',
+    categorie: 'rendement',
+    icon: '◈',
+    def: 'Revenu régulier tiré de votre capital. La règle des 4% stipule que vous pouvez retirer 4% de votre capital chaque année sans l\'épuiser sur 30 ans.',
+    exemple: 'Avec un capital de 500 000 €, la règle des 4% vous permet de retirer 20 000 €/an (1 667 €/mois) indéfiniment — selon l\'étude Trinity.',
+    formule: 'Rente annuelle = Capital × 4% | Capital nécessaire = Dépenses × 25',
+    couleurEx: 'teal'
+  },
+
+  // RISQUE
+  {
+    id: 'volatilite',
+    titre: 'Volatilité',
+    categorie: 'risque',
+    icon: '▲',
+    def: 'Mesure des variations du prix d\'un actif. Une forte volatilité signifie des hausses et baisses importantes. C\'est le principal indicateur de risque d\'un placement.',
+    exemple: 'Le Bitcoin a une volatilité de ~70% : il peut perdre ou gagner 70% en un an. Le fonds euros d\'une AV a ~0% de volatilité.',
+    formule: 'Volatilité = Écart-type des rendements annuels',
+    couleurEx: 'red'
+  },
+  {
+    id: 'drawdown',
+    titre: 'Drawdown (chute max)',
+    categorie: 'risque',
+    icon: '◌',
+    def: 'Baisse maximale d\'un portefeuille depuis son sommet jusqu\'à son point le plus bas. Mesure le pire scénario historique que vous auriez subi.',
+    exemple: 'Le S&P 500 a subi un drawdown de -57% en 2008-2009. Un portefeuille de 100 000 € serait descendu à 43 000 €. Il a fallu 5 ans pour récupérer.',
+    formule: 'Drawdown = (Pic - Creux) / Pic × 100',
+    couleurEx: 'red'
+  },
+  {
+    id: 'diversification',
+    titre: 'Diversification',
+    categorie: 'risque',
+    icon: '⊞',
+    def: 'Répartir ses investissements sur plusieurs actifs, secteurs ou zones géographiques pour réduire le risque global sans sacrifier le rendement.',
+    exemple: 'Si vous avez tout misé sur Nokia en 2000, vous perdez 95%. Avec 50 entreprises tech mondiales (via ETF), le risque est dilué et la performance préservée.',
+    formule: null,
+    couleurEx: 'teal'
+  },
+  {
+    id: 'correlation',
+    titre: 'Corrélation',
+    categorie: 'risque',
+    icon: '◎',
+    def: 'Mesure entre -1 et +1 qui indique si deux actifs évoluent ensemble (+1 = identique) ou en sens contraire (-1 = parfaitement opposés). La diversification fonctionne mieux avec des actifs peu corrélés.',
+    exemple: 'Actions et obligations ont souvent une corrélation négative : quand la bourse chute, les obligations montent. C\'est pourquoi un portefeuille 60/40 est moins volatil.',
+    formule: 'ρ = -1 (oppose) → 0 (indépendant) → +1 (identique)',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'sharpe',
+    titre: 'Ratio de Sharpe',
+    categorie: 'risque',
+    icon: '◉',
+    def: 'Mesure la performance d\'un investissement en tenant compte du risque pris. Plus le ratio est élevé, meilleure est la performance ajustée au risque.',
+    exemple: 'Portefeuille A : 12% de rendement, 20% de volatilité → Sharpe = (12-3)/20 = 0,45. Portefeuille B : 9% de rendement, 8% de volatilité → Sharpe = (9-3)/8 = 0,75. B est meilleur.',
+    formule: 'Sharpe = (Rp - Rf) / σp | Rp=rendement, Rf=sans risque, σ=volatilité',
+    couleurEx: 'gold'
+  },
+  {
+    id: 'beta',
+    titre: 'Bêta (β)',
+    categorie: 'risque',
+    icon: 'β',
+    def: 'Mesure la sensibilité d\'un actif aux mouvements du marché. β=1 : évolue comme le marché. β>1 : amplifie les mouvements. β<1 : moins sensible.',
+    exemple: 'Une action avec β=1,5 monte de 15% si le marché monte de 10% — mais perd aussi 15% si le marché perd 10%. β=0,5 → mouvement deux fois moins fort.',
+    formule: 'β > 1 : agressif | β = 1 : neutre | β < 1 : défensif | β < 0 : inverse',
+    couleurEx: 'red'
+  },
+
+  // FISCALITÉ
+  {
+    id: 'pfu',
+    titre: 'PFU / Flat Tax (30%)',
+    categorie: 'fiscalite',
+    icon: '○',
+    def: 'Prélèvement Forfaitaire Unique de 30% sur les revenus du capital (12,8% d\'impôt + 17,2% de prélèvements sociaux). S\'applique aux dividendes et plus-values du CTO.',
+    exemple: 'Vous réalisez 5 000 € de plus-values sur un CTO. Vous payez 30% = 1 500 € d\'impôt. Il vous reste 3 500 €.',
+    formule: 'PFU = Gains × 30% (12,8% IR + 17,2% PS)',
+    couleurEx: 'gold'
+  },
+  {
+    id: 'pea',
+    titre: 'PEA — avantage fiscal',
+    categorie: 'fiscalite',
+    icon: '◉',
+    def: 'Après 5 ans de détention, les gains du PEA sont exonérés d\'impôt sur le revenu (seuls les 17,2% de prélèvements sociaux restent dus). Plafond de versements : 150 000 €.',
+    exemple: 'Vous investissez 50 000 € dans un PEA qui devient 120 000 €. Gains = 70 000 €. Au CTO : 21 000 € d\'impôt. Au PEA après 5 ans : 12 040 € seulement (PS uniquement).',
+    formule: 'Impôt PEA (après 5 ans) = Gains × 17,2% (PS seulement)',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'av-fiscalite',
+    titre: 'Assurance-vie — fiscalité',
+    categorie: 'fiscalite',
+    icon: '◎',
+    def: 'Après 8 ans, bénéficiez d\'un abattement annuel de 4 600 € (9 200 € pour un couple) sur les gains. Au-delà : 7,5% d\'IR + 17,2% PS (si encours < 150k€).',
+    exemple: 'Votre AV génère 10 000 € de gains. Après 8 ans : les premiers 4 600 € sont totalement exonérés. Le reste (5 400 €) est taxé à 24,7% = 1 334 €.',
+    formule: 'Gains imposables = Gains totaux - Abattement 4 600 € | Taux : 7,5% + 17,2%',
+    couleurEx: 'gold'
+  },
+  {
+    id: 'per-deductible',
+    titre: 'PER — déductibilité',
+    categorie: 'fiscalite',
+    icon: '◈',
+    def: 'Les versements sur un PER sont déductibles de votre revenu imposable (jusqu\'à 10% du revenu, max ~35 000 €/an). Avantage fiscal immédiat, mais impôt reporté à la sortie.',
+    exemple: 'TMI 30%, vous versez 5 000 € dans un PER → 1 500 € d\'impôt économisé cette année. À la retraite avec TMI 11%, l\'imposition sera plus légère.',
+    formule: 'Économie impôt = Versement × TMI actuel | Gain = si TMI retraite < TMI actuel',
+    couleurEx: 'purple'
+  },
+  {
+    id: 'tmi',
+    titre: 'TMI — Tranche Marginale',
+    categorie: 'fiscalite',
+    icon: '▣',
+    def: 'Taux d\'imposition applicable à votre dernière tranche de revenus. En France : 0%, 11%, 30%, 41%, 45%. Seuls les revenus au-delà du seuil sont taxés à ce taux.',
+    exemple: 'Revenus imposables : 40 000 €. TMI = 30%. Mais seuls les revenus entre 27 479 € et 40 000 € (soit 12 521 €) sont taxés à 30%. Les premiers 27 479 € sont taxés à des taux inférieurs.',
+    formule: 'Tranches 2024 : 0% (< 10 778€) / 11% / 30% / 41% / 45% (> 168 994€)',
+    couleurEx: 'red'
+  },
+
+  // STRATÉGIE
+  {
+    id: 'dca',
+    titre: 'DCA — Investissement régulier',
+    categorie: 'strategie',
+    icon: '◇',
+    def: 'Dollar-Cost Averaging : investir un montant fixe à intervalle régulier (chaque mois), quelle que soit l\'évolution des marchés. Réduit l\'impact du "mauvais timing".',
+    exemple: 'Plutôt que d\'investir 12 000 € en une fois, vous investissez 1 000 €/mois. Les mois où le marché est bas, vous achetez plus de parts. Votre prix moyen s\'optimise.',
+    formule: 'Prix moyen = Σ(Montant investi) / Σ(Parts achetées)',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'horizon',
+    titre: 'Horizon de placement',
+    categorie: 'strategie',
+    icon: '▲',
+    def: 'Durée pendant laquelle vous comptez laisser votre argent investi. Plus l\'horizon est long, plus vous pouvez prendre de risques (et espérer de meilleurs rendements).',
+    exemple: 'Court terme (<3 ans) → Livret A, fonds euros. Moyen terme (3-10 ans) → Mix obligations/actions. Long terme (>10 ans) → ETF actions mondiales, immobilier.',
+    formule: null,
+    couleurEx: 'teal'
+  },
+  {
+    id: 'reequilibrage',
+    titre: 'Rééquilibrage',
+    categorie: 'strategie',
+    icon: '⊞',
+    def: 'Ajustement périodique de votre portefeuille pour revenir à l\'allocation cible. On vend ce qui a surperformé, on achète ce qui a sous-performé.',
+    exemple: 'Cible : 70% actions / 30% obligations. Après une bonne année boursière : 80% / 20%. Vous vendez 10% d\'actions et achetez 10% d\'obligations pour revenir à 70/30.',
+    formule: null,
+    couleurEx: 'gold'
+  },
+  {
+    id: 'investissement-passif',
+    titre: 'Gestion passive vs active',
+    categorie: 'strategie',
+    icon: '◉',
+    def: 'Passive : suivre un indice via ETF (faibles frais, performance proche du marché). Active : chercher à "battre le marché" via sélection de titres (frais élevés, moins de 20% des fonds actifs surperforment sur 15 ans).',
+    exemple: 'Fonds actif : 1,5%/an de frais, 7% de performance = 5,5% nets. ETF passif : 0,1% de frais, 7% de performance = 6,9% nets. Sur 30 ans sur 10 000 € : +31 000 € d\'écart.',
+    formule: 'Impact frais sur 30 ans : 10 000 € × [(1+0,069)^30 - (1+0,055)^30] ≈ 31 000€',
+    couleurEx: 'purple'
+  },
+  {
+    id: 'levier',
+    titre: 'Effet de levier',
+    categorie: 'strategie',
+    icon: '▣',
+    def: 'Utiliser de la dette pour augmenter la mise investie et potentiellement amplifier les gains. Amplifie aussi les pertes : outil à double tranchant.',
+    exemple: 'Vous avez 50 000 € et empruntez 50 000 € pour investir 100 000 €. +10% de performance → vous gagnez 10 000 € (20% sur votre mise). -10% → vous perdez 10 000 € (20% de perte sur votre mise).',
+    formule: 'Rendement avec levier = Rendement actif × Levier - Coût dette × (Levier-1)',
+    couleurEx: 'red'
+  },
+  {
+    id: 'valeur-intrinsèque',
+    titre: 'Valeur intrinsèque & PER',
+    categorie: 'strategie',
+    icon: '◌',
+    def: 'Le Price-Earning Ratio (PER ou P/E) compare le cours d\'une action à ses bénéfices. Il indique combien les investisseurs paient pour 1 € de bénéfice. Aide à évaluer si une action est chère ou bon marché.',
+    exemple: 'Action à 100 €, bénéfice par action = 5 €. PER = 100/5 = 20. Cela signifie que vous payez 20 fois les bénéfices annuels. PER moyen historique S&P 500 : ~16-17.',
+    formule: 'PER = Prix de l\'action / Bénéfice par action (BPA)',
+    couleurEx: 'gold'
+  },
+
+  // MICROÉCONOMIE
+  {
+    id: 'offre-demande',
+    titre: 'Offre & Demande',
+    categorie: 'micro',
+    icon: '◆',
+    def: 'La loi fondamentale de l\'économie : quand la demande dépasse l\'offre, les prix montent. Quand l\'offre dépasse la demande, les prix baissent. Tout marché (actions, immobilier, matières premières) obéit à cette loi.',
+    exemple: 'En 2020-2021, la pénurie de puces électroniques (offre faible) face à une demande explosive a multiplié le prix des voitures neuves par 1,3 en moyenne.',
+    formule: 'Prix d\'équilibre = point où Quantité offerte = Quantité demandée',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'elasticite',
+    titre: 'Élasticité-prix',
+    categorie: 'micro',
+    icon: '◈',
+    def: 'Mesure la sensibilité de la demande à une variation de prix. Un produit "inélastique" se vend autant même si le prix monte (essence, médicaments). Un produit "élastique" voit sa demande chuter si le prix augmente.',
+    exemple: 'L\'essence est inélastique : +20% de prix → -5% de consommation. Un voyage en avion low-cost est élastique : +20% de prix → -40% de réservations.',
+    formule: 'Élasticité = % variation quantité demandée / % variation prix',
+    couleurEx: 'gold'
+  },
+  {
+    id: 'cout-opportunite',
+    titre: 'Coût d\'opportunité',
+    categorie: 'micro',
+    icon: '◇',
+    def: 'Ce que vous sacrifiez en choisissant une option plutôt qu\'une autre. Le "vrai" coût d\'un choix inclut toujours ce à quoi vous renoncez.',
+    exemple: 'Laisser 50 000 € sur un livret A à 3% plutôt que dans un ETF à 8% = coût d\'opportunité de 5%/an, soit 2 500 €/an de manque à gagner.',
+    formule: 'Coût d\'opportunité = Valeur de la meilleure alternative non choisie',
+    couleurEx: 'purple'
+  },
+  {
+    id: 'rendements-echelle',
+    titre: 'Rendements décroissants',
+    categorie: 'micro',
+    icon: '▣',
+    def: 'Loi économique : au-delà d\'un certain seuil, chaque unité supplémentaire d\'un facteur produit de moins en moins de résultat. S\'applique au travail, au capital, et même à l\'épargne (diversification).',
+    exemple: 'Un agriculteur avec 1 employé double sa production. Avec 10 employés, il la multiplie par 6 (pas par 10). Chaque travailleur supplémentaire apporte moins que le précédent.',
+    formule: 'Productivité marginale diminue à mesure que le facteur augmente',
+    couleurEx: 'red'
+  },
+  {
+    id: 'externalites',
+    titre: 'Externalités',
+    categorie: 'micro',
+    icon: '○',
+    def: 'Effets d\'une activité économique sur des tiers non impliqués dans la transaction. Positives (recherche, éducation) ou négatives (pollution). Les externalités créent des inefficacités que les marchés seuls ne corrigent pas.',
+    exemple: 'Une usine qui pollue une rivière transfère son coût de production à la société. C\'est une externalité négative — le prix de ses produits ne reflète pas le vrai coût social.',
+    formule: null,
+    couleurEx: 'teal'
+  },
+
+  // MACROÉCONOMIE
+  {
+    id: 'pib',
+    titre: 'PIB — Produit Intérieur Brut',
+    categorie: 'macro',
+    icon: '◉',
+    def: 'Mesure de la richesse produite par un pays en un an. C\'est l\'indicateur macroéconomique le plus suivi. Sa croissance indique la santé de l\'économie ; sa contraction (deux trimestres consécutifs) définit une récession.',
+    exemple: 'France 2023 : PIB ≈ 2 800 Mds€. Croissance de +0,9%. USA : 27 000 Mds$, soit ~10× la France. Un PIB/habitant élevé traduit un niveau de vie plus élevé.',
+    formule: 'PIB = Consommation + Investissement + Dépenses publiques + (Exports - Imports)',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'inflation-macro',
+    titre: 'Inflation & Déflation',
+    categorie: 'macro',
+    icon: '▲',
+    def: 'L\'inflation est la hausse générale et durable des prix, qui érode le pouvoir d\'achat. La déflation (baisse des prix) paraît positive mais est dangereuse : elle pousse les consommateurs à reporter leurs achats, paralysant l\'économie.',
+    exemple: 'Zone euro 2022 : inflation à 8,4% (choc énergétique post-Ukraine). Un panier de 1 000 € en 2021 coûtait 1 084 € en 2022. Les banques centrales visent 2% d\'inflation.',
+    formule: 'IPC = (Panier année N / Panier année N-1 - 1) × 100',
+    couleurEx: 'red'
+  },
+  {
+    id: 'taux-directeur',
+    titre: 'Taux directeur (BCE / Fed)',
+    categorie: 'macro',
+    icon: '◎',
+    def: 'Taux d\'intérêt fixé par la banque centrale pour piloter l\'économie. Hausse des taux → crédit plus cher → moins d\'emprunts → moins d\'inflation. Baisse des taux → crédit moins cher → plus d\'investissement → relance.',
+    exemple: 'La Fed est passée de 0,25% en 2022 à 5,5% en 2023 pour combattre l\'inflation. Résultat : les crédits immobiliers US sont passés de 3% à 7,5%, refroidissant le marché.',
+    formule: 'Taux crédit bancaire ≈ Taux directeur + marge de risque',
+    couleurEx: 'gold'
+  },
+  {
+    id: 'politique-monetaire',
+    titre: 'Politique monétaire',
+    categorie: 'macro',
+    icon: '◈',
+    def: 'Actions de la banque centrale sur la masse monétaire et les taux d\'intérêt pour atteindre ses objectifs (stabilité des prix, croissance). Deux outils : taux directeurs et création monétaire (QE).',
+    exemple: 'QE (Quantitative Easing) : la BCE a acheté 3 000 Mds€ d\'obligations entre 2015 et 2022, injectant des liquidités pour relancer l\'économie. Effet secondaire : inflation des actifs (immobilier, actions).',
+    formule: null,
+    couleurEx: 'purple'
+  },
+  {
+    id: 'politique-budgetaire',
+    titre: 'Politique budgétaire',
+    categorie: 'macro',
+    icon: '▣',
+    def: 'Utilisation des dépenses publiques et de la fiscalité par l\'État pour influencer l\'économie. Politique expansive (déficit) en récession pour relancer. Politique restrictive (austérité) pour réduire la dette.',
+    exemple: 'France 2020 (Covid) : déficit public à -9% du PIB avec le "quoi qu\'il en coûte". L\'État a injecté ~170 Mds€ (chômage partiel, prêts garantis) pour sauver l\'économie.',
+    formule: 'Solde budgétaire = Recettes fiscales - Dépenses publiques',
+    couleurEx: 'gold'
+  },
+  {
+    id: 'cycle-economique',
+    titre: 'Cycle économique',
+    categorie: 'macro',
+    icon: '◌',
+    def: 'L\'économie traverse des phases régulières : expansion (croissance), pic (surchauffe), contraction (ralentissement), creux (récession). Comprendre la phase du cycle aide à orienter ses investissements.',
+    exemple: 'En expansion → actions et immobilier surperforment. En récession → obligations d\'État et or se défendent mieux. En reprise → valeurs cycliques (auto, luxe) rebondissent fort.',
+    formule: 'Expansion → Pic → Contraction → Creux → Reprise → Expansion…',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'chomage',
+    titre: 'Chômage & Courbe de Phillips',
+    categorie: 'macro',
+    icon: '◆',
+    def: 'La courbe de Phillips décrit la relation inverse historique entre chômage et inflation : moins de chômage = plus d\'inflation (salaires plus élevés → hausse des prix). Ce trade-off guide les décisions des banques centrales.',
+    exemple: 'USA 2022 : chômage à 3,5% (quasi plein emploi) et inflation à 9%. La Fed a relevé ses taux pour créer du chômage et casser l\'inflation — arbitrage douloureux mais classique.',
+    formule: 'π = πe - α(u - u*) | π=inflation, u=chômage, u*=chômage naturel',
+    couleurEx: 'red'
+  },
+  {
+    id: 'balance-commerciale',
+    titre: 'Balance commerciale',
+    categorie: 'macro',
+    icon: '⊞',
+    def: 'Différence entre les exportations et importations d\'un pays. Un excédent (exports > imports) renforce la monnaie nationale. Un déficit (imports > exports) l\'affaiblit et peut indiquer une dépendance extérieure.',
+    exemple: 'Allemagne : excédent commercial record de +250 Mds€/an grâce à ses exportations industrielles. France : déficit de -100 Mds€/an, signe d\'une désindustrialisation partielle.',
+    formule: 'Balance commerciale = Valeur exports - Valeur imports',
+    couleurEx: 'teal'
+  },
+  {
+    id: 'taux-change',
+    titre: 'Taux de change',
+    categorie: 'macro',
+    icon: '◎',
+    def: 'Prix d\'une devise exprimé en une autre. Il impacte directement vos investissements internationaux. Un euro fort réduit vos gains sur des actifs en dollars. Un euro faible les amplifie.',
+    exemple: 'EUR/USD = 1,10 → 1 € = 1,10 $. Si vous investissez 10 000 € dans un ETF S&P 500 et que l\'euro monte à 1,20, vos gains en dollars sont amputés de ~8% lors de la conversion.',
+    formule: 'Rendement réel = Rendement actif + Variation taux de change',
+    couleurEx: 'gold'
+  },
+];
+
+const ACAD_LEXIQUE_DATA = [
+  { abbr: 'ETF', full: 'Exchange-Traded Fund', desc: 'Fonds indiciel coté en bourse' },
+  { abbr: 'AV', full: 'Assurance-Vie', desc: 'Enveloppe fiscale française' },
+  { abbr: 'PEA', full: 'Plan d\'Épargne en Actions', desc: 'Enveloppe fiscale — plafond 150k€' },
+  { abbr: 'PER', full: 'Plan d\'Épargne Retraite', desc: 'Épargne retraite déductible' },
+  { abbr: 'CTO', full: 'Compte-Titres Ordinaire', desc: 'Sans avantage fiscal (PFU 30%)' },
+  { abbr: 'SCPI', full: 'Société Civile de Placement Immobilier', desc: 'Immobilier locatif mutualisé' },
+  { abbr: 'REIT', full: 'Real Estate Investment Trust', desc: 'Foncière cotée (version US des SCPI)' },
+  { abbr: 'TRI', full: 'Taux de Rendement Interne', desc: 'Rendement annualisé réel d\'un projet' },
+  { abbr: 'VAN', full: 'Valeur Actuelle Nette', desc: 'Valeur actuelle de flux futurs actualisés' },
+  { abbr: 'CAC 40', full: 'Cotation Assistée en Continu', desc: 'Indice des 40 plus grandes capitalisations françaises' },
+  { abbr: 'S&P 500', full: 'Standard & Poor\'s 500', desc: 'Indice des 500 plus grandes capitalisations US' },
+  { abbr: 'BPA', full: 'Bénéfice Par Action', desc: 'Bénéfice net / nombre d\'actions' },
+  { abbr: 'OAT', full: 'Obligation Assimilable du Trésor', desc: 'Emprunt d\'État français' },
+  { abbr: 'OPCVM', full: 'Organisme de Placement Collectif en Valeurs Mobilières', desc: 'Fonds d\'investissement collectif' },
+  { abbr: 'TMI', full: 'Tranche Marginale d\'Imposition', desc: 'Taux d\'impôt sur la dernière tranche' },
+  { abbr: 'PS', full: 'Prélèvements Sociaux', desc: '17,2% sur les revenus du capital' },
+  { abbr: 'DCA', full: 'Dollar-Cost Averaging', desc: 'Investissement régulier programmé' },
+  { abbr: 'CAGR', full: 'Compound Annual Growth Rate', desc: 'Taux de croissance annuel composé' },
+];
+
+let _acadFilter = 'tous';
+let _acadSearch = '';
+
+function initAcademie() {
+  renderAcadGrid();
+  renderLexique();
+  calcIC();
+  calcR72();
+  calcInf();
+  calcSharpe();
+}
+
+function filterAcad(cat, btn) {
+  _acadFilter = cat;
+  document.querySelectorAll('.acad-filter').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderAcadGrid();
+}
+
+function searchAcad(q) {
+  _acadSearch = q.toLowerCase().trim();
+  renderAcadGrid();
+}
+
+function renderAcadGrid() {
+  const grid = document.getElementById('acad-grid');
+  if (!grid) return;
+  let terms = ACAD_TERMS;
+  if (_acadFilter !== 'tous') terms = terms.filter(t => t.categorie === _acadFilter);
+  if (_acadSearch) terms = terms.filter(t =>
+    t.titre.toLowerCase().includes(_acadSearch) ||
+    t.def.toLowerCase().includes(_acadSearch) ||
+    t.categorie.toLowerCase().includes(_acadSearch)
+  );
+  const countEl = document.getElementById('acad-count');
+  if (countEl) countEl.textContent = `${terms.length} terme${terms.length > 1 ? 's' : ''} affiché${terms.length > 1 ? 's' : ''}`;
+  grid.innerHTML = terms.map(t => acadCard(t)).join('');
+}
+
+function acadCard(t) {
+  const tagLabels = { base: 'Bases', rendement: 'Rendement', risque: 'Risque', fiscalite: 'Fiscalité', strategie: 'Stratégie', micro: 'Microéconomie',   
+  macro: 'Macroéconomie' };
+  return `<div class="acad-card" id="card-${t.id}" onclick="toggleAcadCard('${t.id}')">
+    <div class="acad-toggle-icon">▾</div>
+    <div class="acad-card-top">
+      <div class="acad-card-icon ${t.categorie}">${t.icon}</div>
+      <div class="acad-card-head">
+        <div class="acad-card-titre">${t.titre}</div>
+        <span class="acad-card-tag ${t.categorie}">${tagLabels[t.categorie] || t.categorie}</span>
+      </div>
+    </div>
+    <div class="acad-card-def">${t.def}</div>
+    <div class="acad-card-expand">
+      <div class="acad-card-expand-inner">
+        <div class="acad-example-label">Exemple concret</div>
+        <div class="acad-example ${t.couleurEx || ''}">${t.exemple}</div>
+        ${t.formule ? `<div class="acad-example-label" style="margin-top:10px">Formule clé</div><div class="acad-formula">${t.formule}</div>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleAcadCard(id) {
+  const card = document.getElementById('card-' + id);
+  if (!card) return;
+  card.classList.toggle('expanded');
+}
+
+function renderLexique() {
+  const el = document.getElementById('acad-lexique');
+  if (!el) return;
+  el.innerHTML = ACAD_LEXIQUE_DATA.map(l => `
+    <div class="lex-item">
+      <div class="lex-abbr">${l.abbr}</div>
+      <div class="lex-full">${l.full}</div>
+      <div class="lex-desc">${l.desc}</div>
+    </div>`).join('');
+}
+
+/* ── Calculettes ── */
+function switchCalcTab(tab, btn) {
+  document.querySelectorAll('.acad-ctab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.acad-calc-pane').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const pane = document.getElementById('calc-' + tab);
+  if (pane) pane.classList.add('active');
+}
+
+function fmtAcad(n) {
+  if (!isFinite(n)) return '—';
+  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' €';
+}
+
+function setAcadResults(id, items) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = items.map(item => {
+    if (item.type === 'verdict') return `<div class="acad-verdict">${item.html}</div>`;
+    return `<div class="acr-item"><span>${item.lbl}</span><span class="acr-val ${item.col || ''}">${item.val}</span></div>`;
+  }).join('');
+}
+
+function calcIC() {
+  const capital = parseFloat(document.getElementById('ic-capital')?.value) || 0;
+  const monthly = parseFloat(document.getElementById('ic-monthly')?.value) || 0;
+  const rate = parseFloat(document.getElementById('ic-rate')?.value) || 0;
+  const years = parseInt(document.getElementById('ic-years')?.value) || 0;
+  if (years <= 0) return;
+
+  const r = rate / 100 / 12, n = years * 12;
+  let v = capital;
+  for (let m = 0; m < n; m++) v = v * (1 + r) + monthly;
+  const totalVerse = capital + monthly * n;
+  const interets = v - totalVerse;
+  const multiplicateur = totalVerse > 0 ? (v / totalVerse).toFixed(2) : '—';
+
+  setAcadResults('ic-results', [
+    { lbl: 'Capital final', val: fmtAcad(v), col: 'teal' },
+    { lbl: 'Total versé', val: fmtAcad(totalVerse), col: '' },
+    { lbl: 'Intérêts générés', val: fmtAcad(interets), col: 'gold' },
+    { lbl: 'Multiplicateur', val: multiplicateur + '×', col: 'purple' },
+    {
+      type: 'verdict',
+      html: interets > totalVerse
+        ? `<span style="color:var(--teal)">✓ Les intérêts (${fmtAcad(interets)}) dépassent vos versements (${fmtAcad(totalVerse)}) — la magie des intérêts composés est pleinement active !</span>`
+        : `Les intérêts composés représentent <strong>${(interets / v * 100).toFixed(0)}%</strong> de votre capital final. Augmentez la durée pour décupler l'effet.`
+    }
+  ]);
+}
+
+function calcR72() {
+  const rate = parseFloat(document.getElementById('r72-rate')?.value) || 0;
+  const capital = parseFloat(document.getElementById('r72-capital')?.value) || 0;
+  if (rate <= 0) return;
+
+  const duree72 = 72 / rate;
+  const dureeExacte = Math.log(2) / Math.log(1 + rate / 100);
+  const capitalDouble = capital * 2;
+  const capitalTriple = capital * 3;
+  const dureeTriple = Math.log(3) / Math.log(1 + rate / 100);
+
+  setAcadResults('r72-results', [
+    { lbl: 'Doublement (règle 72)', val: duree72.toFixed(1) + ' ans', col: 'teal' },
+    { lbl: 'Doublement (exact)', val: dureeExacte.toFixed(1) + ' ans', col: '' },
+    { lbl: 'Capital doublé', val: fmtAcad(capitalDouble), col: 'gold' },
+    { lbl: 'Triplement en', val: dureeTriple.toFixed(1) + ' ans', col: 'purple' },
+    {
+      type: 'verdict',
+      html: `À <strong>${rate}%/an</strong>, votre capital double en <strong>${duree72.toFixed(1)} ans</strong>. La règle 72 donne une approximation rapide : à 8% → 9 ans, à 10% → 7,2 ans, à 4% → 18 ans.`
+    }
+  ]);
+}
+
+function calcInf() {
+  const capital = parseFloat(document.getElementById('inf-capital')?.value) || 0;
+  const rate = parseFloat(document.getElementById('inf-rate')?.value) || 0;
+  const years = parseInt(document.getElementById('inf-years')?.value) || 0;
+  if (years <= 0) return;
+
+  const valeurReelle = capital / Math.pow(1 + rate / 100, years);
+  const perte = capital - valeurReelle;
+  const pctPerte = (perte / capital * 100).toFixed(1);
+  const capitalNecessaire = capital * Math.pow(1 + rate / 100, years);
+
+  setAcadResults('inf-results', [
+    { lbl: 'Valeur réelle dans ' + years + ' ans', val: fmtAcad(valeurReelle), col: 'red' },
+    { lbl: 'Perte de pouvoir d\'achat', val: fmtAcad(perte) + ' (-' + pctPerte + '%)', col: 'red' },
+    { lbl: 'Pour conserver 100% du PA', val: fmtAcad(capitalNecessaire), col: 'gold' },
+    {
+      type: 'verdict',
+      html: `Avec une inflation de <strong>${rate}%/an</strong>, vos ${fmtAcad(capital)} actuels n'auront que le pouvoir d'achat de <strong>${fmtAcad(valeurReelle)}</strong> dans ${years} ans. Pour maintenir votre niveau de vie, votre capital devra avoir atteint <strong>${fmtAcad(capitalNecessaire)}</strong>.`
+    }
+  ]);
+}
+
+function calcSharpe() {
+  const rend = parseFloat(document.getElementById('sr-rend')?.value) || 0;
+  const rf = parseFloat(document.getElementById('sr-rf')?.value) || 0;
+  const vol = parseFloat(document.getElementById('sr-vol')?.value) || 0;
+  if (vol <= 0) return;
+
+  const sharpe = (rend - rf) / vol;
+  const excesRend = rend - rf;
+  let verdict = '';
+  let qualite = '';
+  if (sharpe < 0) { qualite = 'Négatif'; verdict = `Ratio négatif : votre investissement ne compense pas le risque pris. Un livret sans risque serait plus rentable.`; }
+  else if (sharpe < 0.5) { qualite = 'Faible'; verdict = `Ratio faible : la performance ne justifie pas bien le risque. Cherchez à réduire la volatilité ou augmenter le rendement.`; }
+  else if (sharpe < 1) { qualite = 'Correct'; verdict = `Ratio correct : acceptable mais pas exceptionnel. Un ETF monde tourne souvent autour de 0,5-0,7.`; }
+  else if (sharpe < 2) { qualite = 'Bon'; verdict = `Bon ratio : vous êtes bien rémunéré pour le risque pris. Warren Buffett affiche ~0,8 sur 40 ans.`; }
+  else { qualite = 'Excellent'; verdict = `Excellent ! Ratio > 2 est rare et souvent signe d'une stratégie à tester sur le long terme (ou de chance sur une courte période).`; }
+
+  const col = sharpe < 0 ? 'red' : sharpe < 0.5 ? 'gold' : 'teal';
+  setAcadResults('sr-results', [
+    { lbl: 'Ratio de Sharpe', val: sharpe.toFixed(2) + ' — ' + qualite, col },
+    { lbl: 'Excès de rendement', val: excesRend.toFixed(1) + '%', col: 'teal' },
+    { lbl: 'Risque (vol.)', val: vol.toFixed(1) + '%', col: 'red' },
+    { type: 'verdict', html: verdict }
+  ]);
+}
