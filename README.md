@@ -15,21 +15,21 @@ Structure du Projet :
 Fonctionnalités principales
 
 
-L'application est divisée en plusieurs modules spécialisés accessibles via une barre de navigation latérale :
+- L'application est divisée en plusieurs modules spécialisés accessibles via une barre de navigation latérale :
 
-Tableau de bord (Vue globale) : Un résumé visuel de votre situation avec des indicateurs clés (KPI) comme le capital projeté et les gains générés.
+- Tableau de bord (Vue globale) : Un résumé visuel de votre situation avec des indicateurs clés (KPI) comme le capital projeté et les gains générés.
 
-Simulateur d'Investissement : Calculez l'évolution de votre capital en fonction de vos versements mensuels, du taux de rendement et de l'inflation.
+- Simulateur d'Investissement : Calculez l'évolution de votre capital en fonction de vos versements mensuels, du taux de rendement et de l'inflation.
 
-Planification Retraite : Projetez le capital nécessaire pour vos vieux jours.
+- Planification Retraite : Projetez le capital nécessaire pour vos vieux jours.
 
-Bilan Patrimonial : Analysez vos actifs et passifs pour obtenir votre valeur nette.
+- Bilan Patrimonial : Analysez vos actifs et passifs pour obtenir votre valeur nette.
 
-Gestion de Budget : Suivez vos revenus et dépenses mensuelles pour calculer votre "reste à vivre".
+- Gestion de Budget : Suivez vos revenus et dépenses mensuelles pour calculer votre "reste à vivre".
 
-Optimisation fiscale : Comparaison des enveloppes fiscales françaises (PEA, Assurance-vie, CTO, PER) avec application automatique des fiscalités respectives sur les gains.
+- Optimisation fiscale : Comparaison des enveloppes fiscales françaises (PEA, Assurance-vie, CTO, PER) avec application automatique des fiscalités respectives sur les gains.
 
-Académie : Un espace de formation pour comprendre les concepts financiers comme les intérêts composés ou le Ratio de Sharpe.
+- Académie : Un espace de formation pour comprendre les concepts financiers comme les intérêts composés ou le Ratio de Sharpe.
 
 
 --------------------------------------------------
