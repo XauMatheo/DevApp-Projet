@@ -513,8 +513,11 @@ function renderMonteCarlo() {
   if (years <= 0) return;
 
   // Force dimensions explicites — sans ça Chart.js échoue sur canvas caché
-  canvas.width = canvas.parentElement.offsetWidth || 600;
-  canvas.height = canvas.parentElement.offsetHeight || 260;
+  const parent = canvas.parentElement;
+  if (parent.offsetWidth > 0) {
+    canvas.width = parent.offsetWidth;
+    canvas.height = parent.offsetHeight || 260;
+  }
 
   const SIM = 200, annualVol = rateNet * 0.6;
   const labels = Array.from({ length: years + 1 }, (_, i) => `An ${i}`);
@@ -571,7 +574,24 @@ function renderMonteCarlo() {
     },
     options: {
       ...chartDefaults(),
-      responsive: false  // désactivé pour éviter le bug de redimensionnement sur canvas caché
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        ...chartDefaults().plugins,
+        tooltip: {
+          ...chartDefaults().plugins.tooltip,
+          filter: function(item) {
+            // N'affiche que les datasets nommés (percentiles), pas les courbes individuelles
+            return item.dataset.label !== '';
+          },
+          callbacks: {
+            label: function(context) {
+              if (!context.dataset.label) return null;
+              return '  ' + context.dataset.label + ' : ' + fmtN(context.raw);
+            }
+          }
+        }
+      }
     }
   });
 
@@ -852,10 +872,10 @@ function renderBudgetList(cid, type) {
 function budgetRow(item, i, type) {
   return `<div class="budget-row-item">
     <input class="field-input" style="flex:2" value="${escHtml(String(item.label))}"
-      onchange="budgetItems['${type}'][${i}].label=this.value;updateBudgetSummary()" onkeydown="if(event.key==='Enter')this.blur()">
+      oninput="budgetItems['${type}'][${i}].label=this.value;updateBudgetSummary()" onkeydown="if(event.key==='Enter')this.blur()">
     <input class="field-input" type="number" style="flex:1;padding-right:12px" value="${item.montant}"
       placeholder="0"
-      onchange="budgetItems['${type}'][${i}].montant=parseFloat(this.value)||0;updateBudgetSummary()" onkeydown="if(event.key==='Enter')this.blur()">
+      oninput="budgetItems['${type}'][${i}].montant=parseFloat(this.value)||0;updateBudgetSummary()" onkeydown="if(event.key==='Enter')this.blur()">
     <button class="del-btn" onclick="budgetItems['${type}'].splice(${i},1);renderBudget()">✕</button>
   </div>`;
 }
@@ -903,7 +923,7 @@ function renderBudget503020(totalR, totalD, ral) {
 
   const cibles = [
     { label: 'Besoins essentiels', pct: 50, actual: totalR > 0 ? (totalD / totalR * 100) : 0, color: '#4aa3e8', desc: 'Logement, alimentation, transport' },
-    { label: 'Loisirs & envies', pct: 30, actual: totalR > 0 ? (Math.max(0, totalD - totalR * 0.5) / totalR * 100) : 0, color: '#b06cf8', desc: 'Sorties, voyages, abonnements' },
+    { label: 'Loisirs & envies', pct: 30, actual: totalR > 0 ? (totalD / totalR * 100) * (30 / 80) : 0, color: '#b06cf8', desc: 'Sorties, voyages, abonnements' },
     { label: 'Épargne & investissement', pct: 20, actual: totalR > 0 ? (Math.max(0, ral) / totalR * 100) : 0, color: '#00c9a7', desc: 'PEA, AV, épargne de précaution' }
   ];
 
@@ -927,6 +947,8 @@ function renderBudget503020(totalR, totalD, ral) {
   destroyChart('budget-503020-chart');
   const canvas = document.getElementById('budget-503020-chart');
   if (!canvas) return;
+  // Réinitialise le canvas pour éviter les artefacts après destroy
+  canvas.width = canvas.width;
   charts['budget-503020-chart'] = new Chart(canvas.getContext('2d'), {
     type: 'bar',
     data: {
@@ -987,8 +1009,7 @@ function renderBudgetProjection(epargne) {
 }
 
 function initBudget() {
-  const saved = loadLocal('budget');
-  if (saved) budgetItems = saved;
+  budgetItems = { revenus: [], depenses: [] };
   renderBudget();
 }
 
@@ -1363,20 +1384,14 @@ function renderAllocDetailTable(weights, total, stats) {
 
 /* ══ HOME REFRESH ══ */
 function refreshHome() {
-  const inv = loadLocal('investResult');
-  if (inv) {
-    document.getElementById('home-capital').textContent = fmt(inv.final);
-    document.getElementById('home-gains').textContent = fmt(inv.gains);
-  }
-  const ret = loadLocal('retraiteResult');
-  if (ret) document.getElementById('home-retraite').textContent = fmt(ret.final);
+  // Les KPIs home se mettent à jour uniquement via les simulateurs, pas depuis le cache
 }
 
 /* ══ INIT ══ */
 function init() {
+  // Vider le localStorage pour repartir à zéro à chaque démarrage
+  try { localStorage.clear(); } catch(e) {}
   initBudget();
-  refreshHome();
-  updateRetraite();
   updateEnvelopeInfo('pea', 'envelope-info-box');
 }
 init();

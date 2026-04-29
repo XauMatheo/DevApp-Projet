@@ -1190,6 +1190,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0;
+  min-width: 0;
 }
 
 /* ══════════════════════════════════════════
@@ -1407,6 +1408,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 0 0 var(--r) var(--r);
   padding: 18px;
+  min-width: 0;
 }
 
 .chart-pane.active {
@@ -1423,16 +1425,22 @@ body {
 .chart-area {
   position: relative;
   height: 270px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .chart-area-sm {
   position: relative;
   height: 210px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .chart-area-lg {
   position: relative;
   height: 340px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* ══════════════════════════════════════════
@@ -1444,6 +1452,7 @@ body {
   border-radius: var(--r);
   padding: 20px;
   transition: border-color var(--tr);
+  min-width: 0;
 }
 
 .card-block:hover {
@@ -2407,13 +2416,46 @@ body {
   .budget-summary {
     flex-direction: column;
   }
+
+  .chart-area {
+    height: 200px;
+  }
+
+  .chart-area-sm {
+    height: 170px;
+  }
+
+  .chart-area-lg {
+    height: 240px;
+  }
+
+  #budget-503020 {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 
 
-/* ══════════════════════════════════════════
-   ACADÉMIE
-══════════════════════════════════════════ */
+/* ══ SCROLL HORIZONTAL GRAPHIQUES (petits écrans) ══ */
+.chart-scroll-wrap {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chart-scroll-wrap .chart-area,
+.chart-scroll-wrap .chart-area-sm,
+.chart-scroll-wrap .chart-area-lg {
+  min-width: 480px;
+}
+
+@media (max-width: 640px) {
+  .chart-scroll-wrap .chart-area,
+  .chart-scroll-wrap .chart-area-sm,
+  .chart-scroll-wrap .chart-area-lg {
+    min-width: 420px;
+  }
+}
 .acad-filters {
   display: flex;
   flex-wrap: wrap;

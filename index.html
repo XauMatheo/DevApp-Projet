@@ -396,19 +396,19 @@
             </div>
 
             <div class="chart-pane active" id="pane-evolution">
-              <div class="chart-area"><canvas id="invest-chart"></canvas></div>
+              <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="invest-chart"></canvas></div></div>
             </div>
             <div class="chart-pane" id="pane-multitaux">
               <p class="chart-note">Comparaison 3% · 5% · 7% · 10% · 12% — avec vos paramètres de frais et durée</p>
-              <div class="chart-area"><canvas id="rend-multi-chart"></canvas></div>
+              <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="rend-multi-chart"></canvas></div></div>
             </div>
             <div class="chart-pane" id="pane-compo">
               <p class="chart-note">Répartition versements / intérêts selon différents taux</p>
-              <div class="chart-area"><canvas id="rend-compo-chart"></canvas></div>
+              <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="rend-compo-chart"></canvas></div></div>
             </div>
             <div class="chart-pane" id="pane-inflation">
               <p class="chart-note">Valeur nominale vs valeur réelle — érosion du pouvoir d'achat</p>
-              <div class="chart-area"><canvas id="rend-inflation-chart"></canvas></div>
+              <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="rend-inflation-chart"></canvas></div></div>
             </div>
             <div class="chart-pane" id="pane-amortissement">
               <p class="chart-note">Progression annuelle du capital — versements, intérêts et solde par tranche</p>
@@ -417,7 +417,7 @@
             <div class="chart-pane" id="pane-montecarlo">
               <p class="chart-note">Simulation de 200 trajectoires aléatoires — distribution des résultats possibles
                 selon la volatilité estimée</p>
-              <div class="chart-area"><canvas id="invest-mc-chart"></canvas></div>
+              <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="invest-mc-chart"></canvas></div></div>
               <div id="mc-kpis" class="detail-kpis" style="margin-top:14px"></div>
             </div>
 
@@ -431,7 +431,7 @@
                   <button class="tb" onclick="setRendTaux(10,this)">10%</button>
                 </div>
               </div>
-              <div class="chart-area"><canvas id="rend-detail-chart"></canvas></div>
+              <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="rend-detail-chart"></canvas></div></div>
               <div id="rend-detail-kpis" class="detail-kpis"></div>
             </div>
           </div>
@@ -506,13 +506,13 @@
               </div>
               <div class="slider-group">
                 <div class="sg-head"><label>Taux de rendement annuel</label><strong id="v-taux-ret">—</strong></div>
-                <input type="range" class="slider" id="ret-taux" min="0.5" max="15" step="0.5" value="5"
+                <input type="range" class="slider" id="ret-taux" min="0.5" max="15" step="0.5" value="0.5"
                   oninput="updateRetraite()">
                 <div class="sg-range"><span>0,5 %</span><span>15 %</span></div>
               </div>
               <div class="slider-group">
                 <div class="sg-head"><label>Inflation estimée</label><strong id="v-inflation">—</strong></div>
-                <input type="range" class="slider" id="ret-inflation" min="0" max="8" step="0.5" value="2"
+                <input type="range" class="slider" id="ret-inflation" min="0" max="8" step="0.5" value="0"
                   oninput="updateRetraite()">
                 <div class="sg-range"><span>0 %</span><span>8 %</span></div>
               </div>
@@ -529,7 +529,7 @@
               <div class="panel-section-title">◈ Objectif mensuel à la retraite</div>
               <div class="slider-group">
                 <div class="sg-head"><label>Revenu mensuel souhaité</label><strong id="v-objectif">—</strong></div>
-                <input type="range" class="slider" id="ret-objectif" min="500" max="10000" step="100" value="2000"
+                <input type="range" class="slider" id="ret-objectif" min="500" max="10000" step="100" value="500"
                   oninput="updateRetraite()">
                 <div class="sg-range"><span>500 €</span><span>10 000 €</span></div>
               </div>
@@ -573,14 +573,14 @@
 
             <div class="card-block mt-16">
               <div class="block-header"><span>Évolution de l'épargne</span></div>
-              <div class="chart-area"><canvas id="retraite-chart"></canvas></div>
+              <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="retraite-chart"></canvas></div></div>
             </div>
 
             <div class="card-block mt-16">
               <div class="block-header gold-dot"><span>Trajectoire de décaissement à la retraite</span></div>
               <p class="chart-note" style="margin-bottom:12px">Évolution du capital pendant la phase de retraite selon
                 différents taux de retrait (3% · 4% · 5% · 6%)</p>
-              <div class="chart-area"><canvas id="retraite-decaissement-chart"></canvas></div>
+              <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="retraite-decaissement-chart"></canvas></div></div>
             </div>
           </div>
         </div>
@@ -619,15 +619,15 @@
             <div class="block-header teal-dot"><span>Actifs</span></div>
             <div id="patri-actifs-list" class="patri-list">
               <div class="patri-row">
-                <input class="field-input flex2" placeholder="Épargne (livrets, PEA…)" value="Épargne"
+                <input class="field-input flex2" placeholder="Épargne (livrets, PEA…)" value=""
                   oninput="updatePatrimoine()">
-                <input class="field-input flex1" type="number" value="15000" oninput="updatePatrimoine()">
+                <input class="field-input flex1" type="number" value="0" oninput="updatePatrimoine()">
                 <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
               </div>
               <div class="patri-row">
-                <input class="field-input flex2" placeholder="Immobilier" value="Immobilier"
+                <input class="field-input flex2" placeholder="Immobilier" value=""
                   oninput="updatePatrimoine()">
-                <input class="field-input flex1" type="number" value="180000" oninput="updatePatrimoine()">
+                <input class="field-input flex1" type="number" value="0" oninput="updatePatrimoine()">
                 <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
               </div>
             </div>
@@ -637,9 +637,9 @@
             <div class="block-header red-dot"><span>Passifs</span></div>
             <div id="patri-passifs-list" class="patri-list">
               <div class="patri-row">
-                <input class="field-input flex2" placeholder="Crédit immobilier" value="Crédit immo"
+                <input class="field-input flex2" placeholder="Crédit immobilier" value=""
                   oninput="updatePatrimoine()">
-                <input class="field-input flex1" type="number" value="120000" oninput="updatePatrimoine()">
+                <input class="field-input flex1" type="number" value="0" oninput="updatePatrimoine()">
                 <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
               </div>
             </div>
@@ -658,7 +658,7 @@
           </div>
           <div class="card-block">
             <div class="block-header gold-dot"><span>Actifs vs Passifs</span></div>
-            <div class="chart-area-sm"><canvas id="patri-compare-chart"></canvas></div>
+            <div class="chart-scroll-wrap"><div class="chart-area-sm"><canvas id="patri-compare-chart"></canvas></div></div>
           </div>
         </div>
 
@@ -735,7 +735,7 @@
           <p class="chart-note">Idéalement : 50% en besoins essentiels, 30% en loisirs/envies, 20% en épargne.</p>
           <div id="budget-503020" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
           </div>
-          <div class="chart-area" style="height:220px"><canvas id="budget-503020-chart"></canvas></div>
+          <div class="chart-scroll-wrap"><div class="chart-area" style="height:220px"><canvas id="budget-503020-chart"></canvas></div></div>
         </div>
 
         <!-- Projection épargne mensuelle -->
@@ -743,7 +743,7 @@
           <div class="block-header purple-dot"><span>Projection de l'épargne sur 10 ans</span></div>
           <p class="chart-note">Simulation de votre reste à vivre investi chaque mois à différents taux de rendement.
           </p>
-          <div class="chart-area"><canvas id="budget-projection-chart"></canvas></div>
+          <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="budget-projection-chart"></canvas></div></div>
         </div>
       </div>
 
@@ -909,19 +909,19 @@
         <div class="compare-charts-grid mt-20">
           <div class="card-block">
             <div class="block-header"><span>Évolution capitaux</span></div>
-            <div class="chart-area"><canvas id="compare-chart"></canvas></div>
+            <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="compare-chart"></canvas></div></div>
           </div>
           <div class="card-block">
             <div class="block-header"><span>Capitaux réels (inflation)</span></div>
-            <div class="chart-area"><canvas id="compare-reel-chart"></canvas></div>
+            <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="compare-reel-chart"></canvas></div></div>
           </div>
           <div class="card-block">
             <div class="block-header"><span>Composition finale</span></div>
-            <div class="chart-area"><canvas id="compare-compo-chart"></canvas></div>
+            <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="compare-compo-chart"></canvas></div></div>
           </div>
           <div class="card-block">
             <div class="block-header"><span>Rentes mensuelles projetées</span></div>
-            <div class="chart-area"><canvas id="compare-rente-chart"></canvas></div>
+            <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="compare-rente-chart"></canvas></div></div>
           </div>
         </div>
 
@@ -969,36 +969,35 @@
                 100 %.</p>
 
               <div class="slider-group">
-                <div class="sg-head"><label>Actions (ETF monde / actions)</label><strong id="v-alloc-actions">40
-                    %</strong></div>
-                <input type="range" class="slider" id="alloc-actions" min="0" max="100" step="5" value="40"
+                <div class="sg-head"><label>Actions (ETF monde / actions)</label><strong id="v-alloc-actions">0 %</strong></div>
+                <input type="range" class="slider" id="alloc-actions" min="0" max="100" step="5" value="0"
                   oninput="updateAllocation()">
               </div>
               <div class="slider-group">
-                <div class="sg-head"><label>Obligations / fonds €</label><strong id="v-alloc-oblig">20 %</strong></div>
-                <input type="range" class="slider" id="alloc-oblig" min="0" max="100" step="5" value="20"
+                <div class="sg-head"><label>Obligations / fonds €</label><strong id="v-alloc-oblig">0 %</strong></div>
+                <input type="range" class="slider" id="alloc-oblig" min="0" max="100" step="5" value="0"
                   oninput="updateAllocation()">
               </div>
               <div class="slider-group">
-                <div class="sg-head"><label>Immobilier (SCPI / REIT)</label><strong id="v-alloc-immo">20 %</strong>
+                <div class="sg-head"><label>Immobilier (SCPI / REIT)</label><strong id="v-alloc-immo">0 %</strong>
                 </div>
-                <input type="range" class="slider" id="alloc-immo" min="0" max="100" step="5" value="20"
+                <input type="range" class="slider" id="alloc-immo" min="0" max="100" step="5" value="0"
                   oninput="updateAllocation()">
               </div>
               <div class="slider-group">
-                <div class="sg-head"><label>Cryptomonnaies</label><strong id="v-alloc-crypto">5 %</strong></div>
-                <input type="range" class="slider" id="alloc-crypto" min="0" max="100" step="5" value="5"
+                <div class="sg-head"><label>Cryptomonnaies</label><strong id="v-alloc-crypto">0 %</strong></div>
+                <input type="range" class="slider" id="alloc-crypto" min="0" max="100" step="5" value="0"
                   oninput="updateAllocation()">
               </div>
               <div class="slider-group">
-                <div class="sg-head"><label>Liquidités / Livrets</label><strong id="v-alloc-cash">15 %</strong></div>
-                <input type="range" class="slider" id="alloc-cash" min="0" max="100" step="5" value="15"
+                <div class="sg-head"><label>Liquidités / Livrets</label><strong id="v-alloc-cash">0 %</strong></div>
+                <input type="range" class="slider" id="alloc-cash" min="0" max="100" step="5" value="0"
                   oninput="updateAllocation()">
               </div>
 
               <div id="alloc-total-check"
                 style="margin-top:10px;padding:8px 12px;border-radius:var(--r-sm);font-size:0.78rem;background:var(--bg3)">
-                Total : <strong id="alloc-total">100 %</strong>
+                Total : <strong id="alloc-total">0 %</strong>
               </div>
             </div>
 
@@ -1008,7 +1007,7 @@
                 <div class="field-group">
                   <label class="field-label">Capital initial</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="alloc-capital" placeholder="10000" value="10000"
+                    <input type="number" class="field-input" id="alloc-capital" placeholder="10000" value="0"
                       oninput="updateAllocation()">
                     <span class="field-unit">€</span>
                   </div>
@@ -1016,7 +1015,7 @@
                 <div class="field-group">
                   <label class="field-label">Apport mensuel</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="alloc-monthly" placeholder="300" value="300"
+                    <input type="number" class="field-input" id="alloc-monthly" placeholder="300" value="0"
                       oninput="updateAllocation()">
                     <span class="field-unit">€/m</span>
                   </div>
@@ -1026,7 +1025,7 @@
                 <div class="field-group">
                   <label class="field-label">Horizon</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="alloc-years" placeholder="20" value="20"
+                    <input type="number" class="field-input" id="alloc-years" placeholder="20" value="0"
                       oninput="updateAllocation()">
                     <span class="field-unit">ans</span>
                   </div>
@@ -1034,7 +1033,7 @@
                 <div class="field-group">
                   <label class="field-label">Taux sans risque</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="alloc-rfree" placeholder="3" value="3" step="0.1"
+                    <input type="number" class="field-input" id="alloc-rfree" placeholder="3" value="0" step="0.1"
                       oninput="updateAllocation()">
                     <span class="field-unit">%</span>
                   </div>
@@ -1076,12 +1075,12 @@
             <div class="card-block mt-16">
               <div class="block-header gold-dot"><span>Projection selon scénarios (pessimiste / base / optimiste)</span>
               </div>
-              <div class="chart-area"><canvas id="alloc-proj-chart"></canvas></div>
+              <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="alloc-proj-chart"></canvas></div></div>
             </div>
 
             <div class="card-block mt-16">
               <div class="block-header purple-dot"><span>Profil risque / rendement par classe d'actif</span></div>
-              <div class="chart-area" style="height:240px"><canvas id="alloc-scatter-chart"></canvas></div>
+              <div class="chart-scroll-wrap"><div class="chart-area" style="height:240px"><canvas id="alloc-scatter-chart"></canvas></div></div>
             </div>
           </div>
         </div>
