@@ -36,13 +36,13 @@ Fonctionnalités principales
 Outils et Technologies utilisés
 
 
-HTML5 / CSS3 : Structure et design moderne utilisant les variables CSS pour un thème basé sur le Glassmorphism (effets de transparence et de flou).
+- HTML5 / CSS3 : Structure et design moderne utilisant les variables CSS pour un thème basé sur le Glassmorphism (effets de transparence et de flou).
 
-JavaScript : Logique métier, calculs financiers complexes et gestion de l'état de l'application.
+- JavaScript : Logique métier, calculs financiers complexes et gestion de l'état de l'application.
 
-Chart.js : Bibliothèque utilisée pour générer tous les graphiques interactifs (évolution du capital, multi-taux, allocation d'actifs).
+- Chart.js : Bibliothèque utilisée pour générer tous les graphiques interactifs (évolution du capital, multi-taux, allocation d'actifs).
 
-Google Fonts : Utilisation des polices Outfit, Syne, DM Mono et Inter pour une typographie soignée.
+- Google Fonts : Utilisation des polices Outfit, Syne, DM Mono et Inter pour une typographie soignée.
 
 
 --------------------------------------------------
@@ -51,9 +51,9 @@ Prérequis
 Pour lancer cette application localement, vous avez simplement besoin de :
 
 
-Un navigateur web moderne (Chrome, Firefox, Edge ou Safari).
+- Un navigateur web moderne (Chrome, Firefox, Edge ou Safari).
 
-Le projet ne nécessite aucun serveur spécifique (Node.js ou autre) car il repose sur des technologies "Client-Side" pures.
+- Le projet ne nécessite aucun serveur spécifique (Node.js ou autre) car il repose sur des technologies "Client-Side" pures.
 
 
 --------------------------------------------------
@@ -71,13 +71,13 @@ Ouvrez le fichier index.html dans votre navigateur (double-clic ou glisser-dépo
 Utilisation de l'application
 
 
-Navigation : Utilisez la barre latérale pour basculer entre les différents modules (Investissement, Budget, etc.).
+- Navigation : Utilisez la barre latérale pour basculer entre les différents modules (Investissement, Budget, etc.).
 
-Saisie de données : Dans chaque simulateur, modifiez les valeurs dans les champs numériques (ex: Capital initial, Versement mensuel). Les calculs et les graphiques se mettent à jour automatiquement dès que vous changez une valeur.
+- Saisie de données : Dans chaque simulateur, modifiez les valeurs dans les champs numériques (ex: Capital initial, Versement mensuel). Les calculs et les graphiques se mettent à jour automatiquement dès que vous changez une valeur.
 
-Visualisation : Survolez les graphiques pour voir le détail des données année par année. Les résultats financiers (Net de fiscalité, Capital réel ajusté de l'inflation) s'affichent instantanément dans les encadrés de résultats.
+- Visualisation : Survolez les graphiques pour voir le détail des données année par année. Les résultats financiers (Net de fiscalité, Capital réel ajusté de l'inflation) s'affichent instantanément dans les encadrés de résultats.
 
-Sauvegarde : L'application utilise le localStorage de votre navigateur pour mémoriser certains réglages, comme l'état (réduit ou ouvert) de la barre latérale.
+- Sauvegarde : L'application utilise le localStorage de votre navigateur pour mémoriser certains réglages, comme l'état (réduit ou ouvert) de la barre latérale.
 
 
 
