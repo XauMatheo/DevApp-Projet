@@ -1,4 +1,3 @@
-Wealth OS — Dashboard Financier
 Wealth OS est une application web interactive de gestion et de simulation de patrimoine. Elle permet aux utilisateurs de piloter leurs finances personnelles avec précision grâce à des outils de simulation en temps réel, des analyses de portefeuille et des projections de retraite.
 
 
