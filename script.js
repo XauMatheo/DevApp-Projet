@@ -152,7 +152,11 @@ function chartDefaults() {
   };
 }
 
-function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+function destroyChart(id) { 
+  if (charts[id]) { 
+    charts[id].destroy(); 
+    delete charts[id]; } 
+}
 function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
 
 /* ══ LOCAL STORAGE ══ */
