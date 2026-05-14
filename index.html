@@ -1,27 +1,65 @@
 <!DOCTYPE html>
+<!--
+  ══════════════════════════════════════════
+  WEALTH OS — index.html
+  Version commentée pour débutants
+
+  Ce fichier contient toute la STRUCTURE HTML de l'application.
+  Il définit :
+  - La sidebar (menu de navigation à gauche)
+  - La topbar (barre du haut)
+  - Les pages : Accueil, Investissement, Retraite, Patrimoine,
+                Budget, Comparaison, Allocation, Académie
+
+  Chaque page a un id HTML de la forme "NOM-page"
+  (ex : "invest-page", "budget-page"…).
+  Le JavaScript affiche/cache ces pages via la classe CSS "active".
+  ══════════════════════════════════════════
+-->
 <html lang="fr">
 
 <head>
   <meta charset="UTF-8">
+  <!-- Permet un bon affichage sur mobile (empêche le zoom automatique) -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wealth OS — Dashboard</title>
+
+  <!-- Notre feuille de styles principale -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- Chart.js : bibliothèque pour dessiner des graphiques -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <!-- Google Fonts : polices de caractères utilisées dans l'app -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
 </head>
 
 <body>
 
+  <!-- ══ DÉCORATION DE FOND ══
+       Ces éléments sont purement visuels (dégradés flous en fond de page).
+       Ils ne contiennent aucun contenu.
+  -->
   <div class="glass-bg-blob blob-1"></div>
-<div class="glass-bg-blob blob-2"></div>
+  <div class="glass-bg-blob blob-2"></div>
+  <div class="glass-grain"></div><!-- Texture grain légère sur toute la page -->
 
-<div class="glass-grain"></div>
 
-  <!-- SIDEBAR -->
+  <!-- ══════════════════════════════════════════
+       SIDEBAR — Menu de navigation latéral gauche
+       ══════════════════════════════════════════
+       La sidebar contient :
+       - Le logo "WealthOS"
+       - Un bouton pour la réduire (toggleSidebar)
+       - Les groupes de navigation (liens vers chaque page)
+       - Un statut système + horloge en bas
+  -->
   <nav id="sidebar">
+
+    <!-- Logo -->
     <div class="logo">
       <div class="logo-wordmark">
         <span class="logo-w">W</span><span class="logo-rest">ealth</span>
@@ -30,100 +68,164 @@
       <div class="logo-tagline">Dashboard</div>
     </div>
 
+    <!--
+      Bouton toggle sidebar.
+      onclick="toggleSidebar()" appelle la fonction JS du même nom.
+      Quand on clique, la sidebar se réduit (seules les icônes restent visibles).
+    -->
     <button class="sidebar-toggle" onclick="toggleSidebar()" title="Réduire la sidebar">
       <span class="toggle-icon">
+        <!-- 3 traits CSS qui forment l'icône "hamburger" -->
         <span></span><span></span><span></span>
       </span>
     </button>
 
+    <!-- Groupe 1 : Vue globale -->
     <div class="nav-group">
       <div class="nav-group-label">Vue globale</div>
-      <div class="nav-item active" data-page="home"><span class="nav-icon">◈</span><span class="nav-label">Tableau de
-          bord</span></div>
+      <!--
+        Chaque .nav-item a un attribut data-page.
+        Le JS lit cet attribut pour savoir vers quelle page naviguer.
+        La classe "active" est ajoutée par le JS sur l'item de la page courante.
+      -->
+      <div class="nav-item active" data-page="home">
+        <span class="nav-icon">◈</span>
+        <span class="nav-label">Tableau de bord</span>
+      </div>
     </div>
 
+    <!-- Groupe 2 : Simulateurs -->
     <div class="nav-group">
       <div class="nav-group-label">Simulateurs</div>
-      <div class="nav-item" data-page="invest"><span class="nav-icon">◆</span><span
-          class="nav-label">Investissement</span></div>
-      <div class="nav-item" data-page="retraite"><span class="nav-icon">◇</span><span class="nav-label">Retraite</span>
+      <div class="nav-item" data-page="invest">
+        <span class="nav-icon">◆</span>
+        <span class="nav-label">Investissement</span>
       </div>
-      <div class="nav-item" data-page="budget"><span class="nav-icon">○</span><span class="nav-label">Budget</span>
+      <div class="nav-item" data-page="retraite">
+        <span class="nav-icon">◇</span>
+        <span class="nav-label">Retraite</span>
+      </div>
+      <div class="nav-item" data-page="budget">
+        <span class="nav-icon">○</span>
+        <span class="nav-label">Budget</span>
       </div>
     </div>
 
+    <!-- Groupe 3 : Analyse -->
     <div class="nav-group">
       <div class="nav-group-label">Analyse</div>
-      <div class="nav-item" data-page="analyse"><span class="nav-icon">▣</span><span class="nav-label">Patrimoine</span>
+      <div class="nav-item" data-page="analyse">
+        <span class="nav-icon">▣</span>
+        <span class="nav-label">Patrimoine</span>
       </div>
-      <div class="nav-item" data-page="compare"><span class="nav-icon">⊞</span><span
-          class="nav-label">Comparaison</span></div>
-      <div class="nav-item" data-page="allocation"><span class="nav-icon">▲</span><span
-          class="nav-label">Allocation</span></div>
+      <div class="nav-item" data-page="compare">
+        <span class="nav-icon">⊞</span>
+        <span class="nav-label">Comparaison</span>
+      </div>
+      <div class="nav-item" data-page="allocation">
+        <span class="nav-icon">▲</span>
+        <span class="nav-label">Allocation</span>
+      </div>
     </div>
 
+    <!-- Groupe 4 : Formation -->
     <div class="nav-group">
       <div class="nav-group-label">Formation</div>
-      <div class="nav-item" data-page="academie"><span class="nav-icon">◉</span><span class="nav-label">Académie</span></div>
+      <div class="nav-item" data-page="academie">
+        <span class="nav-icon">◉</span>
+        <span class="nav-label">Académie</span>
+      </div>
     </div>
 
+    <!-- Bas de sidebar : statut système + horloge -->
     <div class="sidebar-bottom">
       <div class="sys-status">
-        <span class="pulse-dot"></span>
+        <span class="pulse-dot"></span><!-- Point animé vert -->
         <span>Système actif</span>
+        <!-- L'id "clock" est mis à jour chaque seconde par le JS (updateClock) -->
         <span id="clock" class="sys-clock">--:--</span>
       </div>
     </div>
-  </nav>
 
-  <!-- MAIN -->
+  </nav><!-- fin #sidebar -->
+
+
+  <!-- ══════════════════════════════════════════
+       MAIN — Zone de contenu principale
+       ══════════════════════════════════════════
+       Tout ce qui est à droite de la sidebar.
+       Contient : la topbar + le contenu des pages.
+  -->
   <main id="main">
+
+    <!-- TOPBAR : barre sticky en haut de chaque page -->
     <header class="topbar">
+      <!-- Côté gauche : chemin de navigation + badge de section -->
       <div class="topbar-left">
         <div class="page-path">
           <span class="path-root">WealthOS</span>
           <span class="path-sep">/</span>
+          <!-- id="page-title" : mis à jour par le JS quand on change de page -->
           <span class="path-current" id="page-title">Tableau de bord</span>
         </div>
+        <!-- Badge de section (ex: "Simulateur", "Projection"…) -->
         <span class="topbar-badge" id="topbar-badge">Vue globale</span>
       </div>
+      <!-- Côté droit : horloge + avatar -->
       <div class="topbar-right">
+        <!-- id="topbar-clock" : mis à jour par le JS -->
         <span class="topbar-clock" id="topbar-clock">—</span>
         <div class="topbar-avatar" title="Mon espace">W</div>
       </div>
     </header>
 
+    <!-- Zone de contenu : contient toutes les pages -->
     <div class="content">
 
-      <!-- ══ HOME ══ -->
+
+      <!-- ══════════════════════════════════════════
+           PAGE : ACCUEIL (home)
+           ══════════════════════════════════════════
+           Affichée au démarrage (classe "active").
+           Contient : bannière hero + KPIs + accès rapide + concepts clés.
+      -->
       <div id="home-page" class="page active">
 
+        <!-- Bannière hero : titre + boutons + mini graphique -->
         <div class="home-hero">
-          <div class="hero-bg-grid"></div>
+          <div class="hero-bg-grid"></div><!-- Grille décorative en fond -->
           <div class="hero-content">
             <div class="hero-eyebrow">Bienvenue sur votre espace</div>
-            <h1 class="hero-title">Gérer votre <span class="hero-accent">patrimoine</span><br></h1>
-            <p class="hero-sub">Simulez, analysez et optimisez votre patroimoine.</p>
+            <h1 class="hero-title">
+              Gérer votre <span class="hero-accent">patrimoine</span>
+            </h1>
+            <p class="hero-sub">Simulez, analysez et optimisez votre patrimoine.</p>
             <div class="hero-actions">
-              <button class="btn-hero-primary" onclick="goPage('invest')">◆ Simuler un investissement</button>
+              <!-- onclick="goPage('invest')" : navigue vers la page Investissement -->
+              <button class="btn-hero-primary"   onclick="goPage('invest')">◆ Simuler un investissement</button>
               <button class="btn-hero-secondary" onclick="goPage('retraite')">◇ Planifier ma retraite</button>
             </div>
           </div>
+          <!-- Mini graphique de la page d'accueil (tracé par le JS) -->
           <div class="hero-visual">
             <canvas id="home-chart" height="200"></canvas>
           </div>
         </div>
 
+        <!-- KPIs : 4 tuiles de résumé des simulateurs -->
         <div class="home-kpis">
+          <!-- KPI Investissement -->
           <div class="kpi-tile">
             <div class="kpi-icon">◆</div>
             <div class="kpi-body">
+              <!-- id="home-capital" : mis à jour par updateInvest() dans le JS -->
               <div class="kpi-val" id="home-capital">—</div>
               <div class="kpi-lbl">Capital projeté</div>
               <div class="kpi-sub">Investissement</div>
             </div>
             <div class="kpi-arrow" onclick="goPage('invest')">→</div>
           </div>
+          <!-- KPI Gains -->
           <div class="kpi-tile">
             <div class="kpi-icon" style="color:var(--em)">◈</div>
             <div class="kpi-body">
@@ -133,6 +235,7 @@
             </div>
             <div class="kpi-arrow" onclick="goPage('invest')">→</div>
           </div>
+          <!-- KPI Retraite -->
           <div class="kpi-tile">
             <div class="kpi-icon" style="color:var(--gold)">◇</div>
             <div class="kpi-body">
@@ -142,6 +245,7 @@
             </div>
             <div class="kpi-arrow" onclick="goPage('retraite')">→</div>
           </div>
+          <!-- KPI Budget / Reste à vivre -->
           <div class="kpi-tile">
             <div class="kpi-icon" style="color:var(--teal)">○</div>
             <div class="kpi-body">
@@ -153,13 +257,17 @@
           </div>
         </div>
 
+        <!-- Grille bas de page : Accès rapide + Concepts clés -->
         <div class="home-grid">
+
+          <!-- Module Accès rapide -->
           <div class="home-module">
             <div class="module-header">
               <span class="module-dot"></span>
               <span class="module-title">Accès rapide</span>
             </div>
             <div class="quick-links">
+              <!-- Chaque .ql-item navigue vers une page via onclick="goPage(...)" -->
               <div class="ql-item" onclick="goPage('invest')">
                 <div class="ql-icon">◆</div>
                 <div class="ql-text">
@@ -200,19 +308,18 @@
                 </div>
                 <span class="ql-chevron">→</span>
               </div>
-
-               <div class="ql-item" onclick="goPage('academie')">
+              <div class="ql-item" onclick="goPage('academie')">
                 <div class="ql-icon" style="color:var(--gold)">◇</div>
                 <div class="ql-text">
-                  <div class="ql-name">Academie</div>
+                  <div class="ql-name">Académie</div>
                   <div class="ql-desc">Apprenez les bases de l'investissement</div>
                 </div>
                 <span class="ql-chevron">→</span>
               </div>
-
             </div>
           </div>
 
+          <!-- Module Concepts clés -->
           <div class="home-module">
             <div class="module-header">
               <span class="module-dot" style="background:var(--em)"></span>
@@ -249,10 +356,17 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- ══ INVESTISSEMENT ══ -->
+        </div><!-- fin .home-grid -->
+      </div><!-- fin #home-page -->
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE : INVESTISSEMENT
+           ══════════════════════════════════════════
+           Simulateur d'investissement avec intérêts composés.
+           Paramètres → Résultats → Graphiques.
+      -->
       <div id="invest-page" class="page">
 
         <div class="page-intro">
@@ -263,16 +377,23 @@
         </div>
 
         <div class="vertical-layout">
-          <!-- Paramètres -->
+
+          <!-- PARAMÈTRES : 3 colonnes -->
           <div class="three-col-layout mb-20">
+
+            <!-- Colonne 1 : Paramètres de base -->
             <div class="panel-section">
               <div class="panel-section-title">◆ Paramètres de base</div>
 
               <div class="field-group">
                 <label class="field-label">Capital initial</label>
                 <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="r-capital" placeholder="10 000" value=""
-                    oninput="updateInvest()">
+                  <!--
+                    oninput="updateInvest()" : à chaque frappe, le JS recalcule
+                    placeholder : texte grisé affiché quand le champ est vide
+                  -->
+                  <input type="number" class="field-input" id="r-capital"
+                         placeholder="10 000" oninput="updateInvest()">
                   <span class="field-unit">€</span>
                 </div>
               </div>
@@ -280,32 +401,34 @@
               <div class="field-group">
                 <label class="field-label">Versement mensuel</label>
                 <div class="field-input-wrap">
-                  <input type="number" class="field-input" id="r-monthly" placeholder="200" value=""
-                    oninput="updateInvest()">
+                  <input type="number" class="field-input" id="r-monthly"
+                         placeholder="200" oninput="updateInvest()">
                   <span class="field-unit">€/m</span>
                 </div>
               </div>
 
+              <!-- field-row : deux champs côte à côte -->
               <div class="field-row">
                 <div class="field-group">
                   <label class="field-label">Taux annuel brut</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="r-rate" placeholder="7" value="" step="0.1"
-                      oninput="updateInvest()">
+                    <input type="number" class="field-input" id="r-rate"
+                           placeholder="7" step="0.1" oninput="updateInvest()">
                     <span class="field-unit">%</span>
                   </div>
                 </div>
                 <div class="field-group">
                   <label class="field-label">Durée</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="r-years" placeholder="20" value=""
-                      oninput="updateInvest()">
+                    <input type="number" class="field-input" id="r-years"
+                           placeholder="20" oninput="updateInvest()">
                     <span class="field-unit">ans</span>
                   </div>
                 </div>
               </div>
-            </div>
+            </div><!-- fin colonne 1 -->
 
+            <!-- Colonne 2 : Paramètres avancés -->
             <div class="panel-section">
               <div class="panel-section-title">⚙ Paramètres avancés</div>
 
@@ -313,16 +436,16 @@
                 <div class="field-group">
                   <label class="field-label">Inflation estimée</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="r-inflation" placeholder="2" value="" step="0.1"
-                      oninput="updateInvest()">
+                    <input type="number" class="field-input" id="r-inflation"
+                           placeholder="2" step="0.1" oninput="updateInvest()">
                     <span class="field-unit">%</span>
                   </div>
                 </div>
                 <div class="field-group">
                   <label class="field-label">Frais de gestion</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="r-frais" placeholder="0.5" value="" step="0.1"
-                      oninput="updateInvest()">
+                    <input type="number" class="field-input" id="r-frais"
+                           placeholder="0.5" step="0.1" oninput="updateInvest()">
                     <span class="field-unit">%/an</span>
                   </div>
                 </div>
@@ -331,6 +454,7 @@
               <div class="field-row">
                 <div class="field-group">
                   <label class="field-label">TMI fiscal</label>
+                  <!-- select : liste déroulante. onchange déclenche le recalcul -->
                   <select class="field-select" id="r-tmi" onchange="updateInvest()">
                     <option value="0">0 % (PEA/AV exo)</option>
                     <option value="0.128" selected>12,8 % (PFU flat tax)</option>
@@ -342,14 +466,15 @@
                 <div class="field-group">
                   <label class="field-label">Revalorisation vers.</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="r-revalor" placeholder="0" value="" step="0.5"
-                      oninput="updateInvest()">
+                    <input type="number" class="field-input" id="r-revalor"
+                           placeholder="0" step="0.5" oninput="updateInvest()">
                     <span class="field-unit">%/an</span>
                   </div>
                 </div>
               </div>
-            </div>
+            </div><!-- fin colonne 2 -->
 
+            <!-- Colonne 3 : Enveloppe fiscale -->
             <div class="panel-section">
               <div class="panel-section-title">🏦 Fiscalité</div>
               <div class="field-group">
@@ -361,14 +486,16 @@
                   <option value="per">PER — Plan d'Épargne Retraite</option>
                 </select>
               </div>
-
+              <!-- Bloc d'info sur l'enveloppe : rempli dynamiquement par updateEnvelopeInfo() -->
               <div id="envelope-info-box" class="envelope-info"></div>
-            </div>
-          </div>
+            </div><!-- fin colonne 3 -->
 
-          <!-- Résultats synthèse -->
+          </div><!-- fin three-col-layout paramètres -->
+
+          <!-- RÉSULTATS : grille de cellules automatique -->
           <div class="res-grid-auto mb-20">
             <div class="res-cell highlight">
+              <!-- Ces id sont mis à jour par le JS (updateInvest) -->
               <div class="rc-val" style="color:var(--acc-l)" id="res-final">—</div>
               <div class="rc-lbl">Capital final brut</div>
             </div>
@@ -398,8 +525,13 @@
             </div>
           </div>
 
-          <!-- Graphiques -->
+          <!-- GRAPHIQUES avec onglets -->
           <div class="charts-panel">
+
+            <!--
+              Onglets : chaque bouton appelle switchInvestTab('nomOnglet', this).
+              "this" passe le bouton lui-même pour lui appliquer la classe "active".
+            -->
             <div class="chart-tabs" id="invest-chart-tabs">
               <button class="ct-tab active" onclick="switchInvestTab('evolution',this)">Évolution</button>
               <button class="ct-tab" onclick="switchInvestTab('multitaux',this)">Multi-taux</button>
@@ -409,36 +541,54 @@
               <button class="ct-tab" onclick="switchInvestTab('montecarlo',this)">Monte Carlo</button>
             </div>
 
+            <!-- Panneau Évolution -->
             <div class="chart-pane active" id="pane-evolution">
-              <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="invest-chart"></canvas></div></div>
+              <div class="chart-scroll-wrap">
+                <div class="chart-area">
+                  <!-- canvas : zone de dessin de Chart.js. L'id permet au JS de le retrouver. -->
+                  <canvas id="invest-chart"></canvas>
+                </div>
+              </div>
             </div>
+
+            <!-- Panneau Multi-taux -->
             <div class="chart-pane" id="pane-multitaux">
               <p class="chart-note">Comparaison 3% · 5% · 7% · 10% · 12% — avec vos paramètres de frais et durée</p>
               <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="rend-multi-chart"></canvas></div></div>
             </div>
+
+            <!-- Panneau Composition -->
             <div class="chart-pane" id="pane-compo">
               <p class="chart-note">Répartition versements / intérêts selon différents taux</p>
               <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="rend-compo-chart"></canvas></div></div>
             </div>
+
+            <!-- Panneau Inflation -->
             <div class="chart-pane" id="pane-inflation">
               <p class="chart-note">Valeur nominale vs valeur réelle — érosion du pouvoir d'achat</p>
               <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="rend-inflation-chart"></canvas></div></div>
             </div>
+
+            <!-- Panneau Amortissement (tableau HTML, pas canvas) -->
             <div class="chart-pane" id="pane-amortissement">
               <p class="chart-note">Progression annuelle du capital — versements, intérêts et solde par tranche</p>
+              <!-- Ce div est rempli dynamiquement par renderAmortTable() dans le JS -->
               <div id="amort-table-container" style="max-height:360px;overflow-y:auto;margin-top:8px"></div>
             </div>
+
+            <!-- Panneau Monte Carlo -->
             <div class="chart-pane" id="pane-montecarlo">
-              <p class="chart-note">Simulation de 200 trajectoires aléatoires — distribution des résultats possibles
-                selon la volatilité estimée</p>
+              <p class="chart-note">Simulation de 200 trajectoires aléatoires — distribution des résultats possibles selon la volatilité estimée</p>
               <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="invest-mc-chart"></canvas></div></div>
+              <!-- KPIs Monte Carlo : rempli par renderMonteCarlo() -->
               <div id="mc-kpis" class="detail-kpis" style="margin-top:14px"></div>
             </div>
 
-            <!-- Détail annuel bar -->
+            <!-- Bloc Détail annuel (toujours visible, en dehors des onglets) -->
             <div class="card-block mt-16">
               <div class="block-header" style="justify-content:space-between">
-                <span>Détail annuel — versements & intérêts</span>
+                <span>Détail annuel — versements &amp; intérêts</span>
+                <!-- Boutons pour changer le taux affiché dans ce graphique -->
                 <div class="taux-btns">
                   <button class="tb" onclick="setRendTaux(5,this)">5%</button>
                   <button class="tb active" onclick="setRendTaux(7,this)">7%</button>
@@ -446,13 +596,20 @@
                 </div>
               </div>
               <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="rend-detail-chart"></canvas></div></div>
+              <!-- KPIs sous le graphique : remplis par renderRendDetail() -->
               <div id="rend-detail-kpis" class="detail-kpis"></div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- ══ RETRAITE ══ -->
+          </div><!-- fin .charts-panel -->
+        </div><!-- fin .vertical-layout -->
+      </div><!-- fin #invest-page -->
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE : RETRAITE
+           ══════════════════════════════════════════
+           Calculateur de retraite avec sliders interactifs.
+      -->
       <div id="retraite-page" class="page">
         <div class="page-intro">
           <div class="page-intro-text">
@@ -461,6 +618,7 @@
           </div>
         </div>
 
+        <!-- KPIs principaux (mis à jour par updateRetraite()) -->
         <div class="kpi-row-4">
           <div class="kpi-slim">
             <div class="ks-val" id="ret-capital-final">—</div>
@@ -481,82 +639,115 @@
         </div>
 
         <div class="vertical-layout">
+          <!-- PARAMÈTRES RETRAITE : 3 colonnes de sliders -->
           <div class="three-col-layout mb-20">
+
+            <!-- Colonne 1 : Profil (âges) -->
             <div class="panel-section">
               <div class="panel-section-title">◇ Profil</div>
+
+              <!--
+                slider-group : groupe slider + label + valeur affichée.
+                oninput="updateRetraite()" : recalcule à chaque déplacement du curseur.
+                L'id "v-age-actuel" affiche la valeur en cours (mis à jour par le JS).
+              -->
               <div class="slider-group">
-                <div class="sg-head"><label>Âge actuel</label><strong id="v-age-actuel">—</strong></div>
-                <input type="range" class="slider" id="ret-age-actuel" min="18" max="64" value="35"
-                  oninput="updateRetraite()">
+                <div class="sg-head">
+                  <label>Âge actuel</label>
+                  <strong id="v-age-actuel">—</strong>
+                </div>
+                <input type="range" class="slider" id="ret-age-actuel"
+                       min="18" max="64" value="35" oninput="updateRetraite()">
                 <div class="sg-range"><span>18 ans</span><span>64 ans</span></div>
               </div>
+
               <div class="slider-group">
-                <div class="sg-head"><label>Départ à la retraite</label><strong id="v-age-retraite">—</strong></div>
-                <input type="range" class="slider" id="ret-age-retraite" min="50" max="75" value="65"
-                  oninput="updateRetraite()">
+                <div class="sg-head">
+                  <label>Départ à la retraite</label>
+                  <strong id="v-age-retraite">—</strong>
+                </div>
+                <input type="range" class="slider" id="ret-age-retraite"
+                       min="50" max="75" value="65" oninput="updateRetraite()">
                 <div class="sg-range"><span>50 ans</span><span>75 ans</span></div>
               </div>
+
               <div class="slider-group">
-                <div class="sg-head"><label>Espérance de vie</label><strong id="v-esperance">—</strong></div>
-                <input type="range" class="slider" id="ret-esperance" min="65" max="100" value="85"
-                  oninput="updateRetraite()">
+                <div class="sg-head">
+                  <label>Espérance de vie</label>
+                  <strong id="v-esperance">—</strong>
+                </div>
+                <input type="range" class="slider" id="ret-esperance"
+                       min="65" max="100" value="85" oninput="updateRetraite()">
                 <div class="sg-range"><span>65 ans</span><span>100 ans</span></div>
               </div>
             </div>
 
+            <!-- Colonne 2 : Épargne -->
             <div class="panel-section">
               <div class="panel-section-title">○ Épargne</div>
+
               <div class="slider-group">
                 <div class="sg-head"><label>Capital déjà épargné</label><strong id="v-capital-actuel">—</strong></div>
-                <input type="range" class="slider" id="ret-capital-actuel" min="0" max="500000" step="500" value="0"
-                  oninput="updateRetraite()">
+                <input type="range" class="slider" id="ret-capital-actuel"
+                       min="0" max="500000" step="500" value="0" oninput="updateRetraite()">
                 <div class="sg-range"><span>0 €</span><span>500 000 €</span></div>
               </div>
+
               <div class="slider-group">
                 <div class="sg-head"><label>Épargne mensuelle</label><strong id="v-epargne-mensuelle">—</strong></div>
-                <input type="range" class="slider" id="ret-epargne-mensuelle" min="0" max="5000" step="50" value="0"
-                  oninput="updateRetraite()">
+                <input type="range" class="slider" id="ret-epargne-mensuelle"
+                       min="0" max="5000" step="50" value="0" oninput="updateRetraite()">
                 <div class="sg-range"><span>0 €</span><span>5 000 €</span></div>
               </div>
+
               <div class="slider-group">
                 <div class="sg-head"><label>Taux de rendement annuel</label><strong id="v-taux-ret">—</strong></div>
-                <input type="range" class="slider" id="ret-taux" min="0.5" max="15" step="0.5" value="0.5"
-                  oninput="updateRetraite()">
+                <input type="range" class="slider" id="ret-taux"
+                       min="0.5" max="15" step="0.5" value="0.5" oninput="updateRetraite()">
                 <div class="sg-range"><span>0,5 %</span><span>15 %</span></div>
               </div>
+
               <div class="slider-group">
                 <div class="sg-head"><label>Inflation estimée</label><strong id="v-inflation">—</strong></div>
-                <input type="range" class="slider" id="ret-inflation" min="0" max="8" step="0.5" value="0"
-                  oninput="updateRetraite()">
+                <input type="range" class="slider" id="ret-inflation"
+                       min="0" max="8" step="0.5" value="0" oninput="updateRetraite()">
                 <div class="sg-range"><span>0 %</span><span>8 %</span></div>
               </div>
+
               <div class="slider-group">
-                <div class="sg-head"><label>Revalorisation annuelle épargne</label><strong id="v-revalor-ret">—</strong>
-                </div>
-                <input type="range" class="slider" id="ret-revalor" min="0" max="10" step="0.5" value="0"
-                  oninput="updateRetraite()">
+                <div class="sg-head"><label>Revalorisation annuelle épargne</label><strong id="v-revalor-ret">—</strong></div>
+                <input type="range" class="slider" id="ret-revalor"
+                       min="0" max="10" step="0.5" value="0" oninput="updateRetraite()">
                 <div class="sg-range"><span>0 %</span><span>10 %</span></div>
               </div>
             </div>
 
+            <!-- Colonne 3 : Objectif de rente -->
             <div class="panel-section">
               <div class="panel-section-title">◈ Objectif mensuel à la retraite</div>
+
               <div class="slider-group">
                 <div class="sg-head"><label>Revenu mensuel souhaité</label><strong id="v-objectif">—</strong></div>
-                <input type="range" class="slider" id="ret-objectif" min="500" max="10000" step="100" value="500"
-                  oninput="updateRetraite()">
+                <input type="range" class="slider" id="ret-objectif"
+                       min="500" max="10000" step="100" value="500" oninput="updateRetraite()">
                 <div class="sg-range"><span>500 €</span><span>10 000 €</span></div>
               </div>
+
+              <!-- Barre de progression vers l'objectif (largeur mise à jour par le JS) -->
               <div class="progress-track">
                 <div class="pt-bar-bg">
                   <div id="ret-progress-bar" class="pt-bar-fill"></div>
                 </div>
                 <span id="ret-progress-pct" class="pt-pct">0 %</span>
               </div>
+
+              <!-- Message d'atteinte/échec de l'objectif (rempli par le JS) -->
               <div id="ret-objectif-msg" class="obj-msg"></div>
             </div>
-          </div>
 
+          </div><!-- fin three-col-layout retraite -->
+
+          <!-- RÉSULTATS RETRAITE -->
           <div class="charts-panel">
             <div class="card-block">
               <div class="block-header"><span>Résultats détaillés</span></div>
@@ -580,27 +771,36 @@
               </div>
             </div>
 
+            <!-- Scénarios comparés (rempli dynamiquement par le JS) -->
             <div class="card-block mt-16">
               <div class="block-header"><span>Scénarios comparés</span></div>
               <div id="ret-scenarios"></div>
             </div>
 
+            <!-- Graphique d'évolution de l'épargne -->
             <div class="card-block mt-16">
               <div class="block-header"><span>Évolution de l'épargne</span></div>
               <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="retraite-chart"></canvas></div></div>
             </div>
 
+            <!-- Graphique de décaissement -->
             <div class="card-block mt-16">
               <div class="block-header gold-dot"><span>Trajectoire de décaissement à la retraite</span></div>
-              <p class="chart-note" style="margin-bottom:12px">Évolution du capital pendant la phase de retraite selon
-                différents taux de retrait (3% · 4% · 5% · 6%)</p>
+              <p class="chart-note" style="margin-bottom:12px">
+                Évolution du capital pendant la phase de retraite selon différents taux de retrait (3% · 4% · 5% · 6%)
+              </p>
               <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="retraite-decaissement-chart"></canvas></div></div>
             </div>
           </div>
         </div>
-      </div>
+      </div><!-- fin #retraite-page -->
 
-      <!-- ══ ANALYSE / PATRIMOINE ══ -->
+
+      <!-- ══════════════════════════════════════════
+           PAGE : PATRIMOINE (analyse)
+           ══════════════════════════════════════════
+           Bilan actifs / passifs avec saisie libre.
+      -->
       <div id="analyse-page" class="page">
         <div class="page-intro">
           <div class="page-intro-text">
@@ -609,6 +809,7 @@
           </div>
         </div>
 
+        <!-- KPIs patrimoine -->
         <div class="kpi-row-4">
           <div class="kpi-slim teal">
             <div class="ks-val" id="patri-net">—</div>
@@ -628,39 +829,48 @@
           </div>
         </div>
 
+        <!-- Saisie actifs / passifs côte à côte -->
         <div class="two-col-layout mb-20">
+
+          <!-- Actifs -->
           <div class="card-block">
             <div class="block-header teal-dot"><span>Actifs</span></div>
+            <!--
+              Liste des lignes d'actifs.
+              Chaque ligne a : libellé + montant + bouton supprimer.
+              Le JS peut ajouter des lignes via addPatriRow('actifs').
+            -->
             <div id="patri-actifs-list" class="patri-list">
               <div class="patri-row">
-                <input class="field-input flex2" placeholder="Épargne (livrets, PEA…)" value=""
-                  oninput="updatePatrimoine()">
+                <input class="field-input flex2" placeholder="Épargne (livrets, PEA…)" oninput="updatePatrimoine()">
                 <input class="field-input flex1" type="number" value="0" oninput="updatePatrimoine()">
                 <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
               </div>
               <div class="patri-row">
-                <input class="field-input flex2" placeholder="Immobilier" value=""
-                  oninput="updatePatrimoine()">
+                <input class="field-input flex2" placeholder="Immobilier" oninput="updatePatrimoine()">
                 <input class="field-input flex1" type="number" value="0" oninput="updatePatrimoine()">
                 <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
               </div>
             </div>
             <button class="add-row-btn" onclick="addPatriRow('actifs')">+ Ajouter un actif</button>
           </div>
+
+          <!-- Passifs -->
           <div class="card-block">
             <div class="block-header red-dot"><span>Passifs</span></div>
             <div id="patri-passifs-list" class="patri-list">
               <div class="patri-row">
-                <input class="field-input flex2" placeholder="Crédit immobilier" value=""
-                  oninput="updatePatrimoine()">
+                <input class="field-input flex2" placeholder="Crédit immobilier" oninput="updatePatrimoine()">
                 <input class="field-input flex1" type="number" value="0" oninput="updatePatrimoine()">
                 <button class="del-btn" onclick="this.parentElement.remove();updatePatrimoine()">✕</button>
               </div>
             </div>
             <button class="add-row-btn" onclick="addPatriRow('passifs')">+ Ajouter un passif</button>
           </div>
+
         </div>
 
+        <!-- Graphiques patrimoine : 3 donuts -->
         <div class="three-col-layout mb-20">
           <div class="card-block">
             <div class="block-header"><span>Répartition actifs</span></div>
@@ -676,12 +886,14 @@
           </div>
         </div>
 
+        <!-- Barres de santé financière -->
         <div class="card-block">
           <div class="block-header purple-dot"><span>Santé financière</span></div>
           <div class="health-bars">
             <div class="hb-row">
               <span class="hb-lbl">Actifs</span>
               <div class="hb-track">
+                <!-- Largeur mise à jour par le JS -->
                 <div id="patri-bar-actifs" class="hb-fill teal"></div>
               </div>
               <span id="patri-bar-actifs-lbl" class="hb-val teal">—</span>
@@ -694,11 +906,17 @@
               <span id="patri-bar-passifs-lbl" class="hb-val red">—</span>
             </div>
           </div>
+          <!-- Message de santé (rempli par le JS selon le taux d'endettement) -->
           <div id="patri-health-msg" class="health-msg"></div>
         </div>
-      </div>
+      </div><!-- fin #analyse-page -->
 
-      <!-- ══ BUDGET ══ -->
+
+      <!-- ══════════════════════════════════════════
+           PAGE : BUDGET
+           ══════════════════════════════════════════
+           Gestion revenus / dépenses mensuels.
+      -->
       <div id="budget-page" class="page">
         <div class="page-intro">
           <div class="page-intro-text">
@@ -707,9 +925,11 @@
           </div>
         </div>
 
+        <!-- Listes revenus / dépenses côte à côte -->
         <div class="two-col-layout">
           <div class="card-block">
             <div class="block-header teal-dot"><span>Revenus</span></div>
+            <!-- Rempli dynamiquement par renderBudgetList() dans le JS -->
             <div id="revenus-list"></div>
             <button class="add-row-btn" onclick="addRevenu()">+ Ajouter un revenu</button>
           </div>
@@ -720,6 +940,7 @@
           </div>
         </div>
 
+        <!-- Résumé budget : Total revenus / dépenses / reste à vivre -->
         <div class="budget-summary">
           <div class="bs-item teal">
             <div class="bs-val" id="b-revenus">0 €</div>
@@ -735,10 +956,12 @@
           </div>
         </div>
 
+        <!-- Graphique donut dépenses + barres -->
         <div class="card-block mt-16">
           <div class="block-header"><span>Répartition des dépenses</span></div>
           <div class="budget-charts">
             <div class="chart-area-sm"><canvas id="budget-pie"></canvas></div>
+            <!-- Barres de progression par dépense (remplies par le JS) -->
             <div id="budget-bars" class="budget-bar-list"></div>
           </div>
         </div>
@@ -747,21 +970,29 @@
         <div class="card-block mt-16">
           <div class="block-header gold-dot"><span>Règle 50 / 30 / 20 — analyse budgétaire</span></div>
           <p class="chart-note">Idéalement : 50% en besoins essentiels, 30% en loisirs/envies, 20% en épargne.</p>
-          <div id="budget-503020" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+          <!-- Grille 3 colonnes remplie par renderBudget503020() -->
+          <div id="budget-503020" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px"></div>
+          <div class="chart-scroll-wrap">
+            <div class="chart-area" style="height:220px">
+              <canvas id="budget-503020-chart"></canvas>
+            </div>
           </div>
-          <div class="chart-scroll-wrap"><div class="chart-area" style="height:220px"><canvas id="budget-503020-chart"></canvas></div></div>
         </div>
 
-        <!-- Projection épargne mensuelle -->
+        <!-- Projection épargne sur 10 ans -->
         <div class="card-block mt-16">
           <div class="block-header purple-dot"><span>Projection de l'épargne sur 10 ans</span></div>
-          <p class="chart-note">Simulation de votre reste à vivre investi chaque mois à différents taux de rendement.
-          </p>
+          <p class="chart-note">Simulation de votre reste à vivre investi chaque mois à différents taux de rendement.</p>
           <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="budget-projection-chart"></canvas></div></div>
         </div>
-      </div>
+      </div><!-- fin #budget-page -->
 
-      <!-- ══ COMPARAISON ══ -->
+
+      <!-- ══════════════════════════════════════════
+           PAGE : COMPARAISON (compare)
+           ══════════════════════════════════════════
+           Compare deux scénarios A et B côte à côte.
+      -->
       <div id="compare-page" class="page">
         <div class="page-intro">
           <div class="page-intro-text">
@@ -770,11 +1001,14 @@
           </div>
         </div>
 
+        <!-- Deux blocs côte à côte avec un "VS" au centre -->
         <div class="compare-panels">
-          <!-- Scénario A -->
+
+          <!-- SCÉNARIO A -->
           <div class="compare-block sc-a">
             <div class="sc-header sc-a-h">
               <span class="sc-letter">A</span>
+              <!-- Nom du scénario modifiable par l'utilisateur -->
               <input class="sc-name-input" id="ca-name" value="Scénario A" placeholder="Nom du scénario">
             </div>
             <div class="sc-fields">
@@ -791,8 +1025,7 @@
               <div class="field-row">
                 <div class="field-group">
                   <label class="field-label">Taux annuel brut (%)</label>
-                  <input type="number" class="field-input" id="ca-rate" placeholder="0" step="0.1"
-                    oninput="updateCompare()">
+                  <input type="number" class="field-input" id="ca-rate" placeholder="0" step="0.1" oninput="updateCompare()">
                 </div>
                 <div class="field-group">
                   <label class="field-label">Durée (années)</label>
@@ -802,25 +1035,21 @@
               <div class="field-row">
                 <div class="field-group">
                   <label class="field-label">Inflation (%)</label>
-                  <input type="number" class="field-input" id="ca-inflation" placeholder="2" step="0.1"
-                    oninput="updateCompare()">
+                  <input type="number" class="field-input" id="ca-inflation" placeholder="2" step="0.1" oninput="updateCompare()">
                 </div>
                 <div class="field-group">
                   <label class="field-label">Frais gestion (%/an)</label>
-                  <input type="number" class="field-input" id="ca-frais" placeholder="0" step="0.1"
-                    oninput="updateCompare()">
+                  <input type="number" class="field-input" id="ca-frais" placeholder="0" step="0.1" oninput="updateCompare()">
                 </div>
               </div>
               <div class="field-row">
                 <div class="field-group">
                   <label class="field-label">TMI fiscal (%)</label>
-                  <input type="number" class="field-input" id="ca-tmi" placeholder="12.8" step="0.1"
-                    oninput="updateCompare()">
+                  <input type="number" class="field-input" id="ca-tmi" placeholder="12.8" step="0.1" oninput="updateCompare()">
                 </div>
                 <div class="field-group">
                   <label class="field-label">Revalorisation vers. (%/an)</label>
-                  <input type="number" class="field-input" id="ca-revalor" placeholder="0" step="0.5"
-                    oninput="updateCompare()">
+                  <input type="number" class="field-input" id="ca-revalor" placeholder="0" step="0.5" oninput="updateCompare()">
                 </div>
               </div>
               <div class="field-group">
@@ -833,20 +1062,22 @@
                 </select>
               </div>
             </div>
+            <!-- Résultats scénario A (mis à jour par updateCompare()) -->
             <div class="sc-results">
-              <div class="scr-item"><span>Capital brut</span><span class="scr-val blue" id="ca-result">—</span></div>
-              <div class="scr-item"><span>Capital net</span><span class="scr-val" id="ca-net">—</span></div>
-              <div class="scr-item"><span>Capital réel</span><span class="scr-val" id="ca-reel">—</span></div>
+              <div class="scr-item"><span>Capital brut</span><span class="scr-val blue"   id="ca-result">—</span></div>
+              <div class="scr-item"><span>Capital net</span> <span class="scr-val"         id="ca-net">—</span></div>
+              <div class="scr-item"><span>Capital réel</span><span class="scr-val"         id="ca-reel">—</span></div>
               <div class="scr-item"><span>Rente/mois (4%)</span><span class="scr-val teal" id="ca-rente">—</span></div>
-              <div class="scr-item"><span>Total versé</span><span class="scr-val" id="ca-versed">—</span></div>
-              <div class="scr-item"><span>Gains nets</span><span class="scr-val em" id="ca-gains">—</span></div>
-              <div class="scr-item"><span>Multiplicateur</span><span class="scr-val gold" id="ca-multi">—</span></div>
+              <div class="scr-item"><span>Total versé</span> <span class="scr-val"         id="ca-versed">—</span></div>
+              <div class="scr-item"><span>Gains nets</span>  <span class="scr-val em"      id="ca-gains">—</span></div>
+              <div class="scr-item"><span>Multiplicateur</span><span class="scr-val gold"  id="ca-multi">—</span></div>
             </div>
           </div>
 
+          <!-- Badge VS central -->
           <div class="vs-badge">VS</div>
 
-          <!-- Scénario B -->
+          <!-- SCÉNARIO B -->
           <div class="compare-block sc-b">
             <div class="sc-header sc-b-h">
               <span class="sc-letter b">B</span>
@@ -866,8 +1097,7 @@
               <div class="field-row">
                 <div class="field-group">
                   <label class="field-label">Taux annuel brut (%)</label>
-                  <input type="number" class="field-input" id="cb-rate" placeholder="0" step="0.1"
-                    oninput="updateCompare()">
+                  <input type="number" class="field-input" id="cb-rate" placeholder="0" step="0.1" oninput="updateCompare()">
                 </div>
                 <div class="field-group">
                   <label class="field-label">Durée (années)</label>
@@ -877,25 +1107,21 @@
               <div class="field-row">
                 <div class="field-group">
                   <label class="field-label">Inflation (%)</label>
-                  <input type="number" class="field-input" id="cb-inflation" placeholder="2" step="0.1"
-                    oninput="updateCompare()">
+                  <input type="number" class="field-input" id="cb-inflation" placeholder="2" step="0.1" oninput="updateCompare()">
                 </div>
                 <div class="field-group">
                   <label class="field-label">Frais gestion (%/an)</label>
-                  <input type="number" class="field-input" id="cb-frais" placeholder="0" step="0.1"
-                    oninput="updateCompare()">
+                  <input type="number" class="field-input" id="cb-frais" placeholder="0" step="0.1" oninput="updateCompare()">
                 </div>
               </div>
               <div class="field-row">
                 <div class="field-group">
                   <label class="field-label">TMI fiscal (%)</label>
-                  <input type="number" class="field-input" id="cb-tmi" placeholder="30" step="0.1"
-                    oninput="updateCompare()">
+                  <input type="number" class="field-input" id="cb-tmi" placeholder="30" step="0.1" oninput="updateCompare()">
                 </div>
                 <div class="field-group">
                   <label class="field-label">Revalorisation vers. (%/an)</label>
-                  <input type="number" class="field-input" id="cb-revalor" placeholder="0" step="0.5"
-                    oninput="updateCompare()">
+                  <input type="number" class="field-input" id="cb-revalor" placeholder="0" step="0.5" oninput="updateCompare()">
                 </div>
               </div>
               <div class="field-group">
@@ -908,18 +1134,21 @@
                 </select>
               </div>
             </div>
+            <!-- Résultats scénario B -->
             <div class="sc-results">
-              <div class="scr-item"><span>Capital brut</span><span class="scr-val purple" id="cb-result">—</span></div>
-              <div class="scr-item"><span>Capital net</span><span class="scr-val" id="cb-net">—</span></div>
-              <div class="scr-item"><span>Capital réel</span><span class="scr-val" id="cb-reel">—</span></div>
-              <div class="scr-item"><span>Rente/mois (4%)</span><span class="scr-val teal" id="cb-rente">—</span></div>
-              <div class="scr-item"><span>Total versé</span><span class="scr-val" id="cb-versed">—</span></div>
-              <div class="scr-item"><span>Gains nets</span><span class="scr-val em" id="cb-gains">—</span></div>
-              <div class="scr-item"><span>Multiplicateur</span><span class="scr-val gold" id="cb-multi">—</span></div>
+              <div class="scr-item"><span>Capital brut</span>  <span class="scr-val purple" id="cb-result">—</span></div>
+              <div class="scr-item"><span>Capital net</span>   <span class="scr-val"         id="cb-net">—</span></div>
+              <div class="scr-item"><span>Capital réel</span>  <span class="scr-val"         id="cb-reel">—</span></div>
+              <div class="scr-item"><span>Rente/mois (4%)</span><span class="scr-val teal"   id="cb-rente">—</span></div>
+              <div class="scr-item"><span>Total versé</span>   <span class="scr-val"         id="cb-versed">—</span></div>
+              <div class="scr-item"><span>Gains nets</span>    <span class="scr-val em"      id="cb-gains">—</span></div>
+              <div class="scr-item"><span>Multiplicateur</span><span class="scr-val gold"    id="cb-multi">—</span></div>
             </div>
           </div>
-        </div>
 
+        </div><!-- fin .compare-panels -->
+
+        <!-- Graphiques comparaison : 2×2 -->
         <div class="compare-charts-grid mt-20">
           <div class="card-block">
             <div class="block-header"><span>Évolution capitaux</span></div>
@@ -939,13 +1168,19 @@
           </div>
         </div>
 
+        <!-- Tableau différentiel A vs B (rempli par le JS) -->
         <div class="card-block mt-16">
           <div class="block-header"><span>Analyse différentielle A vs B</span></div>
           <div id="compare-delta" class="delta-grid"></div>
         </div>
-      </div>
+      </div><!-- fin #compare-page -->
 
-      <!-- ══ ALLOCATION DE PORTEFEUILLE ══ -->
+
+      <!-- ══════════════════════════════════════════
+           PAGE : ALLOCATION DE PORTEFEUILLE
+           ══════════════════════════════════════════
+           Construction et simulation d'une allocation d'actifs.
+      -->
       <div id="allocation-page" class="page">
         <div class="page-intro">
           <div class="page-intro-text">
@@ -954,7 +1189,7 @@
           </div>
         </div>
 
-        <!-- KPIs portefeuille -->
+        <!-- KPIs allocation (mis à jour par updateAllocation()) -->
         <div class="kpi-row-4" id="alloc-kpis">
           <div class="kpi-slim">
             <div class="ks-val" id="alloc-rendement">—</div>
@@ -975,62 +1210,61 @@
         </div>
 
         <div class="vertical-layout">
-          <!-- Paramètres allocation -->
+          <!-- PARAMÈTRES ALLOCATION : 3 colonnes -->
           <div class="three-col-layout mb-20">
+
+            <!-- Colonne 1 : Curseurs d'allocation (total doit = 100%) -->
             <div class="panel-section">
               <div class="panel-section-title">▲ Allocation cible (%)</div>
-              <p style="font-size:0.73rem;color:var(--t2);margin-bottom:14px">Ajustez les curseurs — le total doit faire
-                100 %.</p>
+              <p style="font-size:0.73rem;color:var(--t2);margin-bottom:14px">
+                Ajustez les curseurs — le total doit faire 100 %.
+              </p>
 
+              <!-- Un curseur par classe d'actif.
+                   L'id "v-alloc-actions" affiche la valeur courante (mis à jour par JS). -->
               <div class="slider-group">
                 <div class="sg-head"><label>Actions (ETF monde / actions)</label><strong id="v-alloc-actions">0 %</strong></div>
-                <input type="range" class="slider" id="alloc-actions" min="0" max="100" step="5" value="0"
-                  oninput="updateAllocation()">
+                <input type="range" class="slider" id="alloc-actions" min="0" max="100" step="5" value="0" oninput="updateAllocation()">
               </div>
               <div class="slider-group">
                 <div class="sg-head"><label>Obligations / fonds €</label><strong id="v-alloc-oblig">0 %</strong></div>
-                <input type="range" class="slider" id="alloc-oblig" min="0" max="100" step="5" value="0"
-                  oninput="updateAllocation()">
+                <input type="range" class="slider" id="alloc-oblig" min="0" max="100" step="5" value="0" oninput="updateAllocation()">
               </div>
               <div class="slider-group">
-                <div class="sg-head"><label>Immobilier (SCPI / REIT)</label><strong id="v-alloc-immo">0 %</strong>
-                </div>
-                <input type="range" class="slider" id="alloc-immo" min="0" max="100" step="5" value="0"
-                  oninput="updateAllocation()">
+                <div class="sg-head"><label>Immobilier (SCPI / REIT)</label><strong id="v-alloc-immo">0 %</strong></div>
+                <input type="range" class="slider" id="alloc-immo" min="0" max="100" step="5" value="0" oninput="updateAllocation()">
               </div>
               <div class="slider-group">
                 <div class="sg-head"><label>Cryptomonnaies</label><strong id="v-alloc-crypto">0 %</strong></div>
-                <input type="range" class="slider" id="alloc-crypto" min="0" max="100" step="5" value="0"
-                  oninput="updateAllocation()">
+                <input type="range" class="slider" id="alloc-crypto" min="0" max="100" step="5" value="0" oninput="updateAllocation()">
               </div>
               <div class="slider-group">
                 <div class="sg-head"><label>Liquidités / Livrets</label><strong id="v-alloc-cash">0 %</strong></div>
-                <input type="range" class="slider" id="alloc-cash" min="0" max="100" step="5" value="0"
-                  oninput="updateAllocation()">
+                <input type="range" class="slider" id="alloc-cash" min="0" max="100" step="5" value="0" oninput="updateAllocation()">
               </div>
 
+              <!-- Indicateur de total : passe en vert si = 100%, rouge sinon -->
               <div id="alloc-total-check"
-                style="margin-top:10px;padding:8px 12px;border-radius:var(--r-sm);font-size:0.78rem;background:var(--bg3)">
+                   style="margin-top:10px;padding:8px 12px;border-radius:var(--r-sm);font-size:0.78rem;background:var(--bg3)">
                 Total : <strong id="alloc-total">0 %</strong>
               </div>
             </div>
 
+            <!-- Colonne 2 : Paramètres de simulation -->
             <div class="panel-section">
               <div class="panel-section-title">⚙ Simulation</div>
               <div class="field-row">
                 <div class="field-group">
                   <label class="field-label">Capital initial</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="alloc-capital" placeholder="10000" value="0"
-                      oninput="updateAllocation()">
+                    <input type="number" class="field-input" id="alloc-capital" placeholder="10000" value="0" oninput="updateAllocation()">
                     <span class="field-unit">€</span>
                   </div>
                 </div>
                 <div class="field-group">
                   <label class="field-label">Apport mensuel</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="alloc-monthly" placeholder="300" value="0"
-                      oninput="updateAllocation()">
+                    <input type="number" class="field-input" id="alloc-monthly" placeholder="300" value="0" oninput="updateAllocation()">
                     <span class="field-unit">€/m</span>
                   </div>
                 </div>
@@ -1039,26 +1273,28 @@
                 <div class="field-group">
                   <label class="field-label">Horizon</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="alloc-years" placeholder="20" value="0"
-                      oninput="updateAllocation()">
+                    <input type="number" class="field-input" id="alloc-years" placeholder="20" value="0" oninput="updateAllocation()">
                     <span class="field-unit">ans</span>
                   </div>
                 </div>
                 <div class="field-group">
                   <label class="field-label">Taux sans risque</label>
                   <div class="field-input-wrap">
-                    <input type="number" class="field-input" id="alloc-rfree" placeholder="3" value="0" step="0.1"
-                      oninput="updateAllocation()">
+                    <input type="number" class="field-input" id="alloc-rfree" placeholder="3" value="0" step="0.1" oninput="updateAllocation()">
                     <span class="field-unit">%</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Profils prédéfinis -->
+            <!-- Colonne 3 : Profils prédéfinis -->
             <div class="panel-section">
               <div class="panel-section-title">◉ Profils prédéfinis</div>
               <div style="display:flex;flex-direction:column;gap:8px">
+                <!--
+                  onclick="applyProfile('prudent')" : applique le profil dans le JS
+                  (règle tous les curseurs aux valeurs du profil)
+                -->
                 <button class="alloc-profile-btn" onclick="applyProfile('prudent')">
                   <span style="color:var(--teal)">◎ Prudent</span>
                   <span style="color:var(--t2);font-size:0.7rem">Actions 20% · Oblig 50% · Immo 15% · Cash 15%</span>
@@ -1077,9 +1313,10 @@
                 </button>
               </div>
             </div>
-          </div>
 
-          <!-- Graphiques allocation -->
+          </div><!-- fin three-col-layout allocation -->
+
+          <!-- GRAPHIQUES ALLOCATION -->
           <div class="charts-panel">
             <div class="card-block">
               <div class="block-header"><span>Répartition du portefeuille</span></div>
@@ -1087,27 +1324,35 @@
             </div>
 
             <div class="card-block mt-16">
-              <div class="block-header gold-dot"><span>Projection selon scénarios (pessimiste / base / optimiste)</span>
-              </div>
+              <div class="block-header gold-dot"><span>Projection selon scénarios (pessimiste / base / optimiste)</span></div>
               <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="alloc-proj-chart"></canvas></div></div>
             </div>
 
             <div class="card-block mt-16">
               <div class="block-header purple-dot"><span>Profil risque / rendement par classe d'actif</span></div>
-              <div class="chart-scroll-wrap"><div class="chart-area" style="height:240px"><canvas id="alloc-scatter-chart"></canvas></div></div>
+              <div class="chart-scroll-wrap">
+                <div class="chart-area" style="height:240px">
+                  <canvas id="alloc-scatter-chart"></canvas>
+                </div>
+              </div>
             </div>
           </div>
+
         </div>
 
-        <!-- Analyse détaillée par classe -->
+        <!-- Tableau détaillé par classe d'actif (rempli par renderAllocDetailTable()) -->
         <div class="card-block mt-16">
           <div class="block-header teal-dot"><span>Analyse par classe d'actif</span></div>
           <div id="alloc-detail-table" style="overflow-x:auto"></div>
         </div>
-      </div>
+      </div><!-- fin #allocation-page -->
 
 
-<!-- ══ ACADÉMIE ══ -->
+      <!-- ══════════════════════════════════════════
+           PAGE : ACADÉMIE
+           ══════════════════════════════════════════
+           Glossaire financier interactif avec calculettes.
+      -->
       <div id="academie-page" class="page">
         <div class="page-intro">
           <div class="page-intro-text">
@@ -1116,8 +1361,12 @@
           </div>
         </div>
 
-        <!-- Filtres thématiques -->
+        <!-- Filtres par catégorie -->
         <div class="acad-filters" id="acad-filters">
+          <!--
+            onclick="filterAcad('tous', this)" : filtre les cartes par catégorie.
+            "this" passe le bouton pour lui appliquer le style actif.
+          -->
           <button class="acad-filter active" onclick="filterAcad('tous',this)">Tous</button>
           <button class="acad-filter" onclick="filterAcad('base',this)">◆ Bases</button>
           <button class="acad-filter" onclick="filterAcad('rendement',this)">◈ Rendement</button>
@@ -1130,19 +1379,29 @@
 
         <!-- Barre de recherche -->
         <div class="acad-search-wrap">
-          <input class="acad-search" id="acad-search" type="text" placeholder="Rechercher un terme… ex: ETF, dividende, volatilité" oninput="searchAcad(this.value)">
+          <!--
+            oninput="searchAcad(this.value)" : filtre les cartes à chaque frappe.
+            this.value = texte actuellement tapé dans le champ.
+          -->
+          <input class="acad-search" id="acad-search" type="text"
+                 placeholder="Rechercher un terme… ex: ETF, dividende, volatilité"
+                 oninput="searchAcad(this.value)">
           <span class="acad-search-icon">⌕</span>
         </div>
 
-        <!-- Compteur -->
-        <div id="acad-count" style="font-size:0.7rem;color:var(--t3);font-family:var(--font-mono);margin-bottom:16px"></div>
+        <!-- Compteur de résultats (mis à jour par renderAcadGrid()) -->
+        <div id="acad-count"
+             style="font-size:0.7rem;color:var(--t3);font-family:var(--font-mono);margin-bottom:16px">
+        </div>
 
-        <!-- Grille des termes -->
+        <!-- Grille des cartes de termes (remplie dynamiquement par renderAcadGrid()) -->
         <div class="acad-grid" id="acad-grid"></div>
 
-        <!-- Calculette interactive -->
+        <!-- Calculettes interactives -->
         <div class="card-block mt-16" id="acad-calc-section">
           <div class="block-header gold-dot"><span>Calculette interactive — visualisez les concepts</span></div>
+
+          <!-- Onglets de calculette -->
           <div class="acad-calc-tabs">
             <button class="acad-ctab active" onclick="switchCalcTab('ic',this)">Intérêts composés</button>
             <button class="acad-ctab" onclick="switchCalcTab('rr',this)">Règle 72</button>
@@ -1150,77 +1409,151 @@
             <button class="acad-ctab" onclick="switchCalcTab('sr',this)">Sharpe</button>
           </div>
 
-          <!-- Intérêts composés -->
+          <!-- Calculette : Intérêts composés -->
           <div class="acad-calc-pane active" id="calc-ic">
             <p class="chart-note">La magie des intérêts composés : vos gains génèrent eux-mêmes des gains.</p>
             <div class="acad-calc-grid">
               <div>
-                <div class="field-group"><label class="field-label">Capital initial (€)</label><div class="field-input-wrap"><input type="number" class="field-input" id="ic-capital" value="1000" oninput="calcIC()"><span class="field-unit">€</span></div></div>
-                <div class="field-group"><label class="field-label">Versement mensuel (€)</label><div class="field-input-wrap"><input type="number" class="field-input" id="ic-monthly" value="100" oninput="calcIC()"><span class="field-unit">€/m</span></div></div>
-                <div class="field-group"><label class="field-label">Taux annuel (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="ic-rate" value="7" step="0.5" oninput="calcIC()"><span class="field-unit">%</span></div></div>
-                <div class="field-group"><label class="field-label">Durée (années)</label><div class="field-input-wrap"><input type="number" class="field-input" id="ic-years" value="20" oninput="calcIC()"><span class="field-unit">ans</span></div></div>
+                <!-- oninput="calcIC()" : recalcule à chaque modification -->
+                <div class="field-group">
+                  <label class="field-label">Capital initial (€)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="ic-capital" value="1000" oninput="calcIC()">
+                    <span class="field-unit">€</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Versement mensuel (€)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="ic-monthly" value="100" oninput="calcIC()">
+                    <span class="field-unit">€/m</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Taux annuel (%)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="ic-rate" value="7" step="0.5" oninput="calcIC()">
+                    <span class="field-unit">%</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Durée (années)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="ic-years" value="20" oninput="calcIC()">
+                    <span class="field-unit">ans</span>
+                  </div>
+                </div>
               </div>
+              <!-- Résultats remplis par calcIC() -->
               <div id="ic-results" class="acad-calc-results"></div>
             </div>
           </div>
 
-          <!-- Règle 72 -->
+          <!-- Calculette : Règle 72 -->
           <div class="acad-calc-pane" id="calc-rr">
             <p class="chart-note">La règle des 72 : divisez 72 par le taux annuel pour estimer le temps de doublement de votre capital.</p>
             <div class="acad-calc-grid">
               <div>
-                <div class="field-group"><label class="field-label">Taux de rendement annuel (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="r72-rate" value="7" step="0.5" oninput="calcR72()"><span class="field-unit">%</span></div></div>
-                <div class="field-group"><label class="field-label">Capital initial (€)</label><div class="field-input-wrap"><input type="number" class="field-input" id="r72-capital" value="10000" oninput="calcR72()"><span class="field-unit">€</span></div></div>
+                <div class="field-group">
+                  <label class="field-label">Taux de rendement annuel (%)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="r72-rate" value="7" step="0.5" oninput="calcR72()">
+                    <span class="field-unit">%</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Capital initial (€)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="r72-capital" value="10000" oninput="calcR72()">
+                    <span class="field-unit">€</span>
+                  </div>
+                </div>
               </div>
               <div id="r72-results" class="acad-calc-results"></div>
             </div>
           </div>
 
-          <!-- Inflation -->
+          <!-- Calculette : Inflation -->
           <div class="acad-calc-pane" id="calc-inf">
             <p class="chart-note">L'inflation érode votre pouvoir d'achat. 100€ aujourd'hui vaudront moins demain.</p>
             <div class="acad-calc-grid">
               <div>
-                <div class="field-group"><label class="field-label">Montant aujourd'hui (€)</label><div class="field-input-wrap"><input type="number" class="field-input" id="inf-capital" value="10000" oninput="calcInf()"><span class="field-unit">€</span></div></div>
-                <div class="field-group"><label class="field-label">Taux d'inflation annuel (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="inf-rate" value="2.5" step="0.1" oninput="calcInf()"><span class="field-unit">%</span></div></div>
-                <div class="field-group"><label class="field-label">Horizon (années)</label><div class="field-input-wrap"><input type="number" class="field-input" id="inf-years" value="20" oninput="calcInf()"><span class="field-unit">ans</span></div></div>
+                <div class="field-group">
+                  <label class="field-label">Montant aujourd'hui (€)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="inf-capital" value="10000" oninput="calcInf()">
+                    <span class="field-unit">€</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Taux d'inflation annuel (%)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="inf-rate" value="2.5" step="0.1" oninput="calcInf()">
+                    <span class="field-unit">%</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Horizon (années)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="inf-years" value="20" oninput="calcInf()">
+                    <span class="field-unit">ans</span>
+                  </div>
+                </div>
               </div>
               <div id="inf-results" class="acad-calc-results"></div>
             </div>
           </div>
 
-          <!-- Sharpe -->
+          <!-- Calculette : Ratio de Sharpe -->
           <div class="acad-calc-pane" id="calc-sr">
             <p class="chart-note">Le ratio de Sharpe mesure la performance ajustée au risque : plus il est élevé, mieux c'est.</p>
             <div class="acad-calc-grid">
               <div>
-                <div class="field-group"><label class="field-label">Rendement du portefeuille (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="sr-rend" value="10" step="0.5" oninput="calcSharpe()"><span class="field-unit">%</span></div></div>
-                <div class="field-group"><label class="field-label">Taux sans risque (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="sr-rf" value="3" step="0.1" oninput="calcSharpe()"><span class="field-unit">%</span></div></div>
-                <div class="field-group"><label class="field-label">Volatilité annuelle (%)</label><div class="field-input-wrap"><input type="number" class="field-input" id="sr-vol" value="15" step="0.5" oninput="calcSharpe()"><span class="field-unit">%</span></div></div>
+                <div class="field-group">
+                  <label class="field-label">Rendement du portefeuille (%)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="sr-rend" value="10" step="0.5" oninput="calcSharpe()">
+                    <span class="field-unit">%</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Taux sans risque (%)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="sr-rf" value="3" step="0.1" oninput="calcSharpe()">
+                    <span class="field-unit">%</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Volatilité annuelle (%)</label>
+                  <div class="field-input-wrap">
+                    <input type="number" class="field-input" id="sr-vol" value="15" step="0.5" oninput="calcSharpe()">
+                    <span class="field-unit">%</span>
+                  </div>
+                </div>
               </div>
               <div id="sr-results" class="acad-calc-results"></div>
             </div>
           </div>
-        </div>
 
-        <!-- Lexique rapide -->
+        </div><!-- fin #acad-calc-section -->
+
+        <!-- Lexique express (rempli par renderLexique()) -->
         <div class="card-block mt-16">
           <div class="block-header purple-dot"><span>Lexique express — abréviations courantes</span></div>
           <div class="acad-lexique" id="acad-lexique"></div>
         </div>
 
-      </div>
+      </div><!-- fin #academie-page -->
 
 
+    </div><!-- fin .content -->
+  </main><!-- fin #main -->
 
-
-
-
-      
-    </div>
-  </main>
-
+  <!--
+    Script JS chargé à la FIN du body.
+    C'est important : le HTML doit être entièrement chargé avant que le JS
+    puisse accéder aux éléments (document.getElementById, etc.).
+  -->
   <script src="script.js"></script>
 </body>
-
 </html>
