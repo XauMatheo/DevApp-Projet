@@ -1,36 +1,19 @@
 <!DOCTYPE html>
-<!--
-  ══════════════════════════════════════════
-  WEALTH OS — index.html
-  Version commentée pour débutants
 
-  Ce fichier contient toute la STRUCTURE HTML de l'application.
-  Il définit :
-  - La sidebar (menu de navigation à gauche)
-  - La topbar (barre du haut)
-  - Les pages : Accueil, Investissement, Retraite, Patrimoine,
-                Budget, Comparaison, Allocation, Académie
-
-  Chaque page a un id HTML de la forme "NOM-page"
-  (ex : "invest-page", "budget-page"…).
-  Le JavaScript affiche/cache ces pages via la classe CSS "active".
-  ══════════════════════════════════════════
--->
 <html lang="fr">
 
 <head>
   <meta charset="UTF-8">
-  <!-- Permet un bon affichage sur mobile (empêche le zoom automatique) -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wealth OS — Dashboard</title>
 
-  <!-- Notre feuille de styles principale -->
+
   <link rel="stylesheet" href="style.css">
 
-  <!-- Chart.js : bibliothèque pour dessiner des graphiques -->
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
-  <!-- Google Fonts : polices de caractères utilisées dans l'app -->
+  <!-- Police de caractere Google fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -39,24 +22,15 @@
 
 <body>
 
-  <!-- ══ DÉCORATION DE FOND ══
-       Ces éléments sont purement visuels (dégradés flous en fond de page).
-       Ils ne contiennent aucun contenu.
-  -->
+  <!-- dégradés flous du fond de page  -->
+
   <div class="glass-bg-blob blob-1"></div>
   <div class="glass-bg-blob blob-2"></div>
-  <div class="glass-grain"></div><!-- Texture grain légère sur toute la page -->
+  <div class="glass-grain"></div>
 
 
-  <!-- ══════════════════════════════════════════
-       SIDEBAR — Menu de navigation latéral gauche
-       ══════════════════════════════════════════
-       La sidebar contient :
-       - Le logo "WealthOS"
-       - Un bouton pour la réduire (toggleSidebar)
-       - Les groupes de navigation (liens vers chaque page)
-       - Un statut système + horloge en bas
-  -->
+  <!--  SIDEBAR   -->
+      
   <nav id="sidebar">
 
     <!-- Logo -->
@@ -69,32 +43,24 @@
     </div>
 
     <!--
-      Bouton toggle sidebar.
-      onclick="toggleSidebar()" appelle la fonction JS du même nom.
-      Quand on clique, la sidebar se réduit (seules les icônes restent visibles).
+      Bouton sidebar affiché/caché
     -->
     <button class="sidebar-toggle" onclick="toggleSidebar()" title="Réduire la sidebar">
       <span class="toggle-icon">
-        <!-- 3 traits CSS qui forment l'icône "hamburger" -->
         <span></span><span></span><span></span>
       </span>
     </button>
 
-    <!-- Groupe 1 : Vue globale -->
+    <!-- Vue globale -->
     <div class="nav-group">
       <div class="nav-group-label">Vue globale</div>
-      <!--
-        Chaque .nav-item a un attribut data-page.
-        Le JS lit cet attribut pour savoir vers quelle page naviguer.
-        La classe "active" est ajoutée par le JS sur l'item de la page courante.
-      -->
       <div class="nav-item active" data-page="home">
         <span class="nav-icon">◈</span>
         <span class="nav-label">Tableau de bord</span>
       </div>
     </div>
 
-    <!-- Groupe 2 : Simulateurs -->
+    <!-- Simulateurs -->
     <div class="nav-group">
       <div class="nav-group-label">Simulateurs</div>
       <div class="nav-item" data-page="invest">
@@ -111,7 +77,7 @@
       </div>
     </div>
 
-    <!-- Groupe 3 : Analyse -->
+    <!-- Analyse -->
     <div class="nav-group">
       <div class="nav-group-label">Analyse</div>
       <div class="nav-item" data-page="analyse">
@@ -128,7 +94,7 @@
       </div>
     </div>
 
-    <!-- Groupe 4 : Formation -->
+    <!-- Formation -->
     <div class="nav-group">
       <div class="nav-group-label">Formation</div>
       <div class="nav-item" data-page="academie">
@@ -137,63 +103,54 @@
       </div>
     </div>
 
-    <!-- Bas de sidebar : statut système + horloge -->
+    <!-- elements en bas de la sidebar-->
     <div class="sidebar-bottom">
       <div class="sys-status">
-        <span class="pulse-dot"></span><!-- Point animé vert -->
+        <span class="pulse-dot"></span>
         <span>Système actif</span>
-        <!-- L'id "clock" est mis à jour chaque seconde par le JS (updateClock) -->
         <span id="clock" class="sys-clock">--:--</span>
       </div>
     </div>
 
-  </nav><!-- fin #sidebar -->
+  </nav>
 
 
-  <!-- ══════════════════════════════════════════
-       MAIN — Zone de contenu principale
-       ══════════════════════════════════════════
-       Tout ce qui est à droite de la sidebar.
-       Contient : la topbar + le contenu des pages.
+  <!--
+       contenu principal
+
   -->
   <main id="main">
 
-    <!-- TOPBAR : barre sticky en haut de chaque page -->
     <header class="topbar">
-      <!-- Côté gauche : chemin de navigation + badge de section -->
       <div class="topbar-left">
         <div class="page-path">
           <span class="path-root">WealthOS</span>
           <span class="path-sep">/</span>
-          <!-- id="page-title" : mis à jour par le JS quand on change de page -->
+
           <span class="path-current" id="page-title">Tableau de bord</span>
         </div>
-        <!-- Badge de section (ex: "Simulateur", "Projection"…) -->
+
         <span class="topbar-badge" id="topbar-badge">Vue globale</span>
       </div>
-      <!-- Côté droit : horloge + avatar -->
+   
       <div class="topbar-right">
-        <!-- id="topbar-clock" : mis à jour par le JS -->
+
         <span class="topbar-clock" id="topbar-clock">—</span>
         <div class="topbar-avatar" title="Mon espace">W</div>
       </div>
     </header>
 
-    <!-- Zone de contenu : contient toutes les pages -->
     <div class="content">
 
 
-      <!-- ══════════════════════════════════════════
-           PAGE : ACCUEIL (home)
-           ══════════════════════════════════════════
-           Affichée au démarrage (classe "active").
-           Contient : bannière hero + KPIs + accès rapide + concepts clés.
+      <!-- 
+           ACCUEIL 
       -->
       <div id="home-page" class="page active">
 
-        <!-- Bannière hero : titre + boutons + mini graphique -->
+
         <div class="home-hero">
-          <div class="hero-bg-grid"></div><!-- Grille décorative en fond -->
+          <div class="hero-bg-grid"></div>
           <div class="hero-content">
             <div class="hero-eyebrow">Bienvenue sur votre espace</div>
             <h1 class="hero-title">
@@ -201,24 +158,24 @@
             </h1>
             <p class="hero-sub">Simulez, analysez et optimisez votre patrimoine.</p>
             <div class="hero-actions">
-              <!-- onclick="goPage('invest')" : navigue vers la page Investissement -->
+        
               <button class="btn-hero-primary"   onclick="goPage('invest')">◆ Simuler un investissement</button>
               <button class="btn-hero-secondary" onclick="goPage('retraite')">◇ Planifier ma retraite</button>
             </div>
           </div>
-          <!-- Mini graphique de la page d'accueil (tracé par le JS) -->
+
           <div class="hero-visual">
             <canvas id="home-chart" height="200"></canvas>
           </div>
         </div>
 
-        <!-- KPIs : 4 tuiles de résumé des simulateurs -->
+      
         <div class="home-kpis">
           <!-- KPI Investissement -->
           <div class="kpi-tile">
             <div class="kpi-icon">◆</div>
             <div class="kpi-body">
-              <!-- id="home-capital" : mis à jour par updateInvest() dans le JS -->
+          
               <div class="kpi-val" id="home-capital">—</div>
               <div class="kpi-lbl">Capital projeté</div>
               <div class="kpi-sub">Investissement</div>
@@ -257,17 +214,17 @@
           </div>
         </div>
 
-        <!-- Grille bas de page : Accès rapide + Concepts clés -->
+        <!-- Grille bas de page du tableau de bord-->
         <div class="home-grid">
 
-          <!-- Module Accès rapide -->
+          <!-- Accès rapide -->
           <div class="home-module">
             <div class="module-header">
               <span class="module-dot"></span>
               <span class="module-title">Accès rapide</span>
             </div>
             <div class="quick-links">
-              <!-- Chaque .ql-item navigue vers une page via onclick="goPage(...)" -->
+           
               <div class="ql-item" onclick="goPage('invest')">
                 <div class="ql-icon">◆</div>
                 <div class="ql-text">
@@ -319,7 +276,7 @@
             </div>
           </div>
 
-          <!-- Module Concepts clés -->
+          <!-- Concepts clés -->
           <div class="home-module">
             <div class="module-header">
               <span class="module-dot" style="background:var(--em)"></span>
@@ -357,15 +314,12 @@
             </div>
           </div>
 
-        </div><!-- fin .home-grid -->
-      </div><!-- fin #home-page -->
+        </div>
+      </div>
 
 
-      <!-- ══════════════════════════════════════════
-           PAGE : INVESTISSEMENT
-           ══════════════════════════════════════════
-           Simulateur d'investissement avec intérêts composés.
-           Paramètres → Résultats → Graphiques.
+      <!-- 
+           INVESTISSEMENT
       -->
       <div id="invest-page" class="page">
 
@@ -378,20 +332,18 @@
 
         <div class="vertical-layout">
 
-          <!-- PARAMÈTRES : 3 colonnes -->
+
           <div class="three-col-layout mb-20">
 
-            <!-- Colonne 1 : Paramètres de base -->
+
             <div class="panel-section">
               <div class="panel-section-title">◆ Paramètres de base</div>
 
               <div class="field-group">
                 <label class="field-label">Capital initial</label>
                 <div class="field-input-wrap">
-                  <!--
-                    oninput="updateInvest()" : à chaque frappe, le JS recalcule
-                    placeholder : texte grisé affiché quand le champ est vide
-                  -->
+              
+                
                   <input type="number" class="field-input" id="r-capital"
                          placeholder="10 000" oninput="updateInvest()">
                   <span class="field-unit">€</span>
@@ -407,7 +359,7 @@
                 </div>
               </div>
 
-              <!-- field-row : deux champs côte à côte -->
+
               <div class="field-row">
                 <div class="field-group">
                   <label class="field-label">Taux annuel brut</label>
@@ -426,11 +378,11 @@
                   </div>
                 </div>
               </div>
-            </div><!-- fin colonne 1 -->
+            </div>
 
-            <!-- Colonne 2 : Paramètres avancés -->
+    
             <div class="panel-section">
-              <div class="panel-section-title">⚙ Paramètres avancés</div>
+              <div class="panel-section-title"> Paramètres avancés</div>
 
               <div class="field-row">
                 <div class="field-group">
@@ -454,7 +406,7 @@
               <div class="field-row">
                 <div class="field-group">
                   <label class="field-label">TMI fiscal</label>
-                  <!-- select : liste déroulante. onchange déclenche le recalcul -->
+         
                   <select class="field-select" id="r-tmi" onchange="updateInvest()">
                     <option value="0">0 % (PEA/AV exo)</option>
                     <option value="0.128" selected>12,8 % (PFU flat tax)</option>
@@ -472,11 +424,11 @@
                   </div>
                 </div>
               </div>
-            </div><!-- fin colonne 2 -->
+            </div>
 
-            <!-- Colonne 3 : Enveloppe fiscale -->
+         
             <div class="panel-section">
-              <div class="panel-section-title">🏦 Fiscalité</div>
+              <div class="panel-section-title"> Fiscalité</div>
               <div class="field-group">
                 <label class="field-label">Type d'enveloppe fiscale</label>
                 <select class="field-select" id="r-envelope" onchange="updateInvest()">
@@ -486,16 +438,16 @@
                   <option value="per">PER — Plan d'Épargne Retraite</option>
                 </select>
               </div>
-              <!-- Bloc d'info sur l'enveloppe : rempli dynamiquement par updateEnvelopeInfo() -->
+              
               <div id="envelope-info-box" class="envelope-info"></div>
-            </div><!-- fin colonne 3 -->
+            </div>
 
-          </div><!-- fin three-col-layout paramètres -->
+          </div>
 
-          <!-- RÉSULTATS : grille de cellules automatique -->
+          <!-- RÉSULTATS-->
           <div class="res-grid-auto mb-20">
             <div class="res-cell highlight">
-              <!-- Ces id sont mis à jour par le JS (updateInvest) -->
+     
               <div class="rc-val" style="color:var(--acc-l)" id="res-final">—</div>
               <div class="rc-lbl">Capital final brut</div>
             </div>
@@ -525,11 +477,11 @@
             </div>
           </div>
 
-          <!-- GRAPHIQUES avec onglets -->
+          <!-- GRAPHIQUES-->
           <div class="charts-panel">
 
             <!--
-              Onglets : chaque bouton appelle switchInvestTab('nomOnglet', this).
+              Onglets : chaque bouton appelle la fonction et 
               "this" passe le bouton lui-même pour lui appliquer la classe "active".
             -->
             <div class="chart-tabs" id="invest-chart-tabs">
@@ -545,7 +497,7 @@
             <div class="chart-pane active" id="pane-evolution">
               <div class="chart-scroll-wrap">
                 <div class="chart-area">
-                  <!-- canvas : zone de dessin de Chart.js. L'id permet au JS de le retrouver. -->
+      
                   <canvas id="invest-chart"></canvas>
                 </div>
               </div>
@@ -569,10 +521,10 @@
               <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="rend-inflation-chart"></canvas></div></div>
             </div>
 
-            <!-- Panneau Amortissement (tableau HTML, pas canvas) -->
+            <!-- Panneau Amortissement-->
             <div class="chart-pane" id="pane-amortissement">
               <p class="chart-note">Progression annuelle du capital — versements, intérêts et solde par tranche</p>
-              <!-- Ce div est rempli dynamiquement par renderAmortTable() dans le JS -->
+            
               <div id="amort-table-container" style="max-height:360px;overflow-y:auto;margin-top:8px"></div>
             </div>
 
@@ -580,15 +532,15 @@
             <div class="chart-pane" id="pane-montecarlo">
               <p class="chart-note">Simulation de 200 trajectoires aléatoires — distribution des résultats possibles selon la volatilité estimée</p>
               <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="invest-mc-chart"></canvas></div></div>
-              <!-- KPIs Monte Carlo : rempli par renderMonteCarlo() -->
+        
               <div id="mc-kpis" class="detail-kpis" style="margin-top:14px"></div>
             </div>
 
-            <!-- Bloc Détail annuel (toujours visible, en dehors des onglets) -->
+            <!-- Bloc détail annuel -->
             <div class="card-block mt-16">
               <div class="block-header" style="justify-content:space-between">
                 <span>Détail annuel — versements &amp; intérêts</span>
-                <!-- Boutons pour changer le taux affiché dans ce graphique -->
+      
                 <div class="taux-btns">
                   <button class="tb" onclick="setRendTaux(5,this)">5%</button>
                   <button class="tb active" onclick="setRendTaux(7,this)">7%</button>
@@ -596,19 +548,18 @@
                 </div>
               </div>
               <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="rend-detail-chart"></canvas></div></div>
-              <!-- KPIs sous le graphique : remplis par renderRendDetail() -->
+     
               <div id="rend-detail-kpis" class="detail-kpis"></div>
             </div>
 
-          </div><!-- fin .charts-panel -->
-        </div><!-- fin .vertical-layout -->
-      </div><!-- fin #invest-page -->
+          </div>
+        </div>
+      </div>
 
 
-      <!-- ══════════════════════════════════════════
+      <!-- 
            PAGE : RETRAITE
-           ══════════════════════════════════════════
-           Calculateur de retraite avec sliders interactifs.
+    
       -->
       <div id="retraite-page" class="page">
         <div class="page-intro">
@@ -618,7 +569,7 @@
           </div>
         </div>
 
-        <!-- KPIs principaux (mis à jour par updateRetraite()) -->
+        <!-- KPIs principaux  -->
         <div class="kpi-row-4">
           <div class="kpi-slim">
             <div class="ks-val" id="ret-capital-final">—</div>
@@ -639,18 +590,14 @@
         </div>
 
         <div class="vertical-layout">
-          <!-- PARAMÈTRES RETRAITE : 3 colonnes de sliders -->
+          <!-- PARAMÈTRES RETRAITE -->
           <div class="three-col-layout mb-20">
 
-            <!-- Colonne 1 : Profil (âges) -->
+  
             <div class="panel-section">
               <div class="panel-section-title">◇ Profil</div>
 
-              <!--
-                slider-group : groupe slider + label + valeur affichée.
-                oninput="updateRetraite()" : recalcule à chaque déplacement du curseur.
-                L'id "v-age-actuel" affiche la valeur en cours (mis à jour par le JS).
-              -->
+          
               <div class="slider-group">
                 <div class="sg-head">
                   <label>Âge actuel</label>
@@ -682,7 +629,7 @@
               </div>
             </div>
 
-            <!-- Colonne 2 : Épargne -->
+            <!-- Colonne Épargne -->
             <div class="panel-section">
               <div class="panel-section-title">○ Épargne</div>
 
@@ -722,7 +669,7 @@
               </div>
             </div>
 
-            <!-- Colonne 3 : Objectif de rente -->
+            <!-- Colonne Objectif de rente -->
             <div class="panel-section">
               <div class="panel-section-title">◈ Objectif mensuel à la retraite</div>
 
@@ -733,7 +680,7 @@
                 <div class="sg-range"><span>500 €</span><span>10 000 €</span></div>
               </div>
 
-              <!-- Barre de progression vers l'objectif (largeur mise à jour par le JS) -->
+             
               <div class="progress-track">
                 <div class="pt-bar-bg">
                   <div id="ret-progress-bar" class="pt-bar-fill"></div>
@@ -741,11 +688,11 @@
                 <span id="ret-progress-pct" class="pt-pct">0 %</span>
               </div>
 
-              <!-- Message d'atteinte/échec de l'objectif (rempli par le JS) -->
+         
               <div id="ret-objectif-msg" class="obj-msg"></div>
             </div>
 
-          </div><!-- fin three-col-layout retraite -->
+          </div>
 
           <!-- RÉSULTATS RETRAITE -->
           <div class="charts-panel">
@@ -771,7 +718,7 @@
               </div>
             </div>
 
-            <!-- Scénarios comparés (rempli dynamiquement par le JS) -->
+            <!-- Scénarios comparés -->
             <div class="card-block mt-16">
               <div class="block-header"><span>Scénarios comparés</span></div>
               <div id="ret-scenarios"></div>
@@ -793,13 +740,12 @@
             </div>
           </div>
         </div>
-      </div><!-- fin #retraite-page -->
+      </div>
 
 
-      <!-- ══════════════════════════════════════════
-           PAGE : PATRIMOINE (analyse)
-           ══════════════════════════════════════════
-           Bilan actifs / passifs avec saisie libre.
+      <!-- 
+           PATRIMOINE 
+           
       -->
       <div id="analyse-page" class="page">
         <div class="page-intro">
@@ -829,17 +775,13 @@
           </div>
         </div>
 
-        <!-- Saisie actifs / passifs côte à côte -->
+    
         <div class="two-col-layout mb-20">
 
           <!-- Actifs -->
           <div class="card-block">
             <div class="block-header teal-dot"><span>Actifs</span></div>
-            <!--
-              Liste des lignes d'actifs.
-              Chaque ligne a : libellé + montant + bouton supprimer.
-              Le JS peut ajouter des lignes via addPatriRow('actifs').
-            -->
+           
             <div id="patri-actifs-list" class="patri-list">
               <div class="patri-row">
                 <input class="field-input flex2" placeholder="Épargne (livrets, PEA…)" oninput="updatePatrimoine()">
@@ -870,7 +812,7 @@
 
         </div>
 
-        <!-- Graphiques patrimoine : 3 donuts -->
+        <!-- Graphiques patrimoine -->
         <div class="three-col-layout mb-20">
           <div class="card-block">
             <div class="block-header"><span>Répartition actifs</span></div>
@@ -893,7 +835,7 @@
             <div class="hb-row">
               <span class="hb-lbl">Actifs</span>
               <div class="hb-track">
-                <!-- Largeur mise à jour par le JS -->
+             
                 <div id="patri-bar-actifs" class="hb-fill teal"></div>
               </div>
               <span id="patri-bar-actifs-lbl" class="hb-val teal">—</span>
@@ -906,16 +848,14 @@
               <span id="patri-bar-passifs-lbl" class="hb-val red">—</span>
             </div>
           </div>
-          <!-- Message de santé (rempli par le JS selon le taux d'endettement) -->
+
           <div id="patri-health-msg" class="health-msg"></div>
         </div>
-      </div><!-- fin #analyse-page -->
+      </div>
 
 
-      <!-- ══════════════════════════════════════════
-           PAGE : BUDGET
-           ══════════════════════════════════════════
-           Gestion revenus / dépenses mensuels.
+      <!-- BUDGET
+        
       -->
       <div id="budget-page" class="page">
         <div class="page-intro">
@@ -925,11 +865,11 @@
           </div>
         </div>
 
-        <!-- Listes revenus / dépenses côte à côte -->
+        <!-- Listes revenus -->
         <div class="two-col-layout">
           <div class="card-block">
             <div class="block-header teal-dot"><span>Revenus</span></div>
-            <!-- Rempli dynamiquement par renderBudgetList() dans le JS -->
+     
             <div id="revenus-list"></div>
             <button class="add-row-btn" onclick="addRevenu()">+ Ajouter un revenu</button>
           </div>
@@ -940,7 +880,7 @@
           </div>
         </div>
 
-        <!-- Résumé budget : Total revenus / dépenses / reste à vivre -->
+        <!-- Résumé budget -->
         <div class="budget-summary">
           <div class="bs-item teal">
             <div class="bs-val" id="b-revenus">0 €</div>
@@ -956,12 +896,12 @@
           </div>
         </div>
 
-        <!-- Graphique donut dépenses + barres -->
+        <!-- Graphique camembert dépenses  -->
         <div class="card-block mt-16">
           <div class="block-header"><span>Répartition des dépenses</span></div>
           <div class="budget-charts">
             <div class="chart-area-sm"><canvas id="budget-pie"></canvas></div>
-            <!-- Barres de progression par dépense (remplies par le JS) -->
+      
             <div id="budget-bars" class="budget-bar-list"></div>
           </div>
         </div>
@@ -970,7 +910,7 @@
         <div class="card-block mt-16">
           <div class="block-header gold-dot"><span>Règle 50 / 30 / 20 — analyse budgétaire</span></div>
           <p class="chart-note">Idéalement : 50% en besoins essentiels, 30% en loisirs/envies, 20% en épargne.</p>
-          <!-- Grille 3 colonnes remplie par renderBudget503020() -->
+
           <div id="budget-503020" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px"></div>
           <div class="chart-scroll-wrap">
             <div class="chart-area" style="height:220px">
@@ -985,13 +925,11 @@
           <p class="chart-note">Simulation de votre reste à vivre investi chaque mois à différents taux de rendement.</p>
           <div class="chart-scroll-wrap"><div class="chart-area"><canvas id="budget-projection-chart"></canvas></div></div>
         </div>
-      </div><!-- fin #budget-page -->
+      </div>
 
 
-      <!-- ══════════════════════════════════════════
-           PAGE : COMPARAISON (compare)
-           ══════════════════════════════════════════
-           Compare deux scénarios A et B côte à côte.
+      <!--  COMPARAISON
+      
       -->
       <div id="compare-page" class="page">
         <div class="page-intro">
@@ -1001,14 +939,14 @@
           </div>
         </div>
 
-        <!-- Deux blocs côte à côte avec un "VS" au centre -->
+        <!-- Les 2 blocs côte à côte -->
         <div class="compare-panels">
 
           <!-- SCÉNARIO A -->
           <div class="compare-block sc-a">
             <div class="sc-header sc-a-h">
               <span class="sc-letter">A</span>
-              <!-- Nom du scénario modifiable par l'utilisateur -->
+          
               <input class="sc-name-input" id="ca-name" value="Scénario A" placeholder="Nom du scénario">
             </div>
             <div class="sc-fields">
@@ -1062,7 +1000,7 @@
                 </select>
               </div>
             </div>
-            <!-- Résultats scénario A (mis à jour par updateCompare()) -->
+            <!-- Résultats scénario A  -->
             <div class="sc-results">
               <div class="scr-item"><span>Capital brut</span><span class="scr-val blue"   id="ca-result">—</span></div>
               <div class="scr-item"><span>Capital net</span> <span class="scr-val"         id="ca-net">—</span></div>
@@ -1146,9 +1084,9 @@
             </div>
           </div>
 
-        </div><!-- fin .compare-panels -->
+        </div>
 
-        <!-- Graphiques comparaison : 2×2 -->
+        <!-- Graphiques comparaison -->
         <div class="compare-charts-grid mt-20">
           <div class="card-block">
             <div class="block-header"><span>Évolution capitaux</span></div>
@@ -1168,18 +1106,17 @@
           </div>
         </div>
 
-        <!-- Tableau différentiel A vs B (rempli par le JS) -->
+        <!-- Tableau différentiel A et B-->
         <div class="card-block mt-16">
           <div class="block-header"><span>Analyse différentielle A vs B</span></div>
           <div id="compare-delta" class="delta-grid"></div>
         </div>
-      </div><!-- fin #compare-page -->
+      </div>
 
 
-      <!-- ══════════════════════════════════════════
-           PAGE : ALLOCATION DE PORTEFEUILLE
-           ══════════════════════════════════════════
-           Construction et simulation d'une allocation d'actifs.
+      <!-- 
+           PAGE 
+         
       -->
       <div id="allocation-page" class="page">
         <div class="page-intro">
@@ -1189,7 +1126,7 @@
           </div>
         </div>
 
-        <!-- KPIs allocation (mis à jour par updateAllocation()) -->
+        <!-- KPIs allocation -->
         <div class="kpi-row-4" id="alloc-kpis">
           <div class="kpi-slim">
             <div class="ks-val" id="alloc-rendement">—</div>
@@ -1210,18 +1147,17 @@
         </div>
 
         <div class="vertical-layout">
-          <!-- PARAMÈTRES ALLOCATION : 3 colonnes -->
+          <!-- PARAMÈTRES ALLOCATION -->
           <div class="three-col-layout mb-20">
 
-            <!-- Colonne 1 : Curseurs d'allocation (total doit = 100%) -->
+            <!-- Colonne 1 -->
             <div class="panel-section">
               <div class="panel-section-title">▲ Allocation cible (%)</div>
               <p style="font-size:0.73rem;color:var(--t2);margin-bottom:14px">
                 Ajustez les curseurs — le total doit faire 100 %.
               </p>
 
-              <!-- Un curseur par classe d'actif.
-                   L'id "v-alloc-actions" affiche la valeur courante (mis à jour par JS). -->
+            
               <div class="slider-group">
                 <div class="sg-head"><label>Actions (ETF monde / actions)</label><strong id="v-alloc-actions">0 %</strong></div>
                 <input type="range" class="slider" id="alloc-actions" min="0" max="100" step="5" value="0" oninput="updateAllocation()">
@@ -1243,7 +1179,7 @@
                 <input type="range" class="slider" id="alloc-cash" min="0" max="100" step="5" value="0" oninput="updateAllocation()">
               </div>
 
-              <!-- Indicateur de total : passe en vert si = 100%, rouge sinon -->
+              
               <div id="alloc-total-check"
                    style="margin-top:10px;padding:8px 12px;border-radius:var(--r-sm);font-size:0.78rem;background:var(--bg3)">
                 Total : <strong id="alloc-total">0 %</strong>
@@ -1291,10 +1227,8 @@
             <div class="panel-section">
               <div class="panel-section-title">◉ Profils prédéfinis</div>
               <div style="display:flex;flex-direction:column;gap:8px">
-                <!--
-                  onclick="applyProfile('prudent')" : applique le profil dans le JS
-                  (règle tous les curseurs aux valeurs du profil)
-                -->
+             
+               
                 <button class="alloc-profile-btn" onclick="applyProfile('prudent')">
                   <span style="color:var(--teal)">◎ Prudent</span>
                   <span style="color:var(--t2);font-size:0.7rem">Actions 20% · Oblig 50% · Immo 15% · Cash 15%</span>
@@ -1314,7 +1248,7 @@
               </div>
             </div>
 
-          </div><!-- fin three-col-layout allocation -->
+          </div>
 
           <!-- GRAPHIQUES ALLOCATION -->
           <div class="charts-panel">
@@ -1340,18 +1274,16 @@
 
         </div>
 
-        <!-- Tableau détaillé par classe d'actif (rempli par renderAllocDetailTable()) -->
+        <!-- Tableau détaillé par classe d'actif-->
         <div class="card-block mt-16">
           <div class="block-header teal-dot"><span>Analyse par classe d'actif</span></div>
           <div id="alloc-detail-table" style="overflow-x:auto"></div>
         </div>
-      </div><!-- fin #allocation-page -->
+      </div>
 
 
-      <!-- ══════════════════════════════════════════
-           PAGE : ACADÉMIE
-           ══════════════════════════════════════════
-           Glossaire financier interactif avec calculettes.
+      <!-- ACADÉMIE
+          
       -->
       <div id="academie-page" class="page">
         <div class="page-intro">
@@ -1361,12 +1293,9 @@
           </div>
         </div>
 
-        <!-- Filtres par catégorie -->
+    
         <div class="acad-filters" id="acad-filters">
-          <!--
-            onclick="filterAcad('tous', this)" : filtre les cartes par catégorie.
-            "this" passe le bouton pour lui appliquer le style actif.
-          -->
+          
           <button class="acad-filter active" onclick="filterAcad('tous',this)">Tous</button>
           <button class="acad-filter" onclick="filterAcad('base',this)">◆ Bases</button>
           <button class="acad-filter" onclick="filterAcad('rendement',this)">◈ Rendement</button>
@@ -1381,7 +1310,7 @@
         <div class="acad-search-wrap">
           <!--
             oninput="searchAcad(this.value)" : filtre les cartes à chaque frappe.
-            this.value = texte actuellement tapé dans le champ.
+
           -->
           <input class="acad-search" id="acad-search" type="text"
                  placeholder="Rechercher un terme… ex: ETF, dividende, volatilité"
@@ -1389,12 +1318,12 @@
           <span class="acad-search-icon">⌕</span>
         </div>
 
-        <!-- Compteur de résultats (mis à jour par renderAcadGrid()) -->
+        <!-- Compteur de résultats -->
         <div id="acad-count"
              style="font-size:0.7rem;color:var(--t3);font-family:var(--font-mono);margin-bottom:16px">
         </div>
 
-        <!-- Grille des cartes de termes (remplie dynamiquement par renderAcadGrid()) -->
+        <!-- Grille des cartes de termes -->
         <div class="acad-grid" id="acad-grid"></div>
 
         <!-- Calculettes interactives -->
@@ -1444,7 +1373,7 @@
                   </div>
                 </div>
               </div>
-              <!-- Résultats remplis par calcIC() -->
+              
               <div id="ic-results" class="acad-calc-results"></div>
             </div>
           </div>
@@ -1535,25 +1464,20 @@
             </div>
           </div>
 
-        </div><!-- fin #acad-calc-section -->
+        </div>
 
-        <!-- Lexique express (rempli par renderLexique()) -->
+        <!-- Lexique express -->
         <div class="card-block mt-16">
-          <div class="block-header purple-dot"><span>Lexique express — abréviations courantes</span></div>
+          <div class="block-header purple-dot"><span>Lexique express - abréviations courantes</span></div>
           <div class="acad-lexique" id="acad-lexique"></div>
         </div>
 
-      </div><!-- fin #academie-page -->
+      </div>
 
 
-    </div><!-- fin .content -->
-  </main><!-- fin #main -->
+    </div>
+  </main>
 
-  <!--
-    Script JS chargé à la FIN du body.
-    C'est important : le HTML doit être entièrement chargé avant que le JS
-    puisse accéder aux éléments (document.getElementById, etc.).
-  -->
   <script src="script.js"></script>
 </body>
 </html>
