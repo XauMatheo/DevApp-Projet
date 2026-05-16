@@ -1,109 +1,59 @@
-/*
-  ══════════════════════════════════════════
-  WEALTH OS — style.css
-  Version commentée pour débutants
-
-  Ce fichier contient tout le style visuel de l'application.
-  Organisation :
-  1.  Variables CSS (couleurs, polices, tailles réutilisables)
-  2.  Reset (neutralise les styles par défaut des navigateurs)
-  3.  Body & fond de page
-  4.  Sidebar
-  5.  Topbar
-  6.  Pages & animations
-  7.  Page Accueil (hero, KPIs, grille)
-  8.  Intro de page
-  9.  KPI rows (slim)
-  10. Layouts (grilles flexibles)
-  11. Panels & formulaires
-  12. Résultats
-  13. Onglets & graphiques
-  14. Card block (conteneur générique)
-  15. KPIs détaillés
-  16. Boutons de taux
-  17. Enveloppe fiscale
-  18. Sliders
-  19. Barre de progression
-  20. Retraite
-  21. Patrimoine
-  22. Budget
-  23. Comparaison
-  24. Tableau d'amortissement
-  25. Allocation
-  26. Scrollbar
-  27. Responsive (media queries)
-  28. Académie
-  29. Décoration (blobs + grain)
-  ══════════════════════════════════════════
-*/
-
 /* Chargement des polices depuis Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700&display=swap');
 
-
-/* ══════════════════════════════════════════
-   1. VARIABLES CSS — "Design Tokens"
-   
-   Les variables CSS (--nom) permettent de définir
-   des valeurs réutilisables dans tout le fichier.
-   Si on veut changer la couleur principale, on ne
-   modifie qu'ici, pas partout dans le code.
-   
-   :root = s'applique à tout le document HTML.
-══════════════════════════════════════════ */
 :root {
-  /* ── Fonds de page (du plus clair au plus sombre) ── */
-  --bg0: #f2f3f0;                      /* Fond principal : gris-vert très clair */
-  --bg1: rgba(230, 232, 226, 0.80);    /* Fond sidebar & topbar : semi-transparent */
+  /* ── Fonds de page ── */
+  --bg0: #f2f3f0;                      /* Fond principal  */
+  --bg1: rgba(230, 232, 226, 0.80);    /* Fond sidebar & topbar */
   --bg2: rgba(238, 240, 234, 0.85);    /* Fond des cartes */
   --bg3: rgba(222, 226, 218, 0.90);    /* Fond des éléments intérieurs */
-  --bg4: rgba(208, 213, 203, 0.95);    /* Fond encore plus sombre */
+  --bg4: rgba(208, 213, 203, 0.95);   
   --bg5: #b8c2b0;                      /* Fond des pistes de sliders */
 
   /* ── Bordures ── */
-  --border:   rgba(80, 110, 80, 0.09); /* Bordure subtile par défaut */
-  --border-h: rgba(80, 110, 80, 0.24); /* Bordure au survol (plus visible) */
-  --border-a: rgba(94, 122, 94, 0.48); /* Bordure active (item sélectionné) */
+  --border:   rgba(80, 110, 80, 0.09); /* Bordure sous titre  */
+  --border-h: rgba(80, 110, 80, 0.24); /* Bordure au survol */
+  --border-a: rgba(94, 122, 94, 0.48); /* Bordure active  */
 
-  /* ── Couleur principale : vert sauge ── */
-  --acc:      #5e7a5e;                     /* Vert sauge de base */
-  --acc-l:    #2d4a2d;                     /* Vert foncé (pour les textes) */
-  --acc-d:    rgba(94, 122, 94, 0.12);     /* Vert très transparent (fonds) */
-  --acc-glow: rgba(94, 122, 94, 0.28);     /* Halo vert (box-shadow) */
+  /* ── Couleur principale ── */
+  --acc:      #5e7a5e;
+  --acc-l:    #2d4a2d;
+  --acc-d:    rgba(94, 122, 94, 0.12); 
+  --acc-glow: rgba(94, 122, 94, 0.28); 
 
   /* ── Couleurs secondaires ── */
-  --em:        #8b7355;                    /* Brun doré (emphasis) */
-  --gold:      #8b7355;                    /* Idem — utilisé pour les gains */
+  --em:        #8b7355;                    
+  --gold:      #8b7355;                    
   --gold-d:    rgba(139, 115, 85, 0.12);
   --gold-glow: rgba(139, 115, 85, 0.28);
 
-  --teal:      #6b8fa0;                    /* Bleu-vert (actifs, positif) */
+  --teal:      #6b8fa0;                    /* actifs positifs */
   --teal-d:    rgba(107, 143, 160, 0.12);
   --teal-glow: rgba(107, 143, 160, 0.28);
 
-  --red:       #a05050;                    /* Rouge-brun (passifs, négatif) */
+  --red:       #a05050;                    /* passifs négatifs*/
   --red-d:     rgba(160, 80, 80, 0.10);
   --red-glow:  rgba(160, 80, 80, 0.25);
 
-  --blue:      #6b8fa0;                    /* Bleu (scénario A) */
+  --blue:      #6b8fa0;                    /* scénario A */
   --blue-d:    rgba(107, 143, 160, 0.12);
-  --purple:    #7a6a8a;                    /* Violet (scénario B) */
+  --purple:    #7a6a8a;                    /*  scénario B */
   --green:     #5e7a5e;
 
   /* ── Texte ── */
-  --t1: #1e2a1e;  /* Texte principal (quasi-noir verdâtre) */
-  --t2: #4a5e4a;  /* Texte secondaire (gris-vert) */
-  --t3: #8fa08f;  /* Texte tertiaire (gris clair) */
+  --t1: #1e2a1e;  /* Texte principal */
+  --t2: #4a5e4a;  /* Texte secondaire */
+  --t3: #8fa08f;  /* Texte tertiaire  */
 
   /* ── Polices ── */
   --font-head: 'Outfit', sans-serif;   /* Titres & valeurs numériques */
   --font-body: 'Inter', sans-serif;    /* Corps de texte */
-  --font-mono: 'DM Mono', monospace;   /* Chiffres & labels techniques */
+  --font-mono: 'DM Mono', monospace;   /* Chiffres  */
 
   /* ── Layout ── */
-  --r:         24px;    /* Border-radius des grandes cartes */
-  --r-sm:      14px;    /* Border-radius des petits éléments */
-  --r-xs:      8px;     /* Border-radius très petit */
+  --r:         24px;
+  --r-sm:      14px;
+  --r-xs:      8px; 
   --sidebar-w: 260px;   /* Largeur de la sidebar */
   --topbar-h:  70px;    /* Hauteur de la topbar */
 
@@ -112,27 +62,18 @@
   --tr-slow: 0.6s  cubic-bezier(0.25, 1, 0.5, 1); /* Transition lente */
 }
 
-
-/* ══════════════════════════════════════════
-   2. RESET
-   Neutralise les marges/paddings par défaut
-   du navigateur pour partir sur une base propre.
-══════════════════════════════════════════ */
+/* 2. RESET */
 *,
 *::before,
 *::after {
-  box-sizing: border-box; /* Les paddings/borders sont inclus dans la largeur */
+  box-sizing: border-box;
   margin:  0;
   padding: 0;
 }
 
-
-/* ══════════════════════════════════════════
-   3. BODY — fond de page
-══════════════════════════════════════════ */
+/* 3. BODY */
 body {
   background: var(--bg0);
-  /* Dégradés radiaux en fond pour l'effet "ambiance colorée" */
   background-image:
     radial-gradient(circle at 10% 20%, rgba(94, 122, 94, 0.08), transparent 40%),
     radial-gradient(circle at 90% 80%, rgba(139, 115, 85, 0.06), transparent 40%),
@@ -142,35 +83,32 @@ body {
   font-size: 15px;
   line-height: 1.65;
   min-height: 100vh;
-  display: flex;           /* Sidebar + Main côte à côte */
+  display: flex;
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased; /* Police plus nette sur macOS */
-  background-attachment: fixed;        /* Le fond ne défile pas */
+  -webkit-font-smoothing: antialiased;
+  background-attachment: fixed;
 }
 
-/* Effet glassmorphism (verre flou) sur les éléments principaux */
+/* glassmorphism sur les éléments principaux */
 .card-block, .panel-section, .home-module, .kpi-tile, .kpi-slim,
 .chart-pane, .dk-item, .bs-item, .compare-block, .delta-item, .hero-bg-grid {
-  backdrop-filter: blur(16px);          /* Flou derrière l'élément */
-  -webkit-backdrop-filter: blur(16px);  /* Compatibilité Safari */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 4px 24px -1px rgba(40, 70, 40, 0.08), inset 0 1px 0 rgba(255,255,255,0.65);
 }
 
-
-/* ══════════════════════════════════════════
-   4. SIDEBAR — menu latéral
-══════════════════════════════════════════ */
+/* 4. SIDEBAR */
 #sidebar {
   display: flex;
-  flex-direction: column; /* Éléments empilés verticalement */
-  position: fixed;        /* Reste en place quand on défile */
+  flex-direction: column;
+  position: fixed;
   width: var(--sidebar-w);
   background: var(--bg1);
   border-right: 1px solid var(--border);
   top: 0; left: 0; bottom: 0;
-  z-index: 100;           /* Au-dessus du contenu */
+  z-index: 100;
   overflow: hidden;
-  transition: width 0.35s cubic-bezier(0.25, 1, 0.5, 1); /* Animation de réduction */
+  transition: width 0.35s cubic-bezier(0.25, 1, 0.5, 1);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -185,12 +123,11 @@ body {
   opacity: 0.8;
 }
 
-/* ── Logo ── */
 .logo {
   padding: 20px 20px 14px;
   border-bottom: 1px solid var(--border);
   margin-bottom: 10px;
-  flex-shrink: 0; /* Ne rétrécit pas si la sidebar manque de place */
+  flex-shrink: 0;
 }
 
 .logo-wordmark {
@@ -205,10 +142,9 @@ body {
   margin-bottom: 4px;
 }
 
-.logo-w    { color: var(--acc-l); }  /* Le "W" en vert foncé */
-.logo-rest { color: var(--t1); }     /* "ealth" en couleur normale */
+.logo-w    { color: var(--acc-l); }
+.logo-rest { color: var(--t1); }
 
-/* Badge "OS" en petit */
 .logo-os {
   font-size: 0.55rem;
   font-weight: 700;
@@ -233,7 +169,6 @@ body {
   font-family: var(--font-mono);
 }
 
-/* ── Groupes de navigation ── */
 .nav-group {
   padding: 8px 12px 6px;
 }
@@ -248,7 +183,6 @@ body {
   font-family: var(--font-mono);
 }
 
-/* Item de navigation (lien vers une page) */
 .nav-item {
   display: flex;
   align-items: center;
@@ -266,13 +200,12 @@ body {
   overflow: hidden;
 }
 
-/* Indicateur vertical à gauche de l'item actif */
 .nav-item::before {
   content: '';
   position: absolute;
   left: 0;
   top: 50%;
-  transform: translateY(-50%) scaleY(0); /* Caché par défaut */
+  transform: translateY(-50%) scaleY(0);
   width: 3px;
   height: 60%;
   background: var(--acc);
@@ -285,19 +218,16 @@ body {
   background: var(--bg3);
 }
 
-/* État actif (page courante) */
 .nav-item.active {
   color: var(--acc-l);
   background: var(--acc-d);
   border-color: var(--border-a);
 }
 
-/* L'indicateur vertical devient visible quand l'item est actif */
 .nav-item.active::before {
   transform: translateY(-50%) scaleY(1);
 }
 
-/* Icône ronde dans chaque item */
 .nav-icon {
   width: 30px;
   height: 30px;
@@ -313,7 +243,6 @@ body {
   border: 1px solid var(--border);
 }
 
-/* L'icône devient colorée quand l'item est actif */
 .nav-item.active .nav-icon {
   background: var(--acc);
   color: #fff;
@@ -326,9 +255,8 @@ body {
   color: var(--t1);
 }
 
-/* ── Bas de sidebar (statut + horloge) ── */
 .sidebar-bottom {
-  margin-top: auto; /* Pousse vers le bas */
+  margin-top: auto;
   padding: 16px;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
@@ -343,7 +271,6 @@ body {
   font-family: var(--font-mono);
 }
 
-/* Point animé (pulse) */
 .pulse-dot {
   width: 7px;
   height: 7px;
@@ -354,20 +281,18 @@ body {
   animation: pulse 2.5s ease-in-out infinite;
 }
 
-/* Animation du point : clignotement doux */
 @keyframes pulse {
   0%,  100% { opacity: 1;   transform: scale(1);   }
   50%        { opacity: 0.4; transform: scale(0.8); }
 }
 
 .sys-clock {
-  margin-left: auto; /* Colle à droite */
+  margin-left: auto;
   font-family: var(--font-mono);
   font-size: 0.68rem;
   color: var(--t3);
 }
 
-/* ── Bouton toggle sidebar ── */
 .sidebar-toggle {
   position: absolute;
   top: 20px;
@@ -391,7 +316,6 @@ body {
   border-color: var(--border-a);
 }
 
-/* Les 3 traits de l'icône hamburger */
 .toggle-icon {
   display: flex;
   flex-direction: column;
@@ -408,14 +332,14 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Largeurs différentes pour l'effet "décalé" */
+/* largeurs décalées pour l'effet visuel */
 .toggle-icon span:nth-child(1) { width: 15px; }
 .toggle-icon span:nth-child(2) { width: 10px; }
 .toggle-icon span:nth-child(3) { width: 13px; }
 
 .sidebar-toggle:hover .toggle-icon span { background: var(--acc-l); }
 
-/* Quand la sidebar est réduite : les traits forment une croix */
+/* mode réduit : les traits forment une croix */
 #sidebar.collapsed .toggle-icon span:nth-child(1) { transform: translateY(5.5px)  rotate(40deg);  }
 #sidebar.collapsed .toggle-icon span:nth-child(2) { width: 15px; opacity: 0; }
 #sidebar.collapsed .toggle-icon span:nth-child(3) { width: 11px; transform: translateY(-5.5px) rotate(-40deg); }
@@ -425,7 +349,6 @@ body {
 
 #sidebar.collapsed .nav-group { padding: 8px 0 4px; }
 
-/* Masquer les textes quand la sidebar est réduite */
 #sidebar.collapsed .nav-label,
 #sidebar.collapsed .nav-group-label,
 #sidebar.collapsed .logo-tagline,
@@ -433,7 +356,6 @@ body {
 #sidebar.collapsed .logo-os,
 #sidebar.collapsed .sidebar-bottom span:not(.sys-clock) { display: none; }
 
-/* Centrer les icônes quand la sidebar est réduite */
 #sidebar.collapsed .nav-item {
   justify-content: center;
   padding: 10px 0;
@@ -460,13 +382,12 @@ body {
   transform: translateX(50%);
 }
 
-/* Quand la sidebar est réduite, le main se rétrécit aussi */
 #sidebar.collapsed + #main { margin-left: 64px; }
 
-/* Tooltip au survol d'un item (affiche le nom de la page) */
+/* tooltip au survol en mode réduit */
 #sidebar.collapsed .nav-item { position: relative; }
 #sidebar.collapsed .nav-item:hover::after {
-  content: attr(data-page); /* Lit l'attribut data-page de l'élément */
+  content: attr(data-page);
   position: absolute;
   left: calc(100% + 10px);
   top: 50%;
@@ -485,7 +406,6 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
-/* Animation d'apparition des labels quand on rouvre la sidebar */
 #sidebar:not(.collapsed) .nav-label,
 #sidebar:not(.collapsed) .nav-group-label,
 #sidebar:not(.collapsed) .logo-tagline,
@@ -499,20 +419,16 @@ body {
   to   { opacity: 1; transform: none; }
 }
 
-
-/* ══════════════════════════════════════════
-   5. MAIN / TOPBAR
-══════════════════════════════════════════ */
+/* 5. MAIN / TOPBAR */
 #main {
-  margin-left: var(--sidebar-w); /* Laisse la place à la sidebar */
-  flex: 1;                       /* Prend toute la largeur restante */
+  margin-left: var(--sidebar-w);
+  flex: 1;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Barre du haut (sticky = reste en place au défilement) */
 .topbar {
   background: var(--bg1);
   backdrop-filter: blur(20px);
@@ -531,13 +447,11 @@ body {
 .topbar-left  { display: flex; align-items: center; gap: 14px; }
 .topbar-right { display: flex; align-items: center; gap: 16px; }
 
-/* Chemin de navigation "WealthOS / Tableau de bord" */
 .page-path  { display: flex; align-items: center; gap: 8px; }
 .path-root  { font-size: 0.72rem; color: var(--t3); font-family: var(--font-mono); }
 .path-sep   { color: var(--t3); font-size: 0.72rem; }
 .path-current { font-family: var(--font-head); font-size: 0.9rem; font-weight: 700; color: var(--t1); }
 
-/* Badge de section (ex: "Simulateur") */
 .topbar-badge {
   font-size: 0.58rem;
   font-weight: 700;
@@ -557,7 +471,6 @@ body {
   color: var(--t3);
 }
 
-/* Avatar utilisateur (cercle avec "W") */
 .topbar-avatar {
   width: 32px;
   height: 32px;
@@ -575,36 +488,26 @@ body {
   flex-shrink: 0;
 }
 
-
-/* ══════════════════════════════════════════
-   6. CONTENU & PAGES
-══════════════════════════════════════════ */
+/* 6. CONTENU & PAGES */
 .content {
   padding: 28px 32px;
   flex: 1;
 }
 
-/* Toutes les pages sont cachées par défaut */
 .page        { display: none; }
 
-/* Seule la page avec la classe "active" est visible */
 .page.active {
   display: block;
-  animation: fadeUp 0.28s cubic-bezier(0.4, 0, 0.2, 1); /* Animation d'apparition */
+  animation: fadeUp 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Animation : la page monte légèrement en apparaissant */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: none; }
 }
 
+/* 7. PAGE ACCUEIL */
 
-/* ══════════════════════════════════════════
-   7. PAGE ACCUEIL — hero, KPIs, grille
-══════════════════════════════════════════ */
-
-/* Bannière hero */
 .home-hero {
   position: relative;
   background: var(--bg1);
@@ -613,12 +516,11 @@ body {
   padding: 36px 40px;
   margin-bottom: 22px;
   display: grid;
-  grid-template-columns: 1fr 340px; /* Texte à gauche, graphique à droite */
+  grid-template-columns: 1fr 340px;
   gap: 40px;
   overflow: hidden;
 }
 
-/* Grille décorative en fond du hero */
 .hero-bg-grid {
   position: absolute;
   inset: 0;
@@ -626,10 +528,9 @@ body {
     linear-gradient(rgba(94, 122, 94, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(94, 122, 94, 0.05) 1px, transparent 1px);
   background-size: 44px 44px;
-  pointer-events: none; /* Ne bloque pas les clics */
+  pointer-events: none;
 }
 
-/* Halo lumineux en haut à droite du hero */
 .home-hero::after {
   content: '';
   position: absolute;
@@ -641,7 +542,6 @@ body {
 
 .hero-content { position: relative; z-index: 1; }
 
-/* Texte sur-titre */
 .hero-eyebrow {
   font-size: 0.7rem;
   text-transform: uppercase;
@@ -655,14 +555,12 @@ body {
   gap: 8px;
 }
 
-/* Petit trait horizontal avant le texte eyebrow */
 .hero-eyebrow::before {
   content: '';
   width: 20px; height: 1px;
   background: var(--acc);
 }
 
-/* Titre principal */
 .hero-title {
   font-family: var(--font-head);
   font-size: 2.6rem;
@@ -672,7 +570,6 @@ body {
   margin-bottom: 16px;
 }
 
-/* Mot "patrimoine" en dégradé de couleur */
 .hero-accent {
   background: linear-gradient(135deg, var(--acc) 0%, var(--teal) 50%, var(--gold) 100%);
   -webkit-background-clip: text;
@@ -690,7 +587,6 @@ body {
 
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
-/* Bouton principal (fond coloré) */
 .btn-hero-primary {
   background: linear-gradient(135deg, var(--acc), #2d4a2d);
   color: #fff;
@@ -707,12 +603,11 @@ body {
 }
 
 .btn-hero-primary:hover {
-  transform: translateY(-3px); /* Monte légèrement au survol */
+  transform: translateY(-3px);
   box-shadow: 0 12px 32px var(--acc-glow), inset 0 1px 2px rgba(255,255,255,0.3);
   filter: brightness(1.15);
 }
 
-/* Bouton secondaire (transparent avec bordure) */
 .btn-hero-secondary {
   background: transparent;
   color: var(--t2);
@@ -732,7 +627,6 @@ body {
   background: var(--acc-d);
 }
 
-/* Zone du mini-graphique dans le hero */
 .hero-visual {
   display: flex;
   align-items: center;
@@ -746,10 +640,9 @@ body {
   max-height: 200px;
 }
 
-/* ── KPI Tiles (4 tuiles d'accueil) ── */
 .home-kpis {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 colonnes égales */
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
   margin-bottom: 22px;
 }
@@ -768,7 +661,6 @@ body {
   overflow: hidden;
 }
 
-/* Ligne colorée en haut de chaque tuile */
 .kpi-tile::before {
   content: '';
   position: absolute;
@@ -819,7 +711,6 @@ body {
 .kpi-arrow { color: var(--t3); font-size: 0.9rem; transition: all var(--tr); flex-shrink: 0; }
 .kpi-tile:hover .kpi-arrow { color: var(--acc-l); transform: translateX(4px); }
 
-/* ── Grille bas de page accueil ── */
 .home-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -860,7 +751,6 @@ body {
   color: var(--t1);
 }
 
-/* Liens rapides */
 .quick-links { display: flex; flex-direction: column; gap: 6px; }
 
 .ql-item {
@@ -888,7 +778,6 @@ body {
 .ql-chevron { color: var(--t3); font-size: 0.85rem; transition: all var(--tr); }
 .ql-item:hover .ql-chevron { color: var(--acc-l); transform: translateX(3px); }
 
-/* Concepts clés */
 .concepts-grid { display: flex; flex-direction: column; gap: 10px; }
 
 .concept-pill {
@@ -920,10 +809,7 @@ body {
 .concept-text { font-size: 0.77rem; color: var(--t2); line-height: 1.65; }
 .concept-text b { color: var(--t1); font-weight: 600; }
 
-
-/* ══════════════════════════════════════════
-   8. INTRO DE PAGE (titre + description)
-══════════════════════════════════════════ */
+/* 8. INTRO DE PAGE */
 .page-intro {
   margin-bottom: 24px;
   padding-bottom: 20px;
@@ -936,7 +822,6 @@ body {
 
 .page-intro-text { flex: 1; }
 
-/* Titre de page avec dégradé de couleur */
 .page-h2 {
   font-family: var(--font-head);
   font-size: 1.6rem;
@@ -956,11 +841,7 @@ body {
   max-width: 620px;
 }
 
-
-/* ══════════════════════════════════════════
-   9. KPI ROW — rangée de tuiles slim
-   Utilisé dans les pages Retraite, Patrimoine, etc.
-══════════════════════════════════════════ */
+/* 9. KPI ROW */
 .kpi-row-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -983,7 +864,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* Ligne colorée en haut selon la variante */
 .kpi-slim::before {
   content: '';
   position: absolute;
@@ -1013,35 +893,25 @@ body {
   font-family: var(--font-mono);
 }
 
+/* 10. LAYOUTS UTILITAIRES */
 
-/* ══════════════════════════════════════════
-   10. LAYOUTS UTILITAIRES
-   Classes réutilisables pour la mise en page.
-══════════════════════════════════════════ */
-
-/* Deux colonnes : fixe à gauche (360px), flexible à droite */
 .two-col-layout {
   display: grid;
   grid-template-columns: 360px 1fr;
   gap: 20px;
 }
 
-/* Trois colonnes égales */
 .three-col-layout {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 16px;
 }
 
-/* Espacements utilitaires */
 .mb-20 { margin-bottom: 20px; }
 .mt-16 { margin-top: 16px; }
 .mt-20 { margin-top: 20px; }
 
-
-/* ══════════════════════════════════════════
-   11. PANELS & FORMULAIRES
-══════════════════════════════════════════ */
+/* 11. PANELS & FORMULAIRES */
 .params-panel { display: flex; flex-direction: column; gap: 14px; }
 
 .panel-section {
@@ -1054,7 +924,6 @@ body {
 
 .panel-section:hover { border-color: var(--border-h); }
 
-/* Titre de section avec ligne horizontale après */
 .panel-section-title {
   font-size: 0.68rem;
   font-weight: 700;
@@ -1068,7 +937,6 @@ body {
   gap: 8px;
 }
 
-/* Ligne horizontale qui s'étend jusqu'au bord */
 .panel-section-title::after {
   content: '';
   flex: 1;
@@ -1078,7 +946,6 @@ body {
 
 .charts-panel { display: flex; flex-direction: column; gap: 0; min-width: 0; }
 
-/* ── Champs de formulaire ── */
 .field-group { margin-bottom: 14px; }
 .field-group:last-child { margin-bottom: 0; }
 
@@ -1093,7 +960,6 @@ body {
 
 .field-input-wrap { position: relative; }
 
-/* Champ texte/nombre */
 .field-input {
   width: 100%;
   background: var(--bg3);
@@ -1101,18 +967,16 @@ body {
   border-radius: var(--r-sm);
   color: var(--t1);
   font-size: 0.85rem;
-  padding: 9px 38px 9px 12px; /* Espace à droite pour l'unité */
+  padding: 9px 38px 9px 12px;
   font-family: var(--font-mono);
   outline: none;
   transition: border-color var(--tr), box-shadow var(--tr), background var(--tr);
-  -moz-appearance: textfield; /* Cache les flèches sur Firefox */
+  -moz-appearance: textfield;
 }
 
-/* Cache les flèches sur Chrome/Safari */
 .field-input::-webkit-outer-spin-button,
 .field-input::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-/* Surbrillance au focus (clic dans le champ) */
 .field-input:focus {
   border-color: var(--acc);
   box-shadow: 0 0 0 3px var(--acc-d);
@@ -1121,7 +985,7 @@ body {
 
 .field-input::placeholder { color: var(--t3); font-family: var(--font-mono); font-size: 0.82rem; }
 
-/* Unité affichée à droite du champ (€, %, ans…) */
+/* unité à droite du champ */
 .field-unit {
   position: absolute;
   right: 10px;
@@ -1130,10 +994,9 @@ body {
   font-size: 0.68rem;
   color: var(--t3);
   font-family: var(--font-mono);
-  pointer-events: none; /* Ne bloque pas les clics sur le champ */
+  pointer-events: none;
 }
 
-/* Liste déroulante */
 .field-select {
   width: 100%;
   background: var(--bg3);
@@ -1146,9 +1009,9 @@ body {
   outline: none;
   cursor: pointer;
   transition: border-color var(--tr);
-  appearance: none; /* Cache la flèche native du navigateur */
+  appearance: none;
   -webkit-appearance: none;
-  /* Flèche personnalisée en SVG */
+
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a6285' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
@@ -1157,7 +1020,6 @@ body {
 
 .field-select:focus { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-d); }
 
-/* Deux champs côte à côte */
 .field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1167,10 +1029,7 @@ body {
 
 .field-row .field-group { margin-bottom: 0; }
 
-
-/* ══════════════════════════════════════════
-   12. RÉSULTATS
-══════════════════════════════════════════ */
+/* 12. RÉSULTATS */
 .results-summary {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -1202,17 +1061,14 @@ body {
 .rs-val.em     { color: var(--em);    }
 .rs-val.red    { color: var(--red);   }
 
+/* 13. ONGLETS & GRAPHIQUES */
 
-/* ══════════════════════════════════════════
-   13. ONGLETS & GRAPHIQUES
-══════════════════════════════════════════ */
-/* Barre d'onglets */
 .chart-tabs {
   display: flex;
   gap: 2px;
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: var(--r) var(--r) 0 0; /* Coins ronds seulement en haut */
+  border-radius: var(--r) var(--r) 0 0;
   border-bottom: none;
   padding: 8px 8px 0;
   flex-wrap: wrap;
@@ -1238,12 +1094,11 @@ body {
 .ct-tab.active {
   color: var(--acc-l);
   background: var(--bg3);
-  border-color: var(--border-a) var(--border-a) var(--bg3); /* Le bas est invisible */
+  border-color: var(--border-a) var(--border-a) var(--bg3);
 }
 
-/* Panneau de graphique */
 .chart-pane {
-  display: none; /* Caché par défaut */
+  display: none;
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 0 0 var(--r) var(--r);
@@ -1255,17 +1110,12 @@ body {
 
 .chart-note { font-size: 0.72rem; color: var(--t2); margin-bottom: 14px; font-style: italic; }
 
-/* Zones de dessin des graphiques (hauteurs fixes pour Chart.js) */
+/* hauteurs fixes pour Chart.js */
 .chart-area    { position: relative; height: 270px; min-width: 0; overflow: hidden; }
 .chart-area-sm { position: relative; height: 210px; min-width: 0; overflow: hidden; }
 .chart-area-lg { position: relative; height: 340px; min-width: 0; overflow: hidden; }
 
-
-/* ══════════════════════════════════════════
-   14. CARD BLOCK — conteneur générique
-   Utilisé dans toute l'application pour
-   regrouper un titre + du contenu.
-══════════════════════════════════════════ */
+/* 14. CARD BLOCK */
 .card-block {
   position: relative;
   background: rgba(240, 244, 236, 0.72);
@@ -1289,7 +1139,6 @@ body {
     0 10px 32px rgba(40, 70, 40, 0.12);
 }
 
-/* En-tête d'un card-block (point coloré + titre) */
 .block-header {
   display: flex;
   align-items: center;
@@ -1303,7 +1152,6 @@ body {
   margin-bottom: 16px;
 }
 
-/* Point coloré par défaut (vert) */
 .block-header::before {
   content: '';
   width: 6px; height: 6px;
@@ -1313,24 +1161,18 @@ body {
   flex-shrink: 0;
 }
 
-/* Variantes de couleur du point */
 .block-header.teal-dot::before   { background: var(--teal);   box-shadow: 0 0 8px var(--teal-glow); }
 .block-header.red-dot::before    { background: var(--red);    box-shadow: 0 0 8px var(--red-glow);  }
 .block-header.gold-dot::before   { background: var(--gold);   box-shadow: 0 0 8px var(--gold-glow); }
 .block-header.purple-dot::before { background: var(--purple); box-shadow: 0 0 8px rgba(192, 132, 252, 0.3); }
 
-/* Effet glassmorphism sur sidebar et items actifs */
 .card-block, #sidebar, .nav-item.active {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 6px 24px rgba(40, 70, 40, 0.10);
 }
 
-
-/* ══════════════════════════════════════════
-   15. KPIs DÉTAILLÉS (dk-item)
-   Petites tuiles sous les graphiques.
-══════════════════════════════════════════ */
+/* 15. KPIs DÉTAILLÉS */
 .detail-kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -1366,10 +1208,7 @@ body {
   font-family: var(--font-mono);
 }
 
-
-/* ══════════════════════════════════════════
-   16. BOUTONS DE TAUX (5% / 7% / 10%)
-══════════════════════════════════════════ */
+/* 16. BOUTONS DE TAUX */
 .taux-btns { display: flex; gap: 4px; margin-left: auto; }
 
 .tb {
@@ -1387,10 +1226,7 @@ body {
 .tb:hover  { color: var(--t1); border-color: var(--border-h); }
 .tb.active { background: var(--acc-d); border-color: var(--border-a); color: var(--acc-l); }
 
-
-/* ══════════════════════════════════════════
-   17. ENVELOPPE FISCALE (info box)
-══════════════════════════════════════════ */
+/* 17. ENVELOPPE FISCALE */
 .envelope-info {
   margin-top: 12px;
   padding: 12px 14px;
@@ -1404,7 +1240,6 @@ body {
 
 .envelope-info strong { color: var(--acc-l); font-weight: 600; }
 
-/* Badge coloré selon le type d'enveloppe */
 .envelope-badge {
   display: inline-flex;
   align-items: center;
@@ -1422,14 +1257,10 @@ body {
 .envelope-badge.cto  { background: rgba(244, 63,  94,  0.12); color: var(--red);    border: 1px solid rgba(244, 63,  94,  0.25); }
 .envelope-badge.per  { background: rgba(192, 132, 252, 0.12); color: var(--purple); border: 1px solid rgba(192, 132, 252, 0.25); }
 
-
-/* ══════════════════════════════════════════
-   18. SLIDERS (curseurs)
-══════════════════════════════════════════ */
+/* 18. SLIDERS */
 .slider-group          { margin-bottom: 16px; }
 .slider-group:last-child { margin-bottom: 0; }
 
-/* En-tête du slider : label à gauche, valeur à droite */
 .sg-head {
   display: flex;
   justify-content: space-between;
@@ -1442,7 +1273,6 @@ body {
 .sg-head label  { font-weight: 500; }
 .sg-head strong { color: var(--t1); font-family: var(--font-mono); font-size: 0.82rem; }
 
-/* Piste du slider */
 .slider {
   width: 100%;
   -webkit-appearance: none;
@@ -1453,7 +1283,7 @@ body {
   cursor: pointer;
 }
 
-/* Poignée du slider (le rond qu'on déplace) */
+/* poignée */
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 16px; height: 16px;
@@ -1470,7 +1300,6 @@ body {
   box-shadow: 0 0 16px var(--acc-glow);
 }
 
-/* Valeurs min/max sous le slider */
 .sg-range {
   display: flex;
   justify-content: space-between;
@@ -1480,10 +1309,7 @@ body {
   font-family: var(--font-mono);
 }
 
-
-/* ══════════════════════════════════════════
-   19. BARRE DE PROGRESSION (objectif retraite)
-══════════════════════════════════════════ */
+/* 19. BARRE DE PROGRESSION */
 .progress-track { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
 
 .pt-bar-bg {
@@ -1494,7 +1320,6 @@ body {
   overflow: hidden;
 }
 
-/* La largeur est mise à jour en JS via style.width */
 .pt-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--acc), var(--teal));
@@ -1524,19 +1349,14 @@ body {
   border: 1px solid var(--border);
 }
 
+/* 20. RETRAITE */
 
-/* ══════════════════════════════════════════
-   20. RETRAITE — grilles de résultats
-══════════════════════════════════════════ */
-
-/* 4 colonnes pour les résultats détaillés */
 .res-grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
 
-/* Grille auto-adaptative (minimum 140px par colonne) */
 .res-grid-auto {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1544,7 +1364,6 @@ body {
   margin-bottom: 20px;
 }
 
-/* Cellule de résultat */
 .res-cell {
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -1556,7 +1375,6 @@ body {
 
 .res-cell:hover { border-color: var(--border-h); }
 
-/* Cellule mise en avant (fond légèrement coloré) */
 .res-cell.highlight { border-color: var(--border-a); background: var(--acc-d); }
 
 .rc-val {
@@ -1576,20 +1394,15 @@ body {
   font-family: var(--font-mono);
 }
 
-
-/* ══════════════════════════════════════════
-   21. PATRIMOINE — liste actifs/passifs
-══════════════════════════════════════════ */
+/* 21. PATRIMOINE */
 .patri-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
 
-/* Ligne : libellé + montant + bouton supprimer */
 .patri-row { display: flex; gap: 8px; align-items: center; }
 
-.flex2 { flex: 2; }  /* Champ libellé plus large */
-.flex1 { flex: 1; }  /* Champ montant plus étroit */
+.flex2 { flex: 2; }
+.flex1 { flex: 1; }
 .field-input.flex1 { padding-right: 12px; }
 
-/* Bouton de suppression d'une ligne */
 .del-btn {
   background: transparent;
   border: 1px solid var(--border);
@@ -1604,11 +1417,10 @@ body {
 
 .del-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-d); }
 
-/* Bouton "Ajouter une ligne" */
 .add-row-btn {
   width: 100%;
   background: transparent;
-  border: 1px dashed var(--border-h); /* Bordure pointillée */
+  border: 1px dashed var(--border-h);
   border-radius: var(--r-sm);
   color: var(--t2);
   padding: 9px;
@@ -1620,7 +1432,6 @@ body {
 
 .add-row-btn:hover { border-color: var(--acc); color: var(--acc-l); background: var(--acc-d); }
 
-/* Barres de santé financière */
 .health-bars { display: flex; flex-direction: column; gap: 16px; }
 
 .hb-row { display: flex; align-items: center; gap: 12px; }
@@ -1647,12 +1458,8 @@ body {
   border: 1px solid var(--border);
 }
 
+/* 22. BUDGET */
 
-/* ══════════════════════════════════════════
-   22. BUDGET
-══════════════════════════════════════════ */
-
-/* Résumé budgétaire : 3 tuiles côte à côte */
 .budget-summary { display: flex; gap: 14px; margin: 18px 0; }
 
 .bs-item {
@@ -1672,7 +1479,6 @@ body {
 
 .bs-val { font-family: var(--font-head); font-size: 1.55rem; font-weight: 800; letter-spacing: -0.5px; }
 
-/* Couleurs selon la catégorie */
 .bs-item.teal   .bs-val { color: var(--teal);  }
 .bs-item.red    .bs-val { color: var(--red);   }
 .bs-item.accent .bs-val { color: var(--acc-l); }
@@ -1687,7 +1493,6 @@ body {
   font-family: var(--font-mono);
 }
 
-/* Graphique donut + barres côte à côte */
 .budget-charts {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1697,21 +1502,15 @@ body {
 
 .budget-bar-list { display: flex; flex-direction: column; gap: 10px; }
 
-/* En-tête d'une barre de progression budgétaire */
 .bb-head { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--t2); margin-bottom: 5px; }
 
 .bb-track { height: 6px; background: var(--bg5); border-radius: 3px; overflow: hidden; }
 .bb-fill  { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
 
-/* Ligne de budget (libellé + montant + supprimer) */
 .budget-row-item { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
 
+/* 23. COMPARAISON */
 
-/* ══════════════════════════════════════════
-   23. COMPARAISON (Scénario A vs B)
-══════════════════════════════════════════ */
-
-/* Grille : [bloc A] [VS] [bloc B] */
 .compare-panels {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -1730,7 +1529,6 @@ body {
 
 .compare-block:hover { border-color: var(--border-h); }
 
-/* Ligne colorée en haut selon le scénario */
 .compare-block.sc-a { border-top: 3px solid var(--blue);   }
 .compare-block.sc-b { border-top: 3px solid var(--purple); }
 
@@ -1738,7 +1536,6 @@ body {
 .sc-a-h    { background: rgba(56, 189, 248, 0.06); border-bottom: 1px solid var(--border); }
 .sc-b-h    { background: rgba(192, 132, 252, 0.06); border-bottom: 1px solid var(--border); }
 
-/* Lettre A ou B dans un carré coloré */
 .sc-letter {
   width: 30px; height: 30px;
   border-radius: 8px;
@@ -1754,7 +1551,6 @@ body {
 
 .sc-letter.b { background: var(--purple); box-shadow: 0 0 10px rgba(192, 132, 252, 0.35); }
 
-/* Champ de nom de scénario (directement éditable) */
 .sc-name-input {
   background: transparent;
   border: none; outline: none;
@@ -1769,7 +1565,6 @@ body {
 .sc-fields  { padding: 16px 18px; }
 .sc-results { border-top: 1px solid var(--border); padding: 14px 18px; }
 
-/* Ligne de résultat dans un scénario */
 .scr-item {
   display: flex;
   justify-content: space-between;
@@ -1790,7 +1585,6 @@ body {
 .scr-val.em     { color: var(--em);     }
 .scr-val.gold   { color: var(--gold);   }
 
-/* Badge "VS" central */
 .vs-badge {
   display: flex; align-items: center; justify-content: center;
   width: 44px; height: 44px;
@@ -1806,10 +1600,8 @@ body {
   margin-top: 60px;
 }
 
-/* Grille 2×2 des graphiques de comparaison */
 .compare-charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-/* Grille de l'analyse différentielle */
 .delta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
 
 .delta-item {
@@ -1827,18 +1619,14 @@ body {
 .delta-val   { font-family: var(--font-mono); font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
 .delta-winner{ font-size: 0.63rem; color: var(--t2); }
 
-
-/* ══════════════════════════════════════════
-   24. TABLEAU D'AMORTISSEMENT
-══════════════════════════════════════════ */
+/* 24. TABLEAU D'AMORTISSEMENT */
 .amort-table {
   width: 100%;
-  border-collapse: collapse; /* Fusionne les bordures adjacentes */
+  border-collapse: collapse;
   font-size: 0.78rem;
   font-family: var(--font-mono);
 }
 
-/* En-têtes de colonnes : collants en haut au défilement */
 .amort-table th {
   padding: 9px 12px;
   text-align: left;
@@ -1857,10 +1645,7 @@ body {
 .amort-table tbody tr:hover td { background: var(--bg3); }
 .amort-table tfoot td { padding: 10px 12px; background: var(--bg3); font-weight: 700; }
 
-
-/* ══════════════════════════════════════════
-   25. ALLOCATION — boutons de profils
-══════════════════════════════════════════ */
+/* 25. ALLOCATION */
 .alloc-profile-btn {
   width: 100%;
   background: var(--bg3);
@@ -1883,45 +1668,32 @@ body {
   transform: translateX(2px);
 }
 
-
-/* ══════════════════════════════════════════
-   26. SCROLLBAR personnalisée
-══════════════════════════════════════════ */
+/* 26. SCROLLBAR */
 ::-webkit-scrollbar       { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg1); }
 ::-webkit-scrollbar-thumb { background: var(--bg5); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--t3); }
 
+/* 27. RESPONSIVE */
 
-/* ══════════════════════════════════════════
-   27. RESPONSIVE — Media Queries
-   Adapte la mise en page selon la largeur d'écran.
-   
-   Principe des media queries :
-   @media (max-width: Xpx) { ... styles à appliquer si écran < X pixels ... }
-══════════════════════════════════════════ */
-
-/* Écrans larges (tablettes paysage, petits laptops) */
 @media (max-width: 1200px) {
-  .home-hero { grid-template-columns: 1fr; } /* Hero sur 1 colonne */
-  .hero-visual { display: none; }             /* Cache le graphique hero */
+  .home-hero { grid-template-columns: 1fr; }
+  .hero-visual { display: none; }
   .two-col-layout { grid-template-columns: 300px 1fr; }
 }
 
 @media (max-width: 1050px) {
-  .two-col-layout     { grid-template-columns: 1fr; }     /* Passe à 1 colonne */
+  .two-col-layout     { grid-template-columns: 1fr; }
   .compare-panels     { grid-template-columns: 1fr; }
   .vs-badge           { display: none; }
-  .res-grid-4         { grid-template-columns: 1fr 1fr; } /* 2 colonnes au lieu de 4 */
+  .res-grid-4         { grid-template-columns: 1fr 1fr; }
   .home-kpis          { grid-template-columns: 1fr 1fr; }
   .kpi-row-4          { grid-template-columns: 1fr 1fr; }
 }
 
-/* Tablettes et mobiles paysage */
 @media (max-width: 900px) {
-  :root { --sidebar-w: 56px; } /* Sidebar réduite automatiquement */
+  :root { --sidebar-w: 56px; }
 
-  /* Masquer les textes dans la sidebar */
   .nav-label, .nav-group-label, .logo-tagline,
   .logo-rest, .logo-os, .sidebar-bottom span:not(.sys-clock) { display: none; }
 
@@ -1934,14 +1706,12 @@ body {
   .content        { padding: 16px; }
 }
 
-/* Mobiles portrait */
 @media (max-width: 640px) {
   .home-kpis        { grid-template-columns: 1fr; }
   .kpi-row-4        { grid-template-columns: 1fr 1fr; }
   .res-grid-4       { grid-template-columns: 1fr 1fr; }
   .budget-summary   { flex-direction: column; }
 
-  /* Graphiques plus petits sur mobile */
   .chart-area    { height: 200px; }
   .chart-area-sm { height: 170px; }
   .chart-area-lg { height: 240px; }
@@ -1949,16 +1719,13 @@ body {
   #budget-503020 { grid-template-columns: 1fr !important; }
 }
 
-/* ── Scroll horizontal sur les graphiques (petits écrans) ──
-   Sur mobile, si le graphique est trop large, on peut défiler horizontalement.
-*/
+/* scroll horizontal sur les graphiques si trop larges */
 .chart-scroll-wrap {
   overflow-x: auto;
   overflow-y: hidden;
-  -webkit-overflow-scrolling: touch; /* Défilement fluide sur iOS */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Largeur minimale des graphiques pour qu'ils restent lisibles */
 .chart-scroll-wrap .chart-area,
 .chart-scroll-wrap .chart-area-sm,
 .chart-scroll-wrap .chart-area-lg { min-width: 480px; }
@@ -1969,12 +1736,8 @@ body {
   .chart-scroll-wrap .chart-area-lg { min-width: 420px; }
 }
 
+/* 28. ACADÉMIE */
 
-/* ══════════════════════════════════════════
-   28. ACADÉMIE — styles spécifiques
-══════════════════════════════════════════ */
-
-/* Boutons de filtre par catégorie */
 .acad-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 
 .acad-filter {
@@ -1993,7 +1756,6 @@ body {
 .acad-filter:hover  { border-color: var(--border-h); color: var(--t1); }
 .acad-filter.active { background: var(--acc-d); border-color: var(--border-a); color: var(--acc-l); }
 
-/* Barre de recherche */
 .acad-search-wrap { position: relative; margin-bottom: 10px; }
 
 .acad-search {
@@ -2003,7 +1765,7 @@ body {
   border-radius: var(--r-sm);
   color: var(--t1);
   font-size: 0.85rem;
-  padding: 11px 16px 11px 40px; /* Espace à gauche pour l'icône loupe */
+  padding: 11px 16px 11px 40px;
   font-family: var(--font-body);
   outline: none;
   transition: border-color var(--tr), box-shadow var(--tr);
@@ -2012,7 +1774,6 @@ body {
 .acad-search:focus { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-d); }
 .acad-search::placeholder { color: var(--t3); }
 
-/* Icône loupe (⌕) positionnée à gauche de la barre */
 .acad-search-icon {
   position: absolute;
   left: 13px;
@@ -2023,7 +1784,6 @@ body {
   pointer-events: none;
 }
 
-/* Grille des cartes termes */
 .acad-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -2031,7 +1791,6 @@ body {
   margin-bottom: 4px;
 }
 
-/* Carte d'un terme financier */
 .acad-card {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -2051,7 +1810,6 @@ body {
 
 .acad-card.expanded { border-color: var(--border-a); }
 
-/* En-tête de la carte (icône + titre + tag) */
 .acad-card-top {
   display: flex;
   align-items: flex-start;
@@ -2059,7 +1817,6 @@ body {
   padding: 16px 18px 14px;
 }
 
-/* Icône ronde colorée selon la catégorie */
 .acad-card-icon {
   width: 36px; height: 36px;
   border-radius: 10px;
@@ -2069,7 +1826,6 @@ body {
   font-family: var(--font-mono);
 }
 
-/* Couleurs des icônes selon catégorie */
 .acad-card-icon.base      { background: var(--acc-d);                color: var(--acc-l); border: 1px solid var(--border-a); }
 .acad-card-icon.rendement { background: rgba(45,212,191,0.12);       color: var(--teal);  border: 1px solid rgba(45,212,191,0.25); }
 .acad-card-icon.risque    { background: rgba(251,113,133,0.12);      color: var(--red);   border: 1px solid rgba(251,113,133,0.25); }
@@ -2082,7 +1838,6 @@ body {
 
 .acad-card-titre { font-family: var(--font-head); font-size: 0.95rem; font-weight: 700; color: var(--t1); margin-bottom: 3px; }
 
-/* Tag de catégorie (petit badge) */
 .acad-card-tag {
   font-size: 0.62rem;
   font-weight: 700;
@@ -2094,7 +1849,6 @@ body {
   display: inline-block;
 }
 
-/* Couleurs des tags */
 .acad-card-tag.base      { background: var(--acc-d);           color: var(--acc-l); }
 .acad-card-tag.rendement { background: rgba(45,212,191,0.12);  color: var(--teal);  }
 .acad-card-tag.risque    { background: rgba(251,113,133,0.12); color: var(--red);   }
@@ -2103,23 +1857,20 @@ body {
 .acad-card-tag.micro     { background: rgba(107,143,160,0.12); color: var(--blue);  }
 .acad-card-tag.macro     { background: rgba(94,122,94,0.12);   color: var(--teal);  }
 
-/* Définition courte (toujours visible) */
 .acad-card-def { padding: 0 18px 14px; font-size: 0.81rem; color: var(--t2); line-height: 1.65; }
 
-/* Zone extensible (exemple + formule) : cachée par défaut */
+/* zone dépliable, cachée par défaut */
 .acad-card-expand {
   border-top: 1px solid var(--border);
-  max-height: 0;             /* 0 = caché */
+  max-height: 0;
   overflow: hidden;
   transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
 }
 
-/* Quand la carte est ouverte : max-height est augmentée pour révéler le contenu */
 .acad-card.expanded .acad-card-expand { max-height: 400px; }
 
 .acad-card-expand-inner { padding: 14px 18px 16px; }
 
-/* Label "Exemple concret" / "Formule clé" */
 .acad-example-label {
   font-size: 0.65rem;
   font-weight: 700;
@@ -2130,7 +1881,6 @@ body {
   margin-bottom: 6px;
 }
 
-/* Encart exemple avec bordure gauche colorée */
 .acad-example {
   background: var(--bg3);
   border-left: 3px solid var(--acc);
@@ -2142,13 +1892,11 @@ body {
   margin-bottom: 10px;
 }
 
-/* Variantes de couleur de la bordure gauche */
 .acad-example.teal   { border-left-color: var(--teal);   }
 .acad-example.gold   { border-left-color: var(--gold);   }
 .acad-example.red    { border-left-color: var(--red);    }
 .acad-example.purple { border-left-color: var(--purple); }
 
-/* Encart formule (fond plus sombre, police mono) */
 .acad-formula {
   background: var(--bg4);
   border: 1px solid var(--border);
@@ -2160,7 +1908,6 @@ body {
   margin-top: 6px;
 }
 
-/* Bouton toggle (▾ / ▴) en haut à droite de la carte */
 .acad-toggle-icon {
   position: absolute;
   top: 16px; right: 16px;
@@ -2174,14 +1921,12 @@ body {
   flex-shrink: 0;
 }
 
-/* Rotation de la flèche quand la carte est ouverte */
 .acad-card.expanded .acad-toggle-icon {
   transform: rotate(180deg);
   color: var(--acc-l);
   background: var(--acc-d);
 }
 
-/* ── Calculettes ── */
 .acad-calc-tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
 
 .acad-ctab {
@@ -2200,10 +1945,9 @@ body {
 .acad-ctab:hover  { color: var(--t1); border-color: var(--border-h); }
 .acad-ctab.active { background: var(--acc-d); border-color: var(--border-a); color: var(--acc-l); }
 
-.acad-calc-pane        { display: none; }     /* Caché par défaut */
-.acad-calc-pane.active { display: block; }    /* Visible si actif */
+.acad-calc-pane        { display: none; }
+.acad-calc-pane.active { display: block; }
 
-/* Grille calculette : champs à gauche, résultats à droite */
 .acad-calc-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2211,7 +1955,6 @@ body {
   align-items: start;
 }
 
-/* Zone de résultats de calculette */
 .acad-calc-results {
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -2222,7 +1965,6 @@ body {
   gap: 10px;
 }
 
-/* Ligne de résultat (libellé + valeur) */
 .acr-item {
   display: flex;
   justify-content: space-between;
@@ -2240,7 +1982,6 @@ body {
 .acr-val.red                    { color: var(--red);    }
 .acr-val.purple                 { color: var(--purple); }
 
-/* Message de conclusion de la calculette */
 .acad-verdict {
   margin-top: 10px;
   padding: 10px 13px;
@@ -2252,7 +1993,6 @@ body {
   color: var(--t2);
 }
 
-/* ── Lexique express ── */
 .acad-lexique {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -2279,50 +2019,42 @@ body {
   .acad-grid      { grid-template-columns: 1fr; }
 }
 
+/* 29. DÉCORATION des blocs */
 
-/* ══════════════════════════════════════════
-   29. DÉCORATION — blobs et grain
-   Éléments purement esthétiques en fond de page.
-══════════════════════════════════════════ */
-
-/* Blobs : grands cercles flous colorés en fond */
 .glass-bg-blob {
-  position: fixed;      /* Ne bougent pas avec le défilement */
-  z-index: -1;          /* Derrière tout le contenu */
+  position: fixed;
+  z-index: -1;
   border-radius: 50%;
-  filter: blur(90px);   /* Très flou → effet doux */
+  filter: blur(90px);
   opacity: 0.35;
-  animation: move 20s infinite alternate; /* Se déplacent lentement */
+  animation: move 20s infinite alternate;
 }
 
-/* Blob vert en haut à droite */
 .blob-1 {
   width: 500px; height: 500px;
   background: linear-gradient(135deg, #7ea87e, #a8c4b0);
   top: -100px; right: -100px;
 }
 
-/* Blob beige-bleu en bas à gauche */
 .blob-2 {
   width: 400px; height: 400px;
   background: linear-gradient(135deg, #c4b89a, #6b8fa0);
   bottom: -50px; left: -50px;
-  animation-delay: -5s; /* Démarre décalé pour une animation asynchrone */
+  animation-delay: -5s;
 }
 
-/* Animation de déplacement des blobs */
 @keyframes move {
   from { transform: translate(0, 0)       scale(1);   }
   to   { transform: translate(100px, 50px) scale(1.1); }
 }
 
-/* Grain : texture légère sur toute la page (comme du papier) */
+/* image de fond */
 .glass-grain {
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  z-index: 1000;           /* Devant tout (mais pointer-events:none = pas bloquant) */
-  pointer-events: none;    /* Ne bloque PAS les clics ni la saisie */
-  opacity: 0.04;           /* Très très léger, quasi invisible */
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0.04;
   background-image: url('https://grainy-gradients.vercel.app/noise.svg');
 }
