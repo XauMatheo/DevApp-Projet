@@ -1,16 +1,6 @@
-/* ══════════════════════════════════════════
-   WEALTH OS — script.js
-   Version commentée pour débutants
-   
-   Ce fichier contient toute la logique JavaScript
-   de l'application : navigation, calculs financiers,
-   graphiques, formulaires.
-══════════════════════════════════════════ */
 
 
-/* ══ VARIABLES GLOBALES ══
-   Ces variables sont accessibles partout dans le fichier.
-   On les déclare ici pour les partager entre toutes les fonctions.
+/*  VARIABLES GLOBALES 
 */
 let charts = {};            // Stocke tous les graphiques Chart.js créés (pour pouvoir les détruire)
 let budgetItems = {         // Stocke les lignes du budget (revenus + dépenses)
@@ -21,9 +11,9 @@ let _rendTaux = 7;          // Taux actif dans l'onglet "Détail annuel" (7% par
 let _investTabActive = 'evolution'; // Onglet de graphique actif dans la page Investissement
 
 
-/* ══ TITRES DES PAGES ══
+/*  TITRES DES PAGES 
    Objet associant chaque identifiant de page à son titre affiché.
-   Exemple : pageTitles['home'] vaut 'Tableau de bord'
+   
 */
 const pageTitles = {
   home:       'Tableau de bord',
@@ -49,7 +39,7 @@ const pageBadges = {
 };
 
 
-/* ══ NAVIGATION ══ */
+/* NAVIGATION  */
 
 /*
   goPage(id) — navigue vers une page de l'application.
@@ -120,7 +110,7 @@ for (var i = 0; i < navItems.length; i++) {
 }
 
 
-/* ══ HORLOGE ══
+/*  HORLOGE 
    Met à jour l'heure affichée dans la sidebar et dans la topbar.
    Appelée toutes les secondes via setInterval.
 */
@@ -144,7 +134,7 @@ setInterval(updateClock, 1000);
 updateClock(); // Premier appel immédiat pour éviter un délai d'1 seconde au démarrage
 
 
-/* ══ SIDEBAR RÉDUCTIBLE ══ */
+/*  SIDEBAR RÉDUCTIBLE  */
 
 /*
   toggleSidebar() — réduit ou agrandit la sidebar.
@@ -166,19 +156,17 @@ if (localStorage.getItem('wos_sidebar') === '1') {
 }
 
 
-/* ══════════════════════════════════════════
+/* 
    FONCTIONS UTILITAIRES (HELPERS)
    Ces fonctions sont utilisées partout dans le code
    pour éviter de répéter les mêmes opérations.
-══════════════════════════════════════════ */
+*/
 
 /*
   fmt(n) — formate un nombre en chaîne lisible avec unité €.
   Exemples :
-    fmt(1500000) → "1.50M€"
-    fmt(25000)   → "25.0k€"
-    fmt(950)     → "950€"
-    fmt(NaN)     → "—"
+    fmt(1500000) ="1.50M€"
+ 
 */
 function fmt(n) {
   // Si la valeur est invalide ou manquante, on affiche un tiret
@@ -201,7 +189,7 @@ function fmt(n) {
 /*
   fmtN(n) — formate un nombre avec séparateur de milliers et "€".
   Utilise Intl.NumberFormat pour la localisation française.
-  Exemple : fmtN(12500) → "12 500 €"
+  Exemple : fmtN(12500) = "12 500 €"
 */
 function fmtN(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
@@ -254,7 +242,7 @@ function generateColors(n) {
 }
 
 
-/* ══ CONFIGURATION PAR DÉFAUT DES GRAPHIQUES ══
+/*  CONFIGURATION PAR DÉFAUT DES GRAPHIQUES 
    Retourne un objet d'options Chart.js commun à tous les graphiques.
    Cela évite de répéter la même configuration partout.
 */
@@ -316,7 +304,7 @@ function chartDefaults() {
         ticks: {
           color: '#5c6692',
           font:  { family: 'DM Mono, monospace', size: 10 },
-          /* Formate les valeurs de l'axe Y (ex: 1500000 → "1.5M€") */
+          /* Formate les valeurs de l'axe Y (ex: 1500000 =  "1.5M€") */
           callback: function(value) {
             if (Math.abs(value) >= 1000000) return (value / 1000000).toFixed(1) + 'M€';
             if (Math.abs(value) >= 1000)    return (value / 1000).toFixed(0) + 'k€';
@@ -344,7 +332,7 @@ function destroyChart(id) {
 /*
   escHtml(s) — sécurise une chaîne avant de l'insérer en HTML.
   Remplace les caractères spéciaux pour éviter les injections HTML.
-  Ex : escHtml('<script>') → '&lt;script&gt;'
+  Ex : escHtml('<script>')  '&lt;script&gt;'
 */
 function escHtml(s) {
   return String(s)
@@ -354,7 +342,7 @@ function escHtml(s) {
 }
 
 
-/* ══ STOCKAGE LOCAL ══
+/* STOCKAGE LOCAL 
    Sauvegarde et récupère des données dans le navigateur (localStorage).
    Les données persistent même après fermeture de l'onglet.
 */
@@ -379,11 +367,9 @@ function loadLocal(key) {
 }
 
 
-/* ══════════════════════════════════════════
+/* 
    ENVELOPPES FISCALES
-   Données et calculs liés aux différents types
-   de comptes d'investissement français.
-══════════════════════════════════════════ */
+ */
 
 /*
   ENVELOPES — objet contenant les caractéristiques fiscales
@@ -515,11 +501,10 @@ function updateEnvelopeInfo(envelopeId, containerId) {
 }
 
 
-/* ══════════════════════════════════════════
+/* 
    PAGE INVESTISSEMENT
-   Simulateur de croissance de capital
-   avec intérêts composés.
-══════════════════════════════════════════ */
+  
+*/
 
 /*
   switchInvestTab(tab, btn) — change l'onglet de graphique affiché.
@@ -633,7 +618,7 @@ function calcCapAt(capital, monthly, rateNet, years) {
 /*
   updateInvest() — fonction principale du simulateur d'investissement.
   
-  Appelée à chaque modification d'un champ de formulaire (oninput).
+  Appelée à chaque modification d'un champ de formulaire .
   1. Lit tous les paramètres du formulaire
   2. Calcule les résultats
   3. Met à jour les KPIs affichés
@@ -744,7 +729,7 @@ function renderInvestCharts() {
 
   var opts = chartDefaults();
 
-  /* ── Graphique 1 : Évolution du capital ── */
+  /*  Graphique 1 : Évolution du capital  */
   destroyChart('invest');
   charts.invest = new Chart(
     document.getElementById('invest-chart').getContext('2d'),
@@ -795,7 +780,7 @@ function renderInvestCharts() {
     }
   );
 
-  /* ── Graphique 2 : Multi-taux ── */
+  /*  Graphique 2 : Multi-taux  */
   destroyChart('rend-multi');
   var tauxListe   = [3, 5, 7, 10, 12];
   var couleurs    = ['#4aa3e8', '#00c9a7', '#5b6fff', '#d4af37', '#f24463'];
@@ -825,7 +810,7 @@ function renderInvestCharts() {
     { type: 'line', data: { labels: labels, datasets: datasetsMultiTaux }, options: chartDefaults() }
   );
 
-  /* ── Graphique 3 : Composition (versements vs intérêts) ── */
+  /*  Graphique 3 : Composition (versements vs intérêts)  */
   destroyChart('rend-compo');
   var versementsFinal = versData[versData.length - 1] ? versData[versData.length - 1].value : 0;
 
@@ -888,7 +873,7 @@ function renderInvestCharts() {
     }
   );
 
-  /* ── Graphique 4 : Inflation (valeur nominale vs réelle) ── */
+  /*  Graphique 4 : Inflation (valeur nominale vs réelle)  */
   destroyChart('rend-inflation');
   charts['rend-inflation'] = new Chart(
     document.getElementById('rend-inflation-chart').getContext('2d'),
@@ -936,7 +921,7 @@ function renderInvestCharts() {
 }
 
 
-/* ══ TABLEAU D'AMORTISSEMENT ══
+/*  TABLEAU D'AMORTISSEMENT 
    Affiche année par année : capital de départ, versements, intérêts, capital de fin.
 */
 function renderAmortTable(capital, monthly, rateNet, years, revalor) {
@@ -1014,7 +999,7 @@ function renderAmortTable(capital, monthly, rateNet, years, revalor) {
 }
 
 /*
-  setRendTaux(t, btn) — change le taux du graphique "Détail annuel".
+  setRendTaux(t, btn) — change le taux du graphique Détail annuel.
   Paramètres :
   - t   : le taux à appliquer (5, 7 ou 10)
   - btn : le bouton cliqué (pour le style actif)
@@ -1137,7 +1122,7 @@ function renderRendDetail() {
 }
 
 
-/* ══ MONTE CARLO ══
+/*  MONTE CARLO 
    Simule 200 trajectoires aléatoires pour visualiser
    l'incertitude sur le capital final.
    
@@ -1165,7 +1150,7 @@ function renderMonteCarlo() {
   }
 
   var NB_SIMULATIONS = 200;
-  var volatiliteAnnuelle = rateNet * 0.6; // Volatilité estimée ≈ 60% du taux annuel
+  var volatiliteAnnuelle = rateNet * 0.6; // Volatilité estimée = 60% du taux annuel
 
   var labels = [];
   for (var i = 0; i <= years; i++) {
@@ -1269,7 +1254,7 @@ function renderMonteCarlo() {
     responsive:          true,
     maintainAspectRatio: false
   });
-  // On ne montre dans le tooltip que les datasets avec un label (pas les trajectoires grises)
+  // datasets avec un label (pas les trajectoires grises)
   optsMC.plugins = Object.assign({}, chartDefaults().plugins);
   optsMC.plugins.tooltip = Object.assign({}, chartDefaults().plugins.tooltip, {
     filter: function(item) {
@@ -1323,7 +1308,7 @@ function renderMonteCarlo() {
 }
 
 
-/* ══ GRAPHIQUE D'ACCUEIL ══
+/*  GRAPHIQUE D'ACCUEIL 
    Mini-graphique affiché dans le bandeau hero de la page d'accueil.
 */
 function updateHomeChart(donnees, versData) {
@@ -1388,10 +1373,9 @@ function updateHomeChart(donnees, versData) {
 }
 
 
-/* ══════════════════════════════════════════
+/* 
    PAGE RETRAITE
-   Simulateur de capitalisation pour la retraite.
-══════════════════════════════════════════ */
+    */
 
 /*
   calcRetraite(capitalActuel, epargne, tauxAnnuel, annees, revalor) —
@@ -1416,7 +1400,7 @@ function calcRetraite(capitalActuel, epargne, tauxAnnuel, annees, revalor) {
     donnees.push({ year: annee, value: capitalCourant });
   }
 
-  // Total versé = capital initial + (épargne × 12 mois × nombre d'années)
+  // Total versé = capital initial + (épargne x 12 mois x nombre d'années)
   var totalVersements = capitalActuel + epargne * annees * 12;
 
   return {
@@ -1431,7 +1415,7 @@ function calcRetraite(capitalActuel, epargne, tauxAnnuel, annees, revalor) {
   qu'on peut tirer d'un capital pendant une durée donnée.
   
   On utilise la formule de l'annuité (rente viagère avec rendement) :
-  rente = capital × r / (1 - (1+r)^-n)
+  rente = capital x r / (1 - (1+r)^-n)
   où r = taux mensuel et n = nombre de mois
   
   Si taux = 0 : rente = capital / nombre de mois (division simple)
@@ -1465,7 +1449,7 @@ function updateRetraite() {
   var revalor      = fv('ret-revalor')       || 0;
   var objectif     = fv('ret-objectif')      || 2000;
 
-  /* Petite fonction interne pour mettre à jour un texte */
+  /*  fonction interne pour mettre à jour un texte */
   function setText(id, texte) {
     var el = document.getElementById(id);
     if (el) el.textContent = texte;
@@ -1561,7 +1545,7 @@ function updateRetraite() {
   /* Graphique d'évolution de l'épargne */
   destroyChart('retraite');
 
-  // Versements cumulés (simple : capital + épargne × mois)
+  // Versements cumulés (simple : capital + épargne x mois)
   var ligneVersements = [];
   for (var annee = 0; annee < donnees.length; annee++) {
     ligneVersements.push(capital + epargne * donnees[annee].year * 12);
@@ -1682,10 +1666,10 @@ function renderDecaissement(capital, tauxPlacement, dureeAns) {
 }
 
 
-/* ══════════════════════════════════════════
+/* 
    PAGE PATRIMOINE
-   Bilan actifs / passifs.
-══════════════════════════════════════════ */
+
+*/
 
 /*
   addPatriRow(type) — ajoute une ligne dans le tableau actifs ou passifs.
@@ -1890,10 +1874,10 @@ function updatePatrimoine() {
 }
 
 
-/* ══════════════════════════════════════════
+/* 
    PAGE BUDGET
-   Gestion des revenus et dépenses.
-══════════════════════════════════════════ */
+
+*/
 
 /* Ajoute un revenu dans la liste (avec valeurs par défaut optionnelles) */
 function addRevenu(label, montant) {
@@ -2245,10 +2229,9 @@ function initBudget() {
 }
 
 
-/* ══════════════════════════════════════════
-   PAGE COMPARAISON (Scénario A vs B)
-   Compare deux stratégies d'investissement.
-══════════════════════════════════════════ */
+/* 
+   PAGE COMPARAISON (Scénario A et B)
+*/
 
 /*
   calcScenario(...) — calcule tous les indicateurs d'un scénario d'investissement.
@@ -2492,10 +2475,10 @@ function updateCompare() {
 }
 
 
-/* ══════════════════════════════════════════
+/* 
    PAGE ALLOCATION DE PORTEFEUILLE
-   Analyse et simulation d'un portefeuille d'actifs.
-══════════════════════════════════════════ */
+
+ */
 
 /*
   ASSET_DATA — caractéristiques historiques estimées de chaque classe d'actif.
@@ -2562,10 +2545,10 @@ function applyProfile(name) {
   rendement pondéré, volatilité, ratio de Sharpe, drawdown max estimé.
   
   Formules :
-  - Rendement pondéré = Σ (rendement_actif × poids / total)
-  - Volatilité ≈ √ Σ (volatilité_actif × poids / total)²  (simplifiée, sans corrélations)
+  - Rendement pondéré =  (rendement_actif × poids / total)
+  - Volatilité =  (volatilité_actif × poids / total)^2  (simplifiée, sans corrélations)
   - Sharpe = (rendement - taux sans risque) / volatilité
-  - Drawdown max ≈ volatilité × 2.5 (approximation empirique)
+  - Drawdown max = volatilité × 2.5 (approximation empirique)
 */
 function calcPortfolioStats(weights) {
   var total = 0;
@@ -2581,7 +2564,7 @@ function calcPortfolioStats(weights) {
     rendement += ASSET_DATA[cle].rendement * weights[cle] / total;
   }
 
-  // Calcul de la variance (somme des volatilités² pondérées) puis on prend la racine
+  // Calcul de la variance (somme des volatilités^2 pondérées) puis on prend la racine
   var variance = 0;
   for (var j = 0; j < cles.length; j++) {
     var cle2    = cles[j];
@@ -2758,7 +2741,7 @@ function renderAllocProjection(rendement, volatilite) {
 }
 
 /*
-  renderAllocScatter(weights, total) — graphique "bubble" (nuage de points)
+  renderAllocScatter(weights, total) — graphique en nuage de points
   affichant chaque classe d'actif selon sa volatilité (axe X) et son rendement (axe Y).
   La taille de la bulle représente le poids dans le portefeuille.
 */
@@ -2891,7 +2874,7 @@ function renderAllocDetailTable(weights, total, stats) {
 }
 
 
-/* ══ ACCUEIL — RAFRAÎCHISSEMENT ══ */
+/*  ACCUEIL — RAFRAÎCHISSEMENT  */
 function refreshHome() {
   /* Les KPIs de la page d'accueil se mettent à jour via les simulateurs.
      Cette fonction est intentionnellement vide : les valeurs
@@ -2899,7 +2882,7 @@ function refreshHome() {
 }
 
 
-/* ══ INITIALISATION ══
+/*  INITIALISATION 
    Appelée au chargement de la page.
 */
 function init() {
@@ -2915,11 +2898,11 @@ function init() {
 init(); // Appel immédiat au chargement du script
 
 
-/* ══════════════════════════════════════════
+/* 
    ACADÉMIE — DONNÉES & LOGIQUE
    Liste des termes financiers avec définitions,
    exemples et formules.
-══════════════════════════════════════════ */
+ */
 
 /*
   ACAD_TERMS — tableau de tous les termes financiers affichés dans l'académie.
@@ -2934,7 +2917,7 @@ init(); // Appel immédiat au chargement du script
   - couleurEx   : couleur de l'encart exemple ('teal', 'gold', 'red', 'purple', ou null)
 */
 const ACAD_TERMS = [
-  // ── BASES ──
+  //  BASES 
   {
     id: 'capital', titre: 'Capital', categorie: 'base', icon: '◆',
     def: "Somme d'argent que vous investissez ou possédez. C'est la base de toute stratégie d'investissement.",
@@ -2972,7 +2955,7 @@ const ACAD_TERMS = [
     formule: null, couleurEx: 'teal'
   },
 
-  // ── RENDEMENT ──
+  //  RENDEMENT 
   {
     id: 'taux-rendement', titre: 'Taux de rendement', categorie: 'rendement', icon: '◈',
     def: "Gain ou perte d'un investissement exprimé en pourcentage du capital investi sur une période donnée.",
@@ -3010,7 +2993,7 @@ const ACAD_TERMS = [
     formule: 'Rente annuelle = Capital × 4% | Capital nécessaire = Dépenses × 25', couleurEx: 'teal'
   },
 
-  // ── RISQUE ──
+  //  RISQUE 
   {
     id: 'volatilite', titre: 'Volatilité', categorie: 'risque', icon: '▲',
     def: "Mesure des variations du prix d'un actif. Une forte volatilité signifie des hausses et baisses importantes. C'est le principal indicateur de risque d'un placement.",
@@ -3048,7 +3031,7 @@ const ACAD_TERMS = [
     formule: 'β > 1 : agressif | β = 1 : neutre | β < 1 : défensif | β < 0 : inverse', couleurEx: 'red'
   },
 
-  // ── FISCALITÉ ──
+  //  FISCALITÉ 
   {
     id: 'pfu', titre: 'PFU / Flat Tax (30%)', categorie: 'fiscalite', icon: '○',
     def: "Prélèvement Forfaitaire Unique de 30% sur les revenus du capital (12,8% d'impôt + 17,2% de prélèvements sociaux). S'applique aux dividendes et plus-values du CTO.",
@@ -3080,7 +3063,7 @@ const ACAD_TERMS = [
     formule: 'Tranches 2024 : 0% (< 10 778€) / 11% / 30% / 41% / 45% (> 168 994€)', couleurEx: 'red'
   },
 
-  // ── STRATÉGIE ──
+  //  STRATÉGIE 
   {
     id: 'dca', titre: 'DCA — Investissement régulier', categorie: 'strategie', icon: '◇',
     def: "Dollar-Cost Averaging : investir un montant fixe à intervalle régulier (chaque mois), quelle que soit l'évolution des marchés. Réduit l'impact du \"mauvais timing\".",
@@ -3118,7 +3101,7 @@ const ACAD_TERMS = [
     formule: "PER = Prix de l'action / Bénéfice par action (BPA)", couleurEx: 'gold'
   },
 
-  // ── MICROÉCONOMIE ──
+  //  MICROÉCONOMIE 
   {
     id: 'offre-demande', titre: 'Offre & Demande', categorie: 'micro', icon: '◆',
     def: "La loi fondamentale de l'économie : quand la demande dépasse l'offre, les prix montent. Quand l'offre dépasse la demande, les prix baissent. Tout marché (actions, immobilier, matières premières) obéit à cette loi.",
@@ -3150,7 +3133,7 @@ const ACAD_TERMS = [
     formule: null, couleurEx: 'teal'
   },
 
-  // ── MACROÉCONOMIE ──
+  //  MACROÉCONOMIE 
   {
     id: 'pib', titre: 'PIB — Produit Intérieur Brut', categorie: 'macro', icon: '◉',
     def: "Mesure de la richesse produite par un pays en un an. C'est l'indicateur macroéconomique le plus suivi. Sa croissance indique la santé de l'économie ; sa contraction (deux trimestres consécutifs) définit une récession.",
@@ -3233,7 +3216,7 @@ const ACAD_LEXIQUE_DATA = [
 ];
 
 /* Variables pour filtrer et rechercher dans l'académie */
-let _acadFilter = 'tous'; // Catégorie active ('tous', 'base', 'rendement', etc.)
+let _acadFilter = 'tous'; // Catégorie active ('tous', 'base', 'rendement')
 let _acadSearch = '';     // Texte de recherche en cours
 
 /*
@@ -3333,11 +3316,11 @@ function renderAcadGrid() {
   acadCard(t) — génère le HTML d'une carte de terme financier.
   
   La carte est repliée par défaut et s'agrandit au clic (via toggleAcadCard).
-  Elle affiche : icône, titre, tag catégorie, définition.
-  En déroulant : exemple concret + formule clé.
+   affiche : icône, titre, tag catégorie, définition.
+   déroulant : exemple concret + formule clé.
 */
 function acadCard(t) {
-  /* Correspondance catégorie → libellé affiché */
+  /* Correspondance catégorie - libellé affiché */
   var tagLabels = {
     base:       'Bases',
     rendement:  'Rendement',
@@ -3431,7 +3414,7 @@ function switchCalcTab(tab, btn) {
   if (panneau) panneau.classList.add('active');
 }
 
-/* fmtAcad(n) — formate un nombre pour l'académie (même logique que fmtN) */
+/* fmtAcad(n) — formate un nombre pour l'académie  */
 function fmtAcad(n) {
   if (!isFinite(n)) return '—';
   return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' €';
@@ -3441,8 +3424,8 @@ function fmtAcad(n) {
   setAcadResults(id, items) — affiche les résultats d'une calculette.
   
   Paramètre items : tableau d'objets de deux types :
-  - { lbl, val, col } → ligne de résultat standard (libellé + valeur colorée)
-  - { type: 'verdict', html } → bloc de conclusion en bas
+  - { lbl, val, col } = ligne de résultat standard (libellé + valeur colorée)
+  - { type: 'verdict', html } = bloc de conclusion en bas
 */
 function setAcadResults(id, items) {
   var el = document.getElementById(id);
@@ -3531,7 +3514,7 @@ function calcR72() {
   var duree72     = 72 / rate;
 
   /* Calcul exact : on cherche n tel que (1 + r)^n = 2
-     → n = log(2) / log(1 + r) */
+     n = log(2) / log(1 + r) */
   var dureeExacte  = Math.log(2) / Math.log(1 + rate / 100);
   var dureeTriple  = Math.log(3) / Math.log(1 + rate / 100);
 
