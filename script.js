@@ -158,14 +158,10 @@ if (localStorage.getItem('wos_sidebar') === '1') {
 
 /* 
    FONCTIONS UTILITAIRES (HELPERS)
-   Ces fonctions sont utilisées partout dans le code
-   pour éviter de répéter les mêmes opérations.
 */
 
 /*
   fmt(n) — formate un nombre en chaîne lisible avec unité €.
-  Exemples :
-    fmt(1500000) ="1.50M€"
  
 */
 function fmt(n) {
@@ -189,7 +185,7 @@ function fmt(n) {
 /*
   fmtN(n) — formate un nombre avec séparateur de milliers et "€".
   Utilise Intl.NumberFormat pour la localisation française.
-  Exemple : fmtN(12500) = "12 500 €"
+
 */
 function fmtN(n) {
   if (n === null || n === undefined || isNaN(n)) return '—';
@@ -199,7 +195,6 @@ function fmtN(n) {
 /*
   fv(id) — lit la valeur d'un champ <input> et la convertit en nombre décimal.
   Retourne 0 si le champ est vide ou introuvable.
-  Ex : fv('r-capital') lit le champ dont l'id HTML est "r-capital"
 */
 function fv(id) {
   var element = document.getElementById(id);
@@ -229,8 +224,8 @@ function sv(id) {
 
 /*
   generateColors(n) — génère un tableau de n couleurs pour les graphiques.
-  On tourne en boucle dans une palette prédéfinie.
-  Ex : generateColors(3) → ['#818cf8', '#2dd4bf', '#fcd34d']
+
+
 */
 function generateColors(n) {
   var palette = ['#818cf8', '#2dd4bf', '#fcd34d', '#fb7185', '#38bdf8', '#c084fc', '#f472b6', '#34d399'];
@@ -244,7 +239,7 @@ function generateColors(n) {
 
 /*  CONFIGURATION PAR DÉFAUT DES GRAPHIQUES 
    Retourne un objet d'options Chart.js commun à tous les graphiques.
-   Cela évite de répéter la même configuration partout.
+
 */
 function chartDefaults() {
   return {
@@ -332,7 +327,6 @@ function destroyChart(id) {
 /*
   escHtml(s) — sécurise une chaîne avant de l'insérer en HTML.
   Remplace les caractères spéciaux pour éviter les injections HTML.
-  Ex : escHtml('<script>')  '&lt;script&gt;'
 */
 function escHtml(s) {
   return String(s)
@@ -350,7 +344,7 @@ function escHtml(s) {
 /* saveLocal(key, val) — sauvegarde une valeur (objet JSON) sous la clé 'wos_' + key */
 function saveLocal(key, val) {
   try {
-    localStorage.setItem('wos_' + key, JSON.stringify(val));
+    localStorage.setItem('wos_' + key, JSON.stringify(val)); //convertit un objet JS en chaine de texte pour sto
   } catch(e) {
     // Si localStorage est indisponible (mode privé, quota dépassé), on ignore silencieusement
   }
@@ -375,10 +369,6 @@ function loadLocal(key) {
   ENVELOPES — objet contenant les caractéristiques fiscales
   de chaque type d'enveloppe (PEA, AV, CTO, PER).
   
-  Pour chaque enveloppe :
-  - tauxImpot : taux d'impôt sur le revenu applicable aux gains
-  - tauxPS    : taux de prélèvements sociaux (17,2%)
-  - plafond   : montant max de versements autorisé
 */
 const ENVELOPES = {
   pea: {
@@ -435,13 +425,7 @@ const ENVELOPES = {
 /*
   applyEnvelopeFiscality(...) — calcule le capital net d'impôts
   selon l'enveloppe fiscale choisie.
-  
-  Paramètres :
-  - capitalBrut  : capital final avant impôts
-  - totalVerse   : somme totale versée (capital initial + versements mensuels)
-  - envelopeId   : identifiant de l'enveloppe ('pea', 'av', 'cto', 'per')
-  - tmi          : taux marginal d'imposition du contribuable
-  - years        : durée de l'investissement en années
+
   
   Retourne : capital net après application de la fiscalité
 */
