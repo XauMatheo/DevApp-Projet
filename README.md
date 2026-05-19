@@ -1,4 +1,4 @@
-Wealth OS est une application web interactive de gestion et de simulation de patrimoine. Elle permet aux utilisateurs de piloter leurs finances personnelles avec précision grâce à des outils de simulation en temps réel, des analyses de portefeuille et des projections de retraite.
+Wealth OS est une application web interactive de gestion et de simulation de patrimoine. Elle permet aux utilisateurs de piloter leurs finances personnelles avec précision grâce à des outils de simulation en temps réel, des analyses ou encore des projections de portefeuille.
 
 
 --------------------------------------------------
@@ -21,11 +21,11 @@ Fonctionnalités principales
 
 - Simulateur d'Investissement : Calculez l'évolution de votre capital en fonction de vos versements mensuels, du taux de rendement et de l'inflation.
 
-- Planification Retraite : Projetez le capital nécessaire pour vos vieux jours.
+- Planification Retraite : Projetez le capital nécessaire pour vos derniers jours.
 
 - Bilan Patrimonial : Analysez vos actifs et passifs pour obtenir votre valeur nette.
 
-- Gestion de Budget : Suivez vos revenus et dépenses mensuelles pour calculer votre "reste à vivre".
+- Gestion de Budget : Suivez vos revenus et dépenses mensuelles pour calculer vos fin de mois.
 
 - Optimisation fiscale : Comparaison des enveloppes fiscales françaises (PEA, Assurance-vie, CTO, PER) avec application automatique des fiscalités respectives sur les gains.
 
@@ -42,7 +42,7 @@ Outils et Technologies utilisés
 
 - Chart.js : Bibliothèque utilisée pour générer tous les graphiques interactifs (évolution du capital, multi-taux, allocation d'actifs).
 
-- Google Fonts : Utilisation des polices Outfit, Syne, DM Mono et Inter pour une typographie soignée.
+- Google Fonts : Utilisation des polices Outfit, Syne, DM Mono et Inter pour une typographie originale.
 
 
 --------------------------------------------------
@@ -53,7 +53,7 @@ Pour lancer cette application localement, vous avez simplement besoin de :
 
 - Un navigateur web moderne (Chrome, Firefox, Edge ou Safari).
 
-- Le projet ne nécessite aucun serveur spécifique (Node.js ou autre) car il repose sur des technologies "Client-Side" pures.
+- Le projet ne nécessite aucun serveur spécifique. Tout est réalisé côté client.
 
 
 --------------------------------------------------
