@@ -2,12 +2,12 @@
 
 /*  VARIABLES GLOBALES 
 */
-let charts = {};            // Stocke tous les graphiques Chart.js créés (pour pouvoir les détruire)
+let charts = {};            // Stocke tous les graphiques Chart.js créés 
 let budgetItems = {         // Stocke les lignes du budget (revenus + dépenses)
   revenus: [],
   depenses: []
 };
-let _rendTaux = 7;          // Taux actif dans l'onglet "Détail annuel" (7% par défaut)
+let _rendTaux = 7;          // Taux actif dans l'onglet  Détail annuel (7% par défaut)
 let _investTabActive = 'evolution'; // Onglet de graphique actif dans la page Investissement
 
 
@@ -157,7 +157,7 @@ if (localStorage.getItem('wos_sidebar') === '1') {
 
 
 /* 
-   FONCTIONS UTILITAIRES (HELPERS)
+   FONCTIONS UTILITAIRES
 */
 
 /*
