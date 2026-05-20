@@ -84,7 +84,7 @@ function goPage(id) {
 
   // 6. Lancer la fonction d'initialisation de la page
   //    requestAnimationFrame attend que le navigateur ait terminé d'afficher
-  //    avant d'appeler la fonction (évite des problèmes avec les graphiques)
+  //    avant d'appeler la fonction de mise à jour
   requestAnimationFrame(function() {
     if (id === 'home')       refreshHome();
     if (id === 'invest')     updateInvest();
@@ -3376,7 +3376,7 @@ function renderLexique() {
 }
 
 
-/* ══ CALCULETTES DE L'ACADÉMIE ══ */
+/*CALCULETTES DE L'ACADÉMIE */
 
 /*
   switchCalcTab(tab, btn) — change l'onglet actif de la calculette.
